@@ -1,0 +1,98 @@
+.dialog {
+    background-color: #0008;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog form {
+    padding: 16px;
+    border-radius: 8px;
+    background-color: white;
+    color: black;
+    box-shadow: 0px 4px 8px #0004;
+}
+
+.dialog input[type=submit],
+button {
+    font-weight: bold;
+    font-size: 16px;
+    outline: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: none;
+    background: none;
+    color: inherit;
+    transition: background .3s linear;
+}
+
+.dialog input[type=submit]:hover,
+button:hover {
+    background-color: #fff2;
+}
+
+.dialog h2 {
+    text-align: center;
+}
+
+.moneySelect {
+    display: flex;
+    font-weight: bold;
+    align-items: center;
+    font-size: 20px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border-bottom: 2px solid #0008;
+    color: white;
+    background: linear-gradient(#5d813d, #476b3b);
+}
+
+.moneySelect input::-webkit-outer-spin-button,
+.moneySelect input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.moneySelect input {
+    background: none;
+    border: none;
+    flex-grow: 1;
+    margin-left: 8px;
+    text-align: center;
+    font-size: inherit;
+    color: inherit;
+    border-bottom: 2px solid #fff4;
+    -moz-appearance: textfield;
+}
+
+.AddPlayer form {
+    background: linear-gradient(#2582ec, #2553ec);
+    border-bottom: 2px solid #0008;
+    min-width: 196px;
+    min-height: 96px;
+    color: white;
+}
+
+.AddPlayer .name {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.AddPlayer .name input {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 22px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    border-bottom: 2px solid #fff8;
+}
