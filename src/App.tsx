@@ -30,7 +30,7 @@ export class App extends React.Component<{}, AppState> {
     render() {
         return (
             <div className="App">
-                <img src="/res/score.svg" height="64" />
+                {this.state.game === null && <img src="/res/score.svg" height="64" />}
                 {this.state.game === null
                     ? <div className="gameSelect">
                         <a href="#money" onClick={this.openGame.bind(this, 'money')}>Dinero</a>

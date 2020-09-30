@@ -1,0 +1,25 @@
+header {
+    display: flex;
+    height: 48px;
+    width: 100%;
+    box-shadow: 0 2px 2px #0004;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    background-color: white;
+}
+
+header a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    margin-right: 4px;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background ease .3s;
+}
+
+header a:hover {
+    background-color: #0004;
+}

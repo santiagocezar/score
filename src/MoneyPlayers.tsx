@@ -3,6 +3,7 @@ import './App.css';
 import { Map } from 'immutable';
 import { Player } from './types';
 import { MoneyInput, AddPlayer } from './Dialogs';
+import { Header } from './Header';
 
 interface MoneyState {
     players: Map<string, Player>;
@@ -14,8 +15,13 @@ interface MoneyState {
 export class MoneyPlayers extends React.Component<{}, MoneyState> {
     constructor(props: {}) {
         super(props);
+        let save = localStorage.getItem('save');
+        let players = Map<string, Player>();
+        if (save) {
+            players = Map(JSON.parse(save));
+        }
         this.state = {
-            players: Map(),
+            players,
             from: null,
             to: null,
             addingPlayer: false,
@@ -60,23 +66,28 @@ export class MoneyPlayers extends React.Component<{}, MoneyState> {
             return;
         }
 
-        this.setState(state => ({
-            players: state.players.update(
-                state.from,
-                player => ({
-                    ...player,
-                    money: player.money - money,
-                })
-            ).update(
-                state.to,
-                player => ({
-                    ...player,
-                    money: player.money + money,
-                })
-            ),
-            from: null,
-            to: null
-        }));
+        this.setState(state => {
+            let newState = {
+                players: state.players.update(
+                    state.from,
+                    player => ({
+                        ...player,
+                        money: player.money - money,
+                    })
+                ).update(
+                    state.to,
+                    player => ({
+                        ...player,
+                        money: player.money + money,
+                    })
+                ),
+                from: null,
+                to: null
+            };
+            localStorage.setItem('save', JSON.stringify(newState.players));
+            return newState;
+        });
+
     }
 
     render() {
@@ -100,15 +111,14 @@ export class MoneyPlayers extends React.Component<{}, MoneyState> {
             : 'banco';
         return (
             <div className="MoneyPlayers">
+                <Header>
+                    <a href="#" className="material-icons">group_add</a>
+                    <a href="#" className="material-icons">history</a>
+                </Header>
                 <ul>
                     {players}
                     <li className="player add" onClick={() => this.setState({ addingPlayer: true })}>Agregar {itemName}</li>
                 </ul>
-                <p>{this.state.from === null
-                    ? 'Ningún jugador seleccionado'
-                    : 'Jugador seleccionado:' + this.state.from}
-
-                </p>
 
                 {
                     this.state.addingPlayer &&
