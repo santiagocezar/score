@@ -48,6 +48,11 @@ export class AddPlayer extends React.Component<AddPlayerProps, {}> {
 
 
     handleSubmit(event: React.FormEvent) {
+        if (this.nameInput.current.value == '') {
+            alert('El jugador debe tener un nombre');
+            event.preventDefault();
+            return;
+        }
         this.props.callback(false, this.nameInput.current.value, Number(this.moneyInput.current.value));
         event.preventDefault();
     }

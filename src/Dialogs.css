@@ -96,3 +96,7 @@ button:hover {
     color: inherit;
     border-bottom: 2px solid #fff8;
 }
+
+.AddPlayer .name input::placeholder {
+    color: #fff8;
+}

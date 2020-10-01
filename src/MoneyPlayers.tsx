@@ -52,17 +52,23 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
             return;
         }
         console.log(`Agregar jugador ${name} con $${money}`);
-        this.setState(state => ({
-            players: state.players.update(
-                name,
-                _ => ({
+        this.setState(state => {
+            let newState = {
+                players: state.players.update(
                     name,
-                    money,
-                })
-            ),
-            addingPlayer: false
-        }));
+                    _ => ({
+                        name,
+                        money,
+                    })
+                ),
+                addingPlayer: false
+            };
+            this.save(newState);
+            return newState;
+        });
     }
+
+    save = (state) => localStorage.setItem('save', JSON.stringify(state.players));
 
     sendMoney(cancelled: boolean, money: number) {
         if (cancelled) {
@@ -91,7 +97,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                 from: null,
                 to: null
             };
-            localStorage.setItem('save', JSON.stringify(newState.players));
+            this.save(newState);
             return newState;
         });
     }

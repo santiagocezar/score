@@ -44,7 +44,7 @@ export class App extends React.Component<{}, AppState> {
                     </div>
                     : <MoneyPlayers home={this.openGame.bind(this, null)} />
                 }
-                <p>Score beta hecho por <a href="https://">Santi Cézar</a></p>
+                <p>Score beta hecho por <a href="https://scez.ar">Santi Cézar</a></p>
             </div >
         );
     }
