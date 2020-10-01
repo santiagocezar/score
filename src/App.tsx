@@ -36,7 +36,7 @@ export class App extends React.Component<{}, AppState> {
                         <a href="#money" onClick={this.openGame.bind(this, 'money')}>Dinero</a>
                         <a href="#cards" onClick={this.openGame.bind(this, 'cards')}>Puntos</a>
                     </div>
-                    : <MoneyPlayers />
+                    : <MoneyPlayers home={this.openGame.bind(this, null)} />
                 }
                 <p>Score beta hecho por <a href="https://">Santi Cézar</a></p>
             </div>

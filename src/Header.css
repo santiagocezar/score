@@ -23,3 +23,28 @@ header a {
 header a:hover {
     background-color: #0004;
 }
+
+.Sidebar {
+    display: block;
+    position: fixed;
+    top: 56px;
+    right: 8px;
+    transform: translateX(calc(100% + 16px));
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 2px 4px #0004;
+    z-index: 3;
+    height: calc(100% - 64px);
+    width: 432px;
+    transition: transform cubic-bezier(1, 0, 0, 1) .3s;
+}
+
+.Sidebar.open {
+    transform: translateX(0);
+}
+
+@media only screen and (max-width: 768px) {
+    .Sidebar {
+        width: calc(100% - 16px);
+    }
+}
