@@ -6,6 +6,7 @@
     align-content: space-around;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .MoneyPlayers>ul {
@@ -15,6 +16,7 @@
     flex-wrap: wrap;
     flex-grow: 1;
     display: flex;
+    overflow: auto;
 }
 
 .player {
@@ -68,6 +70,7 @@
     padding: 9px 12px;
 }
 
+.history,
 .rankings {
     display: flex;
     flex-direction: column;
@@ -75,6 +78,7 @@
     list-style: none;
 }
 
+.history li,
 .rankings li {
     display: flex;
     flex-direction: row;
@@ -82,9 +86,23 @@
     border-bottom: 1px solid #0004;
 }
 
+.history li div,
 .rankings li div {
     display: flex;
     flex-direction: column;
+}
+
+.history li div {
+    margin: 8px;
+}
+
+.history .empty {
+    text-align: center;
+    display: none;
+}
+
+.history .empty:first-child {
+    display: inline;
 }
 
 .rankings .rank {
@@ -122,10 +140,12 @@
     color: black;
 }
 
+.history .name,
 .rankings .name {
     font-size: 22px;
 }
 
+.history .pts,
 .rankings .pts {
     font-size: 12px;
 }

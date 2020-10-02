@@ -6,6 +6,7 @@ import { Player } from './types';
 import { MoneyInput, AddPlayer } from './Dialogs';
 import { Header, Sidebar } from './Header';
 
+interface Transaction { action: string; money: number; id: number; }
 interface MoneyState {
     players: Map<string, Player>;
     from: string;
@@ -13,8 +14,9 @@ interface MoneyState {
     addingPlayer: boolean;
     historyOpen: boolean;
     rankOpen: boolean;
-    rankings: Array<Player>;
+    transactions: Array<Transaction>;
 }
+
 
 export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneyState> {
     constructor(props) {
@@ -31,7 +33,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
             addingPlayer: false,
             historyOpen: false,
             rankOpen: false,
-            rankings: []
+            transactions: [],
         };
     }
 
@@ -79,6 +81,12 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
             return;
         }
 
+        let t: Transaction = {
+            action: this.state.from + ' a ' + this.state.to,
+            money,
+            id: this.state.transactions.length
+        };
+
         this.setState(state => {
             let newState = {
                 players: state.players.update(
@@ -95,7 +103,8 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                     })
                 ),
                 from: null,
-                to: null
+                to: null,
+                transactions: [...state.transactions, t]
             };
             this.save(newState);
             return newState;
@@ -139,6 +148,18 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                 </li>
             ));
         });
+        let transactions = [];
+        for (let t of this.state.transactions) {
+            transactions.push((
+                <li key={t.id}>
+                    <div>
+                        <span className="name">{t.action}</span>
+                        <span className="pts">${t.money}</span>
+                    </div>
+                </li>
+            ));
+        }
+
         let itemName = players.length > 0
             ? 'jugador'
             : 'banco';
@@ -163,6 +184,12 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                         }
                     } >poll</a>
                 </Header>
+                <Sidebar open={this.state.historyOpen}>
+                    <ul className="history">
+                        {transactions.reverse()}
+                        <p className="empty">Historial vacío.</p>
+                    </ul>
+                </Sidebar>
                 <Sidebar open={this.state.rankOpen}>
                     <ul className="rankings">
                         {rankings}

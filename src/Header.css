@@ -37,6 +37,7 @@ header a:hover {
     height: calc(100% - 64px);
     width: 432px;
     transition: transform cubic-bezier(1, 0, 0, 1) .3s;
+    overflow: auto;
 }
 
 .Sidebar.open {
