@@ -1,7 +1,8 @@
 #!/bin/sh
 build() {
     echo [`date +%H:%M:%S`] Building App...
-    node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/index.js '--define:process.env.NODE_ENV="development"'
+    node_modules/.bin/sass src/index.scss dist/index.css
+    node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/index.js --sourcemap '--define:process.env.NODE_ENV="development"'
     cp -r res dist/
 }
 export -f build

@@ -1,5 +1,4 @@
 import React from 'react';
-import './Header.css';
 
 export class Sidebar extends React.Component<{ open: boolean; }> {
     render() {

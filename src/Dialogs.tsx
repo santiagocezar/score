@@ -1,5 +1,4 @@
 import React from 'react';
-import './Dialogs.css';
 
 interface MoneyInputProps {
     from: string;
@@ -74,6 +73,50 @@ export class AddPlayer extends React.Component<AddPlayerProps, {}> {
                         $
                         <input type="number" ref={this.moneyInput} />
                     </label>
+                    <br />
+                    <input type="submit" value="AGREGAR" /> <button onClick={this.cancel.bind(this)}>CANCELAR</button>
+                </form>
+            </div>
+        );
+    }
+}
+
+interface AddSimpleProps {
+    callback: (cancelled: boolean, name: string) => void;
+}
+
+export class AddSimple extends React.Component<AddSimpleProps, {}> {
+    nameInput = React.createRef<HTMLInputElement>();
+
+    handleSubmit(event: React.FormEvent) {
+        if (this.nameInput.current.value == '' ||
+            this.nameInput.current.value.length != 3) {
+            alert('El jugador debe tener un nombre de 3 letras');
+            event.preventDefault();
+            return;
+        }
+        this.props.callback(false, this.nameInput.current.value.toLocaleUpperCase());
+        event.preventDefault();
+    }
+
+    cancel(event) {
+        this.props.callback(true, null);
+    };
+
+    render() {
+        return (
+            <div className="dialog AddSimple">
+                <form onSubmit={this.handleSubmit.bind(this)}>
+                    <label className="name">
+                        Nombre
+                    <br />
+                        <input
+                            type="text" maxLength={3}
+                            placeholder="---" size={3}
+                            ref={this.nameInput}
+                        />
+                    </label>
+                    <br />
                     <br />
                     <input type="submit" value="AGREGAR" /> <button onClick={this.cancel.bind(this)}>CANCELAR</button>
                 </form>

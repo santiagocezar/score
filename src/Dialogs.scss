@@ -100,3 +100,22 @@ button:hover {
 .AddPlayer .name input::placeholder {
     color: #fff8;
 }
+
+.AddSimple {
+    text-align: center;
+}
+
+.AddSimple .name input {
+    display: inline;
+    flex-direction: column;
+    font-weight: lighter;
+    font-size: 38px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: "Roboto Mono", monospace;
+    border-bottom: 2px solid #0008;
+}

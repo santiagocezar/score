@@ -1,23 +1,20 @@
 import React from 'react';
 import { Map } from 'immutable';
 import { Player } from './types';
-import { MoneyInput, AddPlayer } from './Dialogs';
+import { AddSimple } from './Dialogs';
 import { Header, Sidebar } from './Header';
 
 interface Transaction { action: string; money: number; id: number; }
-interface MoneyState {
+interface SheetState {
     players: Map<string, Player>;
-    from: string;
-    to: string;
     addingPlayer: boolean;
-    historyOpen: boolean;
     rankOpen: boolean;
     transactions: Array<Transaction>;
 }
 
-const SAVE_NAME = 'moneysave';
+const SAVE_NAME = 'sheetsave';
 
-export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneyState> {
+export class ScoreSheet extends React.Component<{ home: () => void; }, SheetState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
@@ -27,39 +24,30 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
         }
         this.state = {
             players,
-            from: null,
-            to: null,
             addingPlayer: false,
-            historyOpen: false,
             rankOpen: false,
             transactions: [],
         };
     }
 
     clickPlayer(player: string) {
-        if (this.state.from == null) {
-            this.setState({ from: player });
-        }
-        else {
-            this.setState({ to: player });
-        }
     }
 
-    addPlayer(cancelled: boolean, name: string, money: number) {
+    addPlayer(cancelled: boolean, name: string) {
         if (cancelled) {
             this.setState(state => ({
                 addingPlayer: false
             }));
             return;
         }
-        console.log(`Agregar jugador ${name} con $${money}`);
+        console.log(`Agregar jugador ${name}`);
         this.setState(state => {
             let newState = {
                 players: state.players.update(
                     name,
                     _ => ({
                         name,
-                        score: money,
+                        score: 0,
                     })
                 ),
                 addingPlayer: false
@@ -72,42 +60,6 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
     save = (state) => localStorage.setItem(SAVE_NAME, JSON.stringify(state.players));
 
     sendMoney(cancelled: boolean, money: number) {
-        if (cancelled) {
-            this.setState(state => ({
-                from: null,
-                to: null
-            }));
-            return;
-        }
-
-        let t: Transaction = {
-            action: this.state.from + ' a ' + this.state.to,
-            money,
-            id: this.state.transactions.length
-        };
-
-        this.setState(state => {
-            let newState = {
-                players: state.players.update(
-                    state.from,
-                    player => ({
-                        ...player,
-                        money: player.score - money,
-                    })
-                ).update(
-                    state.to,
-                    player => ({
-                        ...player,
-                        money: player.score + money,
-                    })
-                ),
-                from: null,
-                to: null,
-                transactions: [...state.transactions, t]
-            };
-            this.save(newState);
-            return newState;
-        });
     }
 
     getRankings() {
@@ -122,16 +74,9 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
     render() {
         let players = [];
         this.state.players.forEach((v, k) => {
-            let className = 'player';
-            if (this.state.from == v.name) {
-                className += ' from';
-            }
-            if (this.state.to == v.name) {
-                className += ' to';
-            }
             players.push((
-                <li className={className} key={k} onClick={this.clickPlayer.bind(this, k)}>
-                    {v.name}<span>${v.score}</span>
+                <li className='player' key={k} onClick={this.clickPlayer.bind(this, k)}>
+                    {v.name}<span>{v.score}</span>
                 </li>
             ));
         });
@@ -142,7 +87,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                     <span className="rank">{rank + 1}°</span>
                     <div>
                         <span className="name">{players.name}</span>
-                        <span className="pts">${players.score}</span>
+                        <span className="pts">{players.score}</span>
                     </div>
                 </li>
             ));
@@ -171,24 +116,11 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                     <a href="#" className="material-icons" onClick={
                         () => {
                             this.setState(state => (
-                                { historyOpen: !state.historyOpen, rankOpen: false }
-                            ));
-                        }
-                    } >history</a>
-                    <a href="#" className="material-icons" onClick={
-                        () => {
-                            this.setState(state => (
-                                { historyOpen: false, rankOpen: !state.rankOpen }
+                                { rankOpen: !state.rankOpen }
                             ));
                         }
                     } >poll</a>
                 </Header>
-                <Sidebar open={this.state.historyOpen}>
-                    <ul className="history">
-                        {transactions.reverse()}
-                        <p className="empty">Historial vacío.</p>
-                    </ul>
-                </Sidebar>
                 <Sidebar open={this.state.rankOpen}>
                     <ul className="rankings">
                         {rankings}
@@ -201,11 +133,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
 
                 {
                     this.state.addingPlayer &&
-                    <AddPlayer itemName={itemName} callback={this.addPlayer.bind(this)} />
-                }
-                {
-                    this.state.to !== null &&
-                    <MoneyInput from={this.state.from} to={this.state.to} callback={this.sendMoney.bind(this)} />
+                    <AddSimple callback={this.addPlayer.bind(this)} />
                 }
             </div>
         );

@@ -1,6 +1,6 @@
 import React from 'react';
-import './App.css';
 import { MoneyPlayers } from './MoneyPlayers';
+import { ScoreSheet } from './ScoreSheet';
 
 type CardProps = { src: string; action: () => void; };
 const Card: React.FunctionComponent<CardProps> = (props) => <a href="#" onClick={props.action}>
@@ -22,27 +22,29 @@ export class App extends React.Component<{}, AppState> {
     }
 
     openGame(game: string, event: React.MouseEvent) {
-        if (game == 'cards') {
-            alert('no esta implementado jsjsjsj');
-        }
-        else {
-            this.setState({
-                game
-            });
-        }
+        this.setState({
+            game
+        });
         event.preventDefault();
     }
 
     render() {
         return (
             <div className="App">
-                {this.state.game === null && <img src="/res/score.svg" height="64" />}
-                {this.state.game === null
-                    ? <div className="gameSelect">
-                        <Card src="res/money.svg" action={this.openGame.bind(this, 'money')}>Dinero</Card>
-                        <Card src="res/cards.svg" action={this.openGame.bind(this, 'cards')}>Puntos</Card>
-                    </div>
-                    : <MoneyPlayers home={this.openGame.bind(this, null)} />
+                {this.state.game === null &&
+                    <>
+                        <img src="/res/score.svg" height="64" />
+                        <div className="gameSelect">
+                            <Card src="res/money.svg" action={this.openGame.bind(this, 'money')}>Dinero</Card>
+                            <Card src="res/cards.svg" action={this.openGame.bind(this, 'cards')}>Puntos</Card>
+                        </div>
+                    </>
+                }
+                {this.state.game === 'money' &&
+                    <MoneyPlayers home={this.openGame.bind(this, null)} />
+                }
+                {this.state.game === 'cards' &&
+                    <ScoreSheet home={this.openGame.bind(this, null)} />
                 }
                 <p>Score beta hecho por <a href="https://scez.ar">Santi Cézar</a></p>
             </div >
