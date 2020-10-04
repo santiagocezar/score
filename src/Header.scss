@@ -8,20 +8,20 @@ header {
     justify-content: space-between;
     padding: 0;
     background-color: white;
-}
 
-header a {
-    display: block;
-    text-decoration: none;
-    color: black;
-    margin-right: 4px;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background ease .3s;
-}
+    a {
+        display: block;
+        text-decoration: none;
+        color: black;
+        margin-right: 4px;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background ease .3s;
 
-header a:hover {
-    background-color: #0004;
+        &:hover {
+            background-color: #0004;
+        }
+    }
 }
 
 .Sidebar {
@@ -38,14 +38,12 @@ header a:hover {
     width: 432px;
     transition: transform cubic-bezier(1, 0, 0, 1) .3s;
     overflow: auto;
-}
 
-.Sidebar.open {
-    transform: translateX(0);
-}
+    &.open {
+        transform: translateX(0);
+    }
 
-@media only screen and (max-width: 768px) {
-    .Sidebar {
+    @media only screen and (max-width: 768px) {
         width: calc(100% - 16px);
     }
 }

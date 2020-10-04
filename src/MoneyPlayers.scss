@@ -7,17 +7,18 @@
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+
+    >ul {
+        list-style: none;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        display: flex;
+        overflow: auto;
+    }
 }
 
-.MoneyPlayers>ul {
-    list-style: none;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    flex-grow: 1;
-    display: flex;
-    overflow: auto;
-}
 
 .player {
     background: linear-gradient(#2582ec, #2553ec);
@@ -34,40 +35,40 @@
     box-shadow: 0px 4px 8px #0004;
     border-bottom: 2px solid #0008;
     transition: box-shadow ease .3s, transform ease .3s;
-}
 
-.player:hover {
-    box-shadow: 0px 6px 12px #0004;
-    transform: translateY(-2px);
-}
+    &:hover {
+        box-shadow: 0px 6px 12px #0004;
+        transform: translateY(-2px);
+    }
 
-.player.from {
-    box-shadow: 0px 8px 16px #f008;
-    transform: translateY(-4px);
-}
+    &.from {
+        box-shadow: 0px 8px 16px #f008;
+        transform: translateY(-4px);
+    }
 
-.player.to {
-    box-shadow: 0px 8px 16px #0f08;
-    transform: translateY(-4px);
-}
+    &.to {
+        box-shadow: 0px 8px 16px #0f08;
+        transform: translateY(-4px);
+    }
 
-.player span {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
-}
+    span {
+        display: block;
+        font-size: 12px;
+        font-weight: 900;
+    }
 
-.player:first-child {
-    background: linear-gradient(#5d813d, #476b3b);
-}
+    &:first-child {
+        background: linear-gradient(#5d813d, #476b3b);
+    }
 
-.player.add {
-    background: none;
-    color: #444;
-    border: 2px dashed #0004;
-    box-shadow: none;
-    font-size: 12px;
-    padding: 9px 12px;
+    &.add {
+        background: none;
+        color: #444;
+        border: 2px dashed #0004;
+        box-shadow: none;
+        font-size: 12px;
+        padding: 9px 12px;
+    }
 }
 
 .history,
@@ -76,20 +77,26 @@
     flex-direction: column;
     padding: 16px;
     list-style: none;
-}
 
-.history li,
-.rankings li {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border-bottom: 1px solid #0004;
-}
+    li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-bottom: 1px solid #0004;
 
-.history li div,
-.rankings li div {
-    display: flex;
-    flex-direction: column;
+        div {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .name {
+        font-size: 22px;
+    }
+
+    .pts {
+        font-size: 12px;
+    }
 }
 
 .history li div {
@@ -99,53 +106,37 @@
 .history .empty {
     text-align: center;
     display: none;
+
+    &:first-child {
+        display: inline;
+    }
 }
 
-.history .empty:first-child {
-    display: inline;
+@mixin medal($place, $color, $shadow) {
+    li:nth-child(1) .rank {
+        background-color: $color;
+        border-color: $color;
+        box-shadow: 0px 2px 8px $shadow;
+        color: black;
+    }
 }
 
-.rankings .rank {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    margin: 8px;
-    border-radius: 100%;
-    border: 1px solid #555;
-    font-weight: bold;
-    font-size: 24px;
-    color: #555;
-}
+.rankings {
+    .rank {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin: 8px;
+        border-radius: 100%;
+        border: 1px solid #555;
+        font-weight: bold;
+        font-size: 24px;
+        color: #555;
+    }
 
-.rankings li:nth-child(1) .rank {
-    background-color: gold;
-    border-color: gold;
-    box-shadow: 0px 2px 8px yellow;
-    color: black;
-}
-
-.rankings li:nth-child(2) .rank {
-    box-shadow: 0px 2px 8px cyan;
-    background-color: dodgerblue;
-    border-color: dodgerblue;
-    color: black;
-}
-
-.rankings li:nth-child(3) .rank {
-    background-color: tomato;
-    border-color: tomato;
-    box-shadow: 0px 2px 8px orange;
-    color: black;
-}
-
-.history .name,
-.rankings .name {
-    font-size: 22px;
-}
-
-.history .pts,
-.rankings .pts {
-    font-size: 12px;
+    @include medal(1, gold, yellow);
+    @include medal(2, dodgerblue, cyan);
+    @include medal(3, tomato, orange);
 }
