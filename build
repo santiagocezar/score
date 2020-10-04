@@ -5,7 +5,23 @@ build() {
     node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/index.js --sourcemap '--define:process.env.NODE_ENV="development"'
     cp -r res dist/
 }
-export -f build
 
 build
-inotifywait -e modify -qmr src/ | xargs -L 1 -- bash -c 'build'
+
+# VSCode touches a file two times when saving, making the
+# script run twice. So the script only runs when BUILD_COUNT
+# is an even number.
+# 
+# For more info read here https://github.com/microsoft/vscode/issues/9419
+
+BUILD_COUNT=0
+
+inotifywait -e modify -qmr src/ | \
+while read l
+do
+    (( BUILD_COUNT=$BUILD_COUNT + 1 ))
+    
+    if (( $BUILD_COUNT % 2 )); then
+        build
+    fi
+done
