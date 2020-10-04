@@ -60,6 +60,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                     _ => ({
                         name,
                         score: money,
+                        prevScore: []
                     })
                 ),
                 addingPlayer: false

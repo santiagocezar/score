@@ -48,6 +48,7 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
                     _ => ({
                         name,
                         score: 0,
+                        prevScore: []
                     })
                 ),
                 addingPlayer: false
@@ -72,14 +73,6 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
     };
 
     render() {
-        let players = [];
-        this.state.players.forEach((v, k) => {
-            players.push((
-                <li className='player' key={k} onClick={this.clickPlayer.bind(this, k)}>
-                    {v.name}<span>{v.score}</span>
-                </li>
-            ));
-        });
         let rankings = [];
         this.getRankings().forEach((players, rank) => {
             rankings.push((
@@ -92,23 +85,29 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
                 </li>
             ));
         });
-        let transactions = [];
-        for (let t of this.state.transactions) {
-            transactions.push((
-                <li key={t.id}>
-                    <div>
-                        <span className="name">{t.action}</span>
-                        <span className="pts">${t.money}</span>
-                    </div>
-                </li>
-            ));
-        }
 
-        let itemName = players.length > 0
-            ? 'jugador'
-            : 'banco';
+        let names = [];
+        let prev = [];
+        let totals = [];
+        this.state.players.forEach((v: Player, k) => {
+            names.push(<span key={k}>{v.name}</span>);
+
+            let col = [];
+            for (let s of v.prevScore) {
+                col.push(<span key={col.length}>s</span>);
+            }
+
+            col.push(
+                <span className="material-icons">add</span>
+            );
+
+            prev.push(<div className="col">{col}</div>);
+
+            totals.push(<span key={k}>{v.score}</span>);
+        });
+
         return (
-            <div className="MoneyPlayers">
+            <div className="ScoreSheet">
                 <Header home={this.props.home}>
                     <a href="#" className="material-icons" onClick={
                         () => { this.setState({ players: Map() }); }
@@ -126,10 +125,21 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
                         {rankings}
                     </ul>
                 </Sidebar>
-                <ul>
-                    {players}
-                    <li className="player add" onClick={() => this.setState({ addingPlayer: true })}>Agregar {itemName}</li>
-                </ul>
+
+                <div className="sheet">
+                    <div className="names">
+                        {names}
+                        <span className="material-icons" onClick={() => this.setState({ addingPlayer: true })}>add</span>
+                    </div>
+                    <div className="prev">
+                        {prev}
+                        <div className="col"></div>
+                    </div>
+                    <div className="totals">
+                        {totals}
+                        <span></span>
+                    </div>
+                </div>
 
                 {
                     this.state.addingPlayer &&
