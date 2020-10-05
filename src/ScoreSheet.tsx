@@ -1,15 +1,15 @@
 import React from 'react';
 import { Map } from 'immutable';
 import { Player } from './types';
-import { AddSimple } from './Dialogs';
+import { AddSimple, AddScore } from './Dialogs';
 import { Header, Sidebar } from './Header';
 
 interface Transaction { action: string; money: number; id: number; }
 interface SheetState {
     players: Map<string, Player>;
     addingPlayer: boolean;
+    addingScore: string;
     rankOpen: boolean;
-    transactions: Array<Transaction>;
 }
 
 const SAVE_NAME = 'sheetsave';
@@ -25,12 +25,9 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
         this.state = {
             players,
             addingPlayer: false,
+            addingScore: null,
             rankOpen: false,
-            transactions: [],
         };
-    }
-
-    clickPlayer(player: string) {
     }
 
     addPlayer(cancelled: boolean, name: string) {
@@ -60,12 +57,30 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
 
     save = (state) => localStorage.setItem(SAVE_NAME, JSON.stringify(state.players));
 
-    sendMoney(cancelled: boolean, money: number) {
+    addScore(cancelled: boolean, player: string, score: number) {
+        if (cancelled)
+            return;
+
+
+        this.setState(state => {
+            let newState = {
+                players: state.players.update(
+                    player,
+                    p => ({
+                        ...p,
+                        prevScore: [...p.prevScore, score],
+                        score: p.score + score,
+                    })
+                ),
+                addingScore: null
+            };
+            this.save(newState);
+            return newState;
+        });
     }
 
     getRankings() {
-        let actualPlayers = this.state.players.slice(1); // El banco no cuenta
-        let rankings = Array.from(actualPlayers.values());
+        let rankings = Array.from(this.state.players.values());
 
         rankings.sort((a, b) => b.score - a.score); // Ordenar por el dinero
 
@@ -94,11 +109,14 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
 
             let col = [];
             for (let s of v.prevScore) {
-                col.push(<span key={col.length}>s</span>);
+                col.push(<span key={col.length}>{s}</span>);
             }
 
             col.push(
-                <span className="material-icons">add</span>
+                <span
+                    className="material-icons"
+                    onClick={() => this.setState({ addingScore: v.name })}
+                >add</span>
             );
 
             prev.push(<div className="col">{col}</div>);
@@ -131,9 +149,11 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
                         {names}
                         <span className="material-icons" onClick={() => this.setState({ addingPlayer: true })}>add</span>
                     </div>
-                    <div className="prev">
-                        {prev}
-                        <div className="col"></div>
+                    <div className="prevWrapper">
+                        <div className="prev">
+                            {prev}
+                            <div className="col"></div>
+                        </div>
                     </div>
                     <div className="totals">
                         {totals}
@@ -144,6 +164,10 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
                 {
                     this.state.addingPlayer &&
                     <AddSimple callback={this.addPlayer.bind(this)} />
+                }
+                {
+                    this.state.addingScore !== null &&
+                    <AddScore name={this.state.addingScore} callback={this.addScore.bind(this)} />
                 }
             </div>
         );

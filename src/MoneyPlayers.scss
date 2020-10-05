@@ -114,7 +114,7 @@
 }
 
 @mixin medal($place, $color, $shadow) {
-    li:nth-child(1) .rank {
+    li:nth-child(#{$place}) .rank {
         background-color: $color;
         border-color: $color;
         box-shadow: 0px 2px 8px $shadow;

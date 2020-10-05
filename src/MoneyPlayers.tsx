@@ -93,13 +93,13 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
                     state.from,
                     player => ({
                         ...player,
-                        money: player.score - money,
+                        score: player.score - money,
                     })
                 ).update(
                     state.to,
                     player => ({
                         ...player,
-                        money: player.score + money,
+                        score: player.score + money,
                     })
                 ),
                 from: null,
