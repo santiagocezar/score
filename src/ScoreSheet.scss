@@ -35,7 +35,6 @@
         display: flex;
         flex-direction: column;
         flex-grow: 1;
-        height: 100%;
         min-height: 0;
         overflow: hidden;
 
@@ -133,5 +132,6 @@
             font-size: 12px;
             padding: 9px 12px;
         }
+
     }
 }

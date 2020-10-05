@@ -114,7 +114,12 @@ export class AddSimple extends React.Component
                         <input
                             type="text" maxLength={3}
                             placeholder="---" size={3}
-                            ref={this.nameInput}
+                            ref={this.nameInput} autoFocus
+                            onKeyDown={e => {
+                                if (e.key === 'Escape') {
+                                    this.cancel(e);
+                                }
+                            }}
                         />
                     </label>
                     <br />
@@ -153,7 +158,12 @@ export class AddScore extends React.Component
                         <input
                             type="number"
                             placeholder="0" size={9}
-                            ref={this.scoreInput}
+                            ref={this.scoreInput} autoFocus
+                            onKeyDown={e => {
+                                if (e.key === 'Escape') {
+                                    this.cancel(e);
+                                }
+                            }}
                         />
                     </label>
                     <br />
