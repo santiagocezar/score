@@ -17,7 +17,7 @@ interface MoneyState {
 
 const SAVE_NAME = 'moneysave';
 
-export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneyState> {
+export class MoneyPlayers extends React.Component<{}, MoneyState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
@@ -165,7 +165,7 @@ export class MoneyPlayers extends React.Component<{ home: () => void; }, MoneySt
             : 'banco';
         return (
             <div className="MoneyPlayers">
-                <Header home={this.props.home}>
+                <Header>
                     <a href="#" className="material-icons" onClick={
                         () => { this.setState({ players: Map() }); }
                     } >group_add</a>

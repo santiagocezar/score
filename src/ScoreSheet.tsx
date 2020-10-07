@@ -14,7 +14,7 @@ interface SheetState {
 
 const SAVE_NAME = 'sheetsave';
 
-export class ScoreSheet extends React.Component<{ home: () => void; }, SheetState> {
+export class ScoreSheet extends React.Component<{}, SheetState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
@@ -126,7 +126,7 @@ export class ScoreSheet extends React.Component<{ home: () => void; }, SheetStat
 
         return (
             <div className="ScoreSheet">
-                <Header home={this.props.home}>
+                <Header>
                     <a href="#" className="material-icons" onClick={
                         () => { this.setState({ players: Map() }); }
                     } >group_add</a>

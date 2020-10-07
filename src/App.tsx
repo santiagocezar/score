@@ -1,53 +1,65 @@
 import React from 'react';
+import { render } from 'react-dom';
 import { MoneyPlayers } from './MoneyPlayers';
 import { ScoreSheet } from './ScoreSheet';
+import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom';
 
-type CardProps = { src: string; action: () => void; };
-const Card: React.FunctionComponent<CardProps> = (props) => <a href="#" onClick={props.action}>
-    <img src={props.src} />
-    {props.children}
-</a>;
-
-interface AppState {
-    game: string;
+type CardProps = {
+    src: string;
+    name: string;
+    to: string;
+    description: string;
+};
+class Card extends React.Component<CardProps>{
+    render() {
+        return (
+            <Link to={this.props.to}>
+                <img src={this.props.src} />
+                <div>
+                    <h2>{this.props.name}</h2>
+                    <p>{this.props.description}</p>
+                </div>
+            </Link>
+        );
+    }
 }
-
-export class App extends React.Component<{}, AppState> {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            game: null
-        };
-    }
-
-    openGame(game: string, event: React.MouseEvent) {
-        this.setState({
-            game
-        });
-        event.preventDefault();
-    }
+export class App extends React.Component {
 
     render() {
         return (
-            <div className="App">
-                {this.state.game === null &&
-                    <>
-                        <img src="/res/score.svg" height="64" />
-                        <div className="gameSelect">
-                            <Card src="res/money.svg" action={this.openGame.bind(this, 'money')}>Dinero</Card>
-                            <Card src="res/cards.svg" action={this.openGame.bind(this, 'cards')}>Puntos</Card>
-                        </div>
-                    </>
-                }
-                {this.state.game === 'money' &&
-                    <MoneyPlayers home={this.openGame.bind(this, null)} />
-                }
-                {this.state.game === 'cards' &&
-                    <ScoreSheet home={this.openGame.bind(this, null)} />
-                }
-                <p>Score beta hecho por <a href="https://scez.ar">Santi Cézar</a></p>
-            </div >
+            <Router>
+                <div className="App">
+                    <Switch>
+                        <Route path="/" exact>
+                            <img src="/res/score.svg" height="64" />
+                            <div className="gameSelect">
+                                <Card
+                                    src="res/money.svg"
+                                    name="Dinero"
+                                    to="/money"
+                                    description="Para juegos en donde hay un banco 
+                                     y cada jugador tiene su propio dinero. 
+                                     Acepta transferencias y rankings"
+                                />
+                                <Card
+                                    src="res/cards.svg"
+                                    name="Tabla"
+                                    to="/sheet"
+                                    description="Planilla de puntaje tradicional. 
+                                    Recomendada para juegos de cartas"
+                                />
+                            </div>
+                        </Route>
+                        <Route path="/money">
+                            <MoneyPlayers />
+                        </Route>
+                        <Route path="/sheet">
+                            <ScoreSheet />
+                        </Route>
+                    </Switch>
+                    <p>Score beta hecho por <a href="https://scez.ar">Santi Cézar</a></p>
+                </div >
+            </Router>
         );
     }
 };;

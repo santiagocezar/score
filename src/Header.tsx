@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export class Sidebar extends React.Component<{ open: boolean; }> {
     render() {
@@ -13,11 +14,13 @@ export class Sidebar extends React.Component<{ open: boolean; }> {
         );
     }
 }
-export class Header extends React.Component<{ home: () => void; }> {
+export class Header extends React.Component {
     render() {
         return (
             <header>
-                <img src="/res/score.svg" height="48" onClick={this.props.home} />
+                <Link to="/" className="material-icons">
+                    arrow_back
+                </Link>
                 <nav>
                     {this.props.children}
                 </nav>
