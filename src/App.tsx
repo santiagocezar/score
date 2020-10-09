@@ -1,8 +1,7 @@
 import React from 'react';
-import { render } from 'react-dom';
-import { MoneyPlayers } from './MoneyPlayers';
-import { ScoreSheet } from './ScoreSheet';
 import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom';
+import MoneyPlayers from './MoneyPlayers';
+import ScoreSheet from './ScoreSheet';
 
 type CardProps = {
     src: string;
@@ -10,11 +9,12 @@ type CardProps = {
     to: string;
     description: string;
 };
+
 class Card extends React.Component<CardProps>{
     render() {
         return (
             <Link to={this.props.to}>
-                <img src={this.props.src} />
+                <img src={this.props.src} alt={this.props.name} />
                 <div>
                     <h2>{this.props.name}</h2>
                     <p>{this.props.description}</p>
@@ -31,7 +31,7 @@ export class App extends React.Component {
                 <div className="App">
                     <Switch>
                         <Route path="/" exact>
-                            <img src="/res/score.svg" height="64" />
+                            <img src="/res/score.svg" height="64" alt="Score" />
                             <div className="gameSelect">
                                 <Card
                                     src="res/money.svg"
