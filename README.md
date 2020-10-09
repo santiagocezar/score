@@ -15,6 +15,6 @@ Para hacer una transacción haga click en el jugador/banco que entrega el dinero
 # TODO
 
 - [x] Historial funcional
-- [ ] Modo para juegos de cartas
-- [ ] Acciones comunes
+- [x] Modo para juegos de cartas
+- [x] Acciones comunes
 - [ ] Otros modos?
