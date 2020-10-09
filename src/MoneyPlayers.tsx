@@ -17,7 +17,7 @@ interface MoneyState {
 
 const SAVE_NAME = 'moneysave';
 
-export class MoneyPlayers extends React.Component<{}, MoneyState> {
+export default class MoneyPlayers extends React.Component<{}, MoneyState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);

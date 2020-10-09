@@ -14,7 +14,7 @@ interface SheetState {
 
 const SAVE_NAME = 'sheetsave';
 
-export class ScoreSheet extends React.Component<{}, SheetState> {
+export default class ScoreSheet extends React.Component<{}, SheetState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
@@ -113,13 +113,13 @@ export class ScoreSheet extends React.Component<{}, SheetState> {
             }
 
             col.push(
-                <span
+                <span key={k}
                     className="material-icons"
                     onClick={() => this.setState({ addingScore: v.name })}
                 >add</span>
             );
 
-            prev.push(<div className="col">{col}</div>);
+            prev.push(<div key={k} className="col">{col}</div>);
 
             totals.push(<span key={k}>{v.score}</span>);
         });
