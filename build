@@ -1,12 +1,48 @@
 #!/bin/sh
+
+env='development'
+watch=
+
+APP_NAME=$(cat package.json | jq -r .name)
+
+while [ "$1" != "" ]
+do
+    case $1 in
+        -p | --production )
+            env='production'
+            ;;
+        -w | --watch )
+            watch=1
+            ;;
+        
+    esac
+    shift
+done
+
 build() {
-    echo [`date +%H:%M:%S`] Building App...
-    node_modules/.bin/sass src/index.scss dist/index.css
-    node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/index.js --sourcemap '--define:process.env.NODE_ENV="development"'
+    echo [`date +%H:%M:%S`] "Building $APP_NAME in ${env} mode..."
+
+    rm -r dist/*
+
+    sass_prod_args=''
+    esbuild_args='--sourcemap'
+    if [ $env == 'production' ]
+    then
+        sass_prod_args='--no-source-map --style=compressed'
+        esbuild_args='--minify'
+    fi
+
+    node_modules/.bin/sass src/index.scss dist/index.css $sass_prod_args
+    
+    node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/main.js $esbuild_args --define:process.env.NODE_ENV="\"${env}\""
+
+    cp src/index.html src/robots.txt dist/
     cp -r res dist/
 }
 
 build
+
+if [ ! $watch ]; then echo 'Done!'; exit; fi
 
 # VSCode touches a file two times when saving, making the
 # script run twice. So the script only runs when BUILD_COUNT
