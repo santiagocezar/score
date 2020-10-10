@@ -1,28 +1,20 @@
 import React from 'react';
-import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Card, Icon } from './CommonComponents';
 import MoneyPlayers from './MoneyPlayers';
 import ScoreSheet from './ScoreSheet';
 
-type CardProps = {
-    src: string;
-    name: string;
-    to: string;
-    description: string;
+const socialStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    textDecoration: 'none',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'inherit',
+    gap: 4
 };
 
-class Card extends React.Component<CardProps>{
-    render() {
-        return (
-            <Link to={this.props.to}>
-                <img src={this.props.src} alt={this.props.name} />
-                <div>
-                    <h2>{this.props.name}</h2>
-                    <p>{this.props.description}</p>
-                </div>
-            </Link>
-        );
-    }
-}
 export class App extends React.Component {
 
     render() {
@@ -57,9 +49,16 @@ export class App extends React.Component {
                             <ScoreSheet />
                         </Route>
                     </Switch>
-                    <p>Score beta hecho por <a href="https://scez.ar">Santi Cézar</a></p>
+                    <div style={{ ...socialStyle, marginBottom: 4 }}>
+                        <a style={socialStyle} href="https://scez.ar">
+                            <Icon name="icon-scezar" size={20} /> por scezar
+                        </a> —
+                        <a style={socialStyle} href="https://github.com/santiagocezar/score">
+                            <Icon name="icon-github" size={16} /> código
+                        </a>
+                    </div >
                 </div >
-            </Router>
+            </Router >
         );
     }
 };;
