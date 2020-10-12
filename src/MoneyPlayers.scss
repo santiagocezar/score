@@ -13,7 +13,8 @@
         align-items: center;
         justify-content: center;
         flex-wrap: wrap;
-        flex-grow: 1;
+        margin-top: auto;
+        margin-bottom: auto;
         display: flex;
         overflow: auto;
     }
@@ -207,11 +208,11 @@
     }
 }
 
-@mixin medal($place, $color, $shadow) {
+@mixin medal($place, $color) {
     li:nth-child(#{$place}) .rank {
         background-color: $color;
         border-color: $color;
-        box-shadow: 0px 2px 8px $shadow;
+        box-shadow: 0px 0px 8px opacify($color, $amount: .8);
         color: black;
     }
 }
@@ -231,7 +232,7 @@
         color: #555;
     }
 
-    @include medal(1, gold, yellow);
-    @include medal(2, dodgerblue, cyan);
-    @include medal(3, tomato, orange);
+    @include medal(1, gold);
+    @include medal(2, silver);
+    @include medal(3, orange);
 }
