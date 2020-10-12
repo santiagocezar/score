@@ -125,7 +125,7 @@ export default class ScoreSheet extends React.Component<{}, SheetState> {
         });
 
         return (
-            <div className="ScoreSheet">
+            <div className="_SS">
                 <Header>
                     <a href="#" className="material-icons" onClick={
                         () => { this.setState({ players: Map() }); }

@@ -1,4 +1,4 @@
-.MoneyPlayers {
+._MP {
     flex-grow: 1;
     width: 100%;
     display: flex;
@@ -19,53 +19,146 @@
     }
 
     .player {
-        background: linear-gradient(#2582ec, #2553ec);
-        color: white;
-        width: 196px;
-        height: 96px;
+        //background: linear-gradient(#2582ec, #2553ec);
+        background-color: white;
+        color: black;
+        width: 192px;
+        height: 64px;
         display: flex;
         flex-direction: column;
-        font-size: 22px;
-        font-weight: bold;
-        padding: 10px 12px;
-        border-radius: 4px;
-        margin: 6px;
-        box-shadow: 0px 4px 8px #0004;
-        border-bottom: 2px solid #0008;
-        transition: box-shadow ease .3s, transform ease .3s;
+        padding-top: 2px;
+        padding-left: 8px;
+        padding-right: 8px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin: 10px;
+        border: 1px solid royalblue;
+        position: relative;
 
-        &:hover {
-            box-shadow: 0px 6px 12px #0004;
-            transform: translateY(-2px);
+        transition: transform ease .3s;
+
+        &::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: -1px;
+            top: -1px;
+            width: 28px;
+            height: 28px;
+            background-color: white;
         }
 
-        &.from {
-            box-shadow: 0px 8px 16px #f008;
-            transform: translateY(-4px);
+        .avatar {
+
+            transition:
+                border-color ease .3s,
+                background ease .3s,
+                box-shadow ease .3s;
+
+            display: block;
+            position: absolute;
+            left: -9px;
+            top: -9px;
+            width: 32px;
+            height: 32px;
+            box-sizing: border-box;
+            border-radius: 32px;
+            border: 4px solid royalblue;
+            background: url(res/avatars.svg#human) no-repeat;
+            background-color: black;
+            background-position: center;
+
+            &.cancel {
+                position: absolute;
+                width: 24px;
+                height: 24px;
+                left: calc(100% - 30px);
+                top: 6px;
+                border: none;
+                background: url(res/avatars.svg#cancel) no-repeat;
+                background-color: transparent;
+            }
+
+            &.from {
+                border-color: #c83771;
+                background: url(res/avatars.svg#out) no-repeat;
+                background-color: #c83771;
+                box-shadow: 0 0 10px #c83771cc;
+            }
+
+            &.to {
+                border-color: #37abc8;
+                background: url(res/avatars.svg#in) no-repeat;
+                background-color: #37abc8;
+                box-shadow: 0 0 10px #37abc8cc;
+
+            }
+
+            &.ok {
+                background: url(res/avatars.svg#ok) no-repeat;
+                background-color: green;
+                border-color: green;
+                box-shadow: 0 0 10px green;
+            }
+
+            &.bank {
+                border-color: gold;
+                background: url(res/avatars.svg#bank) no-repeat;
+                background-color: white;
+            }
         }
 
-        &.to {
-            box-shadow: 0px 8px 16px #0f08;
-            transform: translateY(-4px);
+        h2 {
+            display: block;
+            margin-left: 20px;
+            font-size: 22px;
+            font-weight: 500;
         }
 
         span {
             display: block;
-            font-size: 12px;
-            font-weight: 900;
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        label {
+            display: flex;
+            font-size: 16px;
+            align-self: stretch;
+            margin-top: 2px;
+        }
+
+        input {
+            display: block;
+            font-size: 16px;
+            flex-grow: 1;
+            width: 0;
+            background: none;
+            border-bottom: 1px dashed black;
+
+            &::placeholder {
+                color: #0008;
+            }
+        }
+
+        &:hover {
+            //box-shadow: 0px 6px 12px #0004;
+            transform: translateY(-2px);
         }
 
         &:first-child {
-            background: linear-gradient(#5d813d, #476b3b);
+            border-color: black;
         }
 
         &.add {
-            background: none;
-            color: #444;
-            border: 2px dashed #0004;
+            .avatar {
+                border-color: cyan;
+                background: url(res/avatars.svg#add) no-repeat;
+                background-color: white;
+            }
+
+            border-style: dashed;
             box-shadow: none;
-            font-size: 12px;
-            padding: 9px 12px;
         }
     }
 }
@@ -93,6 +186,7 @@
 
     .name {
         font-size: 22px;
+
     }
 
     .pts {

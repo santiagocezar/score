@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 env='development'
 watch=
 
@@ -22,7 +23,6 @@ done
 build() {
     echo [`date +%H:%M:%S`] "Building $APP_NAME in ${env} mode..."
 
-    rm -r dist/*
 
     sass_prod_args=''
     esbuild_args='--sourcemap'
@@ -40,6 +40,7 @@ build() {
     cp -r res dist/
 }
 
+rm -r dist/*
 build
 
 if [ ! $watch ]; then echo 'Done!'; exit; fi
