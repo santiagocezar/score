@@ -1,125 +1,10 @@
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 import { Map } from 'immutable';
 import { Player } from './types';
-import { MoneyInput, AddPlayer } from './Dialogs';
+import PlayerCard, { sel } from './PlayerCard';
 import { Header, Sidebar } from './Header';
 
 const SAVE_NAME = 'moneysave';
-
-enum sel {
-    Unselected,
-    From,
-    To
-}
-
-type PlayerCardProps = {
-    name: string;
-    money: number;
-    isBank: boolean;
-    inputCallback: (amount: number) => void;
-    onSelection: (name: string) => void;
-    selection: sel;
-};
-
-class PlayerCard extends Component<PlayerCardProps> {
-    state = {
-        val: ''
-    };
-
-    constructor(props) {
-        super(props);
-    }
-
-    inputChange(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
-            this.setState({
-                val: e.target.value
-            });
-        }
-    }
-
-    clickAvatar(ok: boolean) {
-        let { selection, inputCallback } = this.props;
-
-        if (selection == sel.To && ok) { // Pressed confirm
-            let m = Number(this.state.val);
-            if (isNaN(m)) m = 0; // Just in case
-
-            inputCallback(m);
-            this.setState({ val: '' });
-        }
-        else { // Pressed cancel
-            inputCallback(null);
-            this.setState({ val: '' });
-        }
-    }
-
-    selected(e: React.MouseEvent<HTMLLIElement>) {
-        if (this.props.selection == sel.Unselected) {
-            this.props.onSelection(this.props.name);
-            e.preventDefault();
-        }
-    }
-
-    render() {
-        let { name, money, selection, isBank } = this.props;
-
-        let confirm = this.state.val != '';
-        let avatarClass = 'avatar';
-        if (confirm) {
-            avatarClass += ' ok';
-        }
-        else {
-            switch (selection) {
-                case sel.From:
-                    avatarClass += ' from';
-                    break;
-                case sel.To:
-                    avatarClass += ' to';
-                    break;
-                default:
-                    if (isBank) avatarClass += ' bank';
-            }
-        }
-
-        return (
-            <li className="player" onClick={this.selected.bind(this)}>
-                <div
-                    className={avatarClass}
-                    onClick={e => this.clickAvatar(true)}
-                />
-                {selection == sel.To && <div
-                    className="avatar cancel"
-                    onClick={e => this.clickAvatar(false)}
-                />}
-                <h2>{name}</h2>
-                {selection == sel.To
-                    ? <label>
-                        $&nbsp;
-                        <input
-                            type="text"
-                            pattern="[0-9]*"
-                            inputMode="numeric"
-                            value={this.state.val}
-                            autoFocus={true}
-                            onChange={
-                                e => this.inputChange(e)
-                            }
-                            onKeyPress={e => {
-                                if (e.key == 'Enter')
-                                    this.clickAvatar(true);
-                            }}
-                            placeholder={`${this.props.money} más...`}
-                        />
-                    </label>
-                    : <span>$ {money}</span>
-                }
-            </li>
-        );
-    }
-}
-
-
 
 type Transaction = { action: string; money: number; id: number; };
 
@@ -153,7 +38,6 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
     }
 
     selectPlayer(name: string) {
-        console.log(name);
         if (this.state.from == null) {
             this.setState({ from: name });
         }
@@ -164,12 +48,11 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
 
     addPlayer(cancelled: boolean, name: string, money: number) {
         if (cancelled) {
-            this.setState(state => ({
+            this.setState({
                 addingPlayer: false
-            }));
+            });
             return;
         }
-        console.log(`Agregar jugador ${name} con $${money}`);
         this.setState(state => {
             let newState = {
                 players: state.players.update(
@@ -240,8 +123,6 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
     render() {
         let players = [];
 
-        console.dir(this.state);
-
         this.state.players.forEach((v, k) => {
             let s = sel.Unselected;
 
@@ -255,7 +136,7 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
                     money={v.score}
                     isBank={players.length == 0}
                     selection={s}
-                    inputCallback={m => this.sendMoney(m)}
+                    inputCallback={(_, m) => this.sendMoney(m)}
                     onSelection={n => this.selectPlayer(n)}
                 />
             ));
@@ -349,18 +230,18 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
 
                 <ul>
                     {players}
-                    <li className="player add" onClick={
-                        () => this.setState({ addingPlayer: true })
-                    }>
-                        <div className="avatar"></div>
-                        <h2>Agregar</h2>
-                    </li>
+                    <PlayerCard
+                        name='Add'
+                        money={0}
+                        isBank={false}
+                        selection={sel.Unselected}
+                        add={this.state.addingPlayer}
+                        inputCallback={
+                            (n, m) => { this.addPlayer(n == null, n, m); }
+                        }
+                        onSelection={_ => this.setState({ addingPlayer: true })}
+                    />
                 </ul>
-
-                {
-                    this.state.addingPlayer &&
-                    <AddPlayer itemName={itemName} callback={this.addPlayer.bind(this)} />
-                }
             </div>
 
         );

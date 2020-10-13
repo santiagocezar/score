@@ -102,6 +102,13 @@
                 box-shadow: 0 0 10px green;
             }
 
+            &.add {
+                border-color: cyan;
+                background: url(res/avatars.svg#add) no-repeat;
+                background-color: white;
+            }
+
+
             &.bank {
                 border-color: gold;
                 background: url(res/avatars.svg#bank) no-repeat;
@@ -109,31 +116,29 @@
             }
         }
 
-        h2 {
+        .name {
             display: block;
             margin-left: 20px;
             font-size: 22px;
             font-weight: 500;
         }
 
-        span {
+        .money {
             display: block;
             font-size: 16px;
             margin-top: 2px;
+            align-self: stretch;
         }
 
         label {
-            display: flex;
-            font-size: 16px;
-            align-self: stretch;
-            margin-top: 2px;
+            display: flex !important;
         }
 
         input {
-            display: block;
-            font-size: 16px;
             flex-grow: 1;
             width: 0;
+            margin-top: 0 !important;
+            margin-left: 0 !important;
             background: none;
             border-bottom: 1px dashed black;
 
@@ -152,12 +157,6 @@
         }
 
         &.add {
-            .avatar {
-                border-color: cyan;
-                background: url(res/avatars.svg#add) no-repeat;
-                background-color: white;
-            }
-
             border-style: dashed;
             box-shadow: none;
         }
