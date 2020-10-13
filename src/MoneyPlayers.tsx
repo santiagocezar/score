@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map } from 'immutable';
+import { OrderedMap } from 'immutable';
 import { Player } from './types';
 import PlayerCard, { sel } from './PlayerCard';
 import { Header, Sidebar } from './Header';
@@ -9,7 +9,7 @@ const SAVE_NAME = 'moneysave';
 type Transaction = { action: string; money: number; id: number; };
 
 type MoneyState = {
-    players: Map<string, Player>;
+    players: OrderedMap<string, Player>;
     from: string;
     to: string;
     addingPlayer: boolean;
@@ -22,9 +22,9 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
-        let players = Map<string, Player>();
+        let players = OrderedMap<string, Player>();
         if (save) {
-            players = Map(JSON.parse(save));
+            players = OrderedMap(JSON.parse(save));
         }
         this.state = {
             players,
@@ -188,7 +188,7 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
 
                 <Header>
                     <a href="#" className="material-icons" onClick={
-                        () => { this.setState({ players: Map() }); }
+                        () => { this.setState({ players: OrderedMap() }); }
                     }>
                         group_add
                     </a>
