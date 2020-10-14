@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { Card, Icon } from './CommonComponents';
-import MoneyPlayers from './MoneyPlayers';
+import Banker from './Banker/Banker';
 import ScoreSheet from './ScoreSheet';
 
 const socialStyle: React.CSSProperties = {
@@ -41,14 +41,6 @@ export class App extends React.Component {
                                     Recomendada para juegos de cartas"
                                 />
                             </div>
-                        </Route>
-                        <Route path="/money">
-                            <MoneyPlayers />
-                        </Route>
-                        <Route path="/sheet">
-                            <ScoreSheet />
-                        </Route>
-                    </Switch>
                     <div style={{ ...socialStyle, marginBottom: 4 }}>
                         <a style={socialStyle} href="https://scez.ar">
                             <Icon name="icon-scezar" size={20} /> por scezar
@@ -57,6 +49,14 @@ export class App extends React.Component {
                             <Icon name="icon-github" size={16} /> código
                         </a>
                     </div >
+                        </Route>
+                        <Route path="/money">
+                            <Banker />
+                        </Route>
+                        <Route path="/sheet">
+                            <ScoreSheet />
+                        </Route>
+                    </Switch>
                 </div >
             </Router >
         );

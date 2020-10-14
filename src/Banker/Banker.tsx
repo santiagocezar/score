@@ -1,24 +1,31 @@
 import React, { Component } from 'react';
 import { OrderedMap } from 'immutable';
-import { Player } from './types';
+import { Player, saveString, loadString } from '../utils';
 import PlayerCard, { sel } from './PlayerCard';
-import { Header, Sidebar } from './Header';
+import { Header, Sidebar } from '../Header';
+import Property, { PropertyData } from './Property';
+import OwnedProperties from './OwnedProperties';
 
 const SAVE_NAME = 'moneysave';
 
 type Transaction = { action: string; money: number; id: number; };
 
-type MoneyState = {
+
+type BankerState = {
     players: OrderedMap<string, Player>;
     from: string;
     to: string;
     addingPlayer: boolean;
-    historyOpen: boolean;
-    rankOpen: boolean;
+    sidebars: boolean[];
     transactions: Array<Transaction>;
+    properties: PropertyData[];
 };
 
-export default class MoneyPlayers extends Component<{}, MoneyState> {
+const SIDE_PROP = 0;
+const SIDE_HIST = 1;
+const SIDE_RANK = 2;
+
+export default class Banker extends Component<{}, BankerState> {
     constructor(props) {
         super(props);
         let save = localStorage.getItem(SAVE_NAME);
@@ -26,15 +33,34 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
         if (save) {
             players = OrderedMap(JSON.parse(save));
         }
+
+        let propertiesString = localStorage.getItem('properties');
+        let properties = null;
+        if (propertiesString) {
+            let propfile = JSON.parse(propertiesString);
+            properties = propfile.properties;
+        }
+
         this.state = {
             players,
             from: null,
             to: null,
             addingPlayer: false,
-            historyOpen: false,
-            rankOpen: false,
+            sidebars: [false, false, false],
             transactions: [],
+            properties
         };
+    }
+
+    loadSave() {
+        let save = localStorage.getItem(SAVE_NAME);
+        let players = OrderedMap<string, Player>();
+        if (save) {
+            players = OrderedMap(JSON.parse(save));
+        }
+        this.setState({
+            players
+        });
     }
 
     selectPlayer(name: string) {
@@ -120,6 +146,14 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
         return rankings;
     };
 
+    loadProperties() {
+        loadString(s => {
+            localStorage.setItem('properties', s);
+            let propfile = JSON.parse(s);
+            this.setState({ properties: propfile.properties });
+        });
+    }
+
     render() {
         let players = [];
 
@@ -182,11 +216,37 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
             ? 'jugador'
             : 'banco';
 
+        let propertyList = [];
+
+        if (this.state.properties) {
+            for (let data of this.state.properties) {
+                propertyList.push(<Property data={data} />);
+            }
+        }
+
         return (
 
             <div className="_MP">
 
                 <Header>
+                    <a href="#" className="material-icons" onClick={
+                        () => {
+                            loadString(s => {
+                                localStorage.setItem(SAVE_NAME, s);
+                                this.loadSave();
+                            });
+                        }
+                    }>
+                        publish
+                    </a>
+                    <a href="#" className="material-icons" onClick={
+                        () => {
+                            saveString(`score_save${Date.now()}.txt`,
+                                localStorage.getItem(SAVE_NAME));
+                        }
+                    }>
+                        get_app
+                    </a>
                     <a href="#" className="material-icons" onClick={
                         () => { this.setState({ players: OrderedMap() }); }
                     }>
@@ -195,7 +255,26 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
                     <a href="#" className="material-icons" onClick={
                         () => {
                             this.setState(state => (
-                                { historyOpen: !state.historyOpen, rankOpen: false }
+                                {
+                                    sidebars: [
+                                        !state.sidebars[SIDE_PROP],
+                                        false, false
+                                    ]
+                                }
+                            ));
+                        }
+                    }>
+                        domain
+                    </a>
+                    <a href="#" className="material-icons" onClick={
+                        () => {
+                            this.setState(state => (
+                                {
+                                    sidebars: [
+                                        false, !state.sidebars[SIDE_HIST],
+                                        false
+                                    ]
+                                }
                             ));
                         }
                     }>
@@ -204,7 +283,12 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
                     <a href="#" className="material-icons" onClick={
                         () => {
                             this.setState(state => (
-                                { historyOpen: false, rankOpen: !state.rankOpen }
+                                {
+                                    sidebars: [
+                                        false, false,
+                                        !state.sidebars[SIDE_RANK]
+                                    ]
+                                }
                             ));
                         }
                     }>
@@ -213,14 +297,25 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
                 </Header>
 
 
-                <Sidebar open={this.state.historyOpen}>
+                <Sidebar open={this.state.sidebars[SIDE_HIST]}>
                     <ul className="history">
                         {transactions.reverse()}
                         <p className="empty">Historial vacío.</p>
                     </ul>
                 </Sidebar>
+                <Sidebar open={this.state.sidebars[SIDE_PROP]}>
+                    <div style={{ padding: 8, display: "flex", alignItems: "center", flexDirection: "column" }}>
+                        {
+                            propertyList.length == 0
+                                ? <button onClick={_ => this.loadProperties()}>
+                                    Importar propiedades
+                                </button>
+                                : propertyList
+                        }
+                    </div>
+                </Sidebar>
 
-                <Sidebar open={this.state.rankOpen}>
+                <Sidebar open={this.state.sidebars[SIDE_RANK]}>
                     <ul className="rankings">
                         {rankings}
                     </ul>
@@ -242,6 +337,7 @@ export default class MoneyPlayers extends Component<{}, MoneyState> {
                         onSelection={_ => this.setState({ addingPlayer: true })}
                     />
                 </ul>
+                <OwnedProperties properties={this.state.properties} player="Santi"/>
             </div>
 
         );

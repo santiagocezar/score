@@ -1,6 +1,6 @@
 import React from 'react';
 import { Map } from 'immutable';
-import { Player } from './types';
+import { Player } from './utils';
 import { AddSimple, AddScore } from './Dialogs';
 import { Header, Sidebar } from './Header';
 
