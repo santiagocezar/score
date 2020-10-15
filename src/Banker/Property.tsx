@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Avatar, { icon } from './Avatar'
 
 export type PropertyData = {
     name: string,
@@ -21,8 +22,8 @@ const Card = styled.div<{expanded:boolean}>`
     align-items: stretch;
     width: 240px;
     box-sizing: border-box;
+    position: relative;
     background-color: white;
-    overflow: hidden;
     height: ${props => props.expanded ? '328px' : '84px'};
 
     &:hover {
@@ -59,6 +60,7 @@ const Title = styled.h2`
 const Separator = styled.hr`
     padding-top: 1px;
     margin: 10px 0;
+    width: 100%;
     background-color: #0008;
 `;
 
@@ -67,6 +69,8 @@ const Content = styled.div`
     flex-direction: column;
     align-items: center;
     text-align: center;
+    overflow: hidden;
+
 `;
 
 const Rent = styled.p`
@@ -92,8 +96,8 @@ export default class Property extends Component
         return (
             <Card className={this.props.className} expanded={this.props.expanded == true} draggable={true}>
                 <Title color={group}>{name}</Title>
-                <Separator />
                 <Content>
+                <Separator />
                     <Rent>Alquiler $ {rent[0]}</Rent>
                     <ul>
                         <House> × 1 — $ {rent[1]}</House>
@@ -104,14 +108,11 @@ export default class Property extends Component
                     </ul>
                     <br />
 
-                </Content >
-
                 <Separator />
-
-                <Content>
                     <p><small>Valor de hipoteca $ {cost / 2}</small></p>
                     <p><small>Costo por casa/hotel $ {house}</small></p>
                 </Content >
+                <Avatar icon={icon.Property}></Avatar>
             </Card >
         );
     }

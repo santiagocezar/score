@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Avatar, { icon } from './Avatar'
 
 export enum sel {
     Unselected,
@@ -38,7 +39,8 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let { selection, inputCallback } = this.props;
 
         // Pressed confirm
-        if ((selection == sel.To || this.props.add == true) && ok) {
+        if (selection == sel.To || this.props.add == true) {
+            if (ok) {
             let m = Number(this.state.amount);
             if (isNaN(m)) m = 0; // Just in case
             let n = this.state.name == ''
@@ -47,10 +49,11 @@ export default class PlayerCard extends Component<PlayerCardProps> {
 
             inputCallback(n, m);
             this.setState({ name: '', amount: '' });
-        }
-        else { // Pressed cancel
-            inputCallback(null, null);
-            this.setState({ name: '', amount: '' });
+            }
+            else { // Pressed cancel
+                inputCallback(null, null);
+                this.setState({ name: '', amount: '' });
+            }
         }
     }
 
@@ -78,34 +81,31 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let confirm =
             this.state.amount != '' || (adding && this.state.name != '');
 
-        let avatarClass = 'avatar';
+        let avatarIcon = icon.Human;
         if (confirm) {
-            avatarClass += ' ok';
+            avatarIcon = icon.Confirm;
         }
         else {
-            switch (selection) {
-                case sel.From:
-                    avatarClass += ' from';
-                    break;
-                case sel.To:
-                    avatarClass += ' to';
-                    break;
-                default:
-                    if (isBank) avatarClass += ' bank';
-                    if (addMode) avatarClass += ' add';
+            if (selection == sel.From) {
+                avatarIcon = icon.From
             }
+            else if (selection == sel.To) {
+                avatarIcon = icon.To
+            }
+            else if (isBank) avatarIcon = icon.Bank;
+            else if (addMode) avatarIcon = icon.Add;
         }
 
 
 
         return (
             <li className={playerClass} onClick={this.selected.bind(this)}>
-                <div
-                    className={avatarClass}
+                <Avatar
+                    icon={avatarIcon}
                     onClick={e => this.clickAvatar(true)}
                 />
-                {(selection == sel.To || adding) && <div
-                    className="avatar cancel"
+                {(selection == sel.To || adding) && <Avatar
+                    icon={icon.Cancel}
                     onClick={e => this.clickAvatar(false)}
                 />}
                 {adding
