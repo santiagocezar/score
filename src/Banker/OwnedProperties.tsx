@@ -5,14 +5,15 @@ import Property, { PropertyData } from './Property';
 
 const List = styled.div`
     display: flex;
+    position: absolute;
     flex-direction: column;
-    align-self: stretch;
+    width: 100%;
+    bottom: 0;
     align-items: stretch;
 `
 
 const ContentWrapper = styled.div`
     overflow-x: auto;
-    overflow-y: hidden;
     display: block;
 `
 const Content = styled.div`
@@ -23,6 +24,7 @@ const Content = styled.div`
 
 const PeekingProperty = styled(Property)`
     margin-left: 16px;
+    margin-top: 16px;
 `
 
 type Props = { properties: PropertyData[], player: string }
