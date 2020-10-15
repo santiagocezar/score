@@ -5,6 +5,9 @@
 Un contador de puntos web para tus juegos de mesa.
 
 ![screenshot](res/screenshot.png)
+![screenshot](res/moneyscreenshot.png)
+
+<small>*propiedades no incluidas</small>
 
 # Uso
 
