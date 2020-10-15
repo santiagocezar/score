@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { OrderedMap } from 'immutable';
-import { Player, saveString, loadString } from '../utils';
+import { saveString, loadString } from '../utils';
 import PlayerCard, { sel } from './PlayerCard';
 import { Header, Sidebar } from '../Header';
 import Property, { PropertyData } from './Property';
@@ -10,6 +10,12 @@ const SAVE_NAME = 'moneysave';
 
 type Transaction = { action: string; money: number; id: number; };
 
+type Player = {
+    name: string;
+    score: number;
+    properties: number[];
+    prevScore: number[];
+}
 
 type BankerState = {
     players: OrderedMap<string, Player>;
@@ -19,6 +25,7 @@ type BankerState = {
     sidebars: boolean[];
     transactions: Array<Transaction>;
     properties: PropertyData[];
+    selectedProperty: number | null;
 };
 
 const SIDE_PROP = 0;
@@ -48,7 +55,8 @@ export default class Banker extends Component<{}, BankerState> {
             addingPlayer: false,
             sidebars: [false, false, false],
             transactions: [],
-            properties
+            properties,
+            selectedProperty: null
         };
     }
 
@@ -86,6 +94,7 @@ export default class Banker extends Component<{}, BankerState> {
                     _ => ({
                         name,
                         score: money,
+                        properties: [],
                         prevScore: []
                     })
                 ),
