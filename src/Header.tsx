@@ -18,7 +18,7 @@ export class Header extends React.Component {
     render() {
         return (
             <header>
-                <Link to="/" className="material-icons">
+                <Link to="/" about="Atrás" className="material-icons">
                     arrow_back
                 </Link>
                 <nav>

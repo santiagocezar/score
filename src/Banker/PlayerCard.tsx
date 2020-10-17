@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import Avatar, { icon } from './Avatar'
 
 export enum sel {
@@ -7,11 +8,33 @@ export enum sel {
     To
 }
 
+const Stripe = styled.div<{ c: string }>`
+    display: block;
+    width: 12px;
+    height: 2px;
+    margin: 1px;
+    background-color: ${p => p.c};
+`
+
+const Stripes = styled.div`
+    display: flex;
+    position: absolute;
+    flex-wrap: wrap-reverse;
+    align-items: flex-end;
+    align-content: flex-start;
+    flex-direction: row-reverse;
+    left: calc(100% - 48px);
+    top: calc(100% - 66px);
+    width: 42px;
+    height: 60px;
+`
+
 type PlayerCardProps = {
     name: string;
     money: number;
     isBank: boolean;
     add?: boolean;
+    colors?: string[];
     inputCallback: (name: string, amount: number) => void;
     onSelection: (name: string) => void;
     selection: sel;
@@ -39,16 +62,16 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let { selection, inputCallback } = this.props;
 
         // Pressed confirm
-        if (selection == sel.To || this.props.add == true) {
+        if (selection == sel.To || selection == sel.From || this.props.add == true) {
             if (ok) {
-            let m = Number(this.state.amount);
-            if (isNaN(m)) m = 0; // Just in case
-            let n = this.state.name == ''
-                ? null
-                : this.state.name;
+                let m = Number(this.state.amount);
+                if (isNaN(m)) m = 0; // Just in case
+                let n = this.state.name == ''
+                    ? null
+                    : this.state.name;
 
-            inputCallback(n, m);
-            this.setState({ name: '', amount: '' });
+                inputCallback(n, m);
+                this.setState({ name: '', amount: '' });
             }
             else { // Pressed cancel
                 inputCallback(null, null);
@@ -96,15 +119,24 @@ export default class PlayerCard extends Component<PlayerCardProps> {
             else if (addMode) avatarIcon = icon.Add;
         }
 
-
-
+        let stripes = []
+        if (this.props.colors) {
+            for (let c of this.props.colors) {
+                stripes.push(
+                    <Stripe c={c} />
+                )
+            }
+        }
         return (
             <li className={playerClass} onClick={this.selected.bind(this)}>
                 <Avatar
                     icon={avatarIcon}
                     onClick={e => this.clickAvatar(true)}
                 />
-                {(selection == sel.To || adding) && <Avatar
+                <Stripes>
+                    {stripes}
+                </Stripes>
+                {(selection == sel.To || selection == sel.From || adding) && <Avatar
                     icon={icon.Cancel}
                     onClick={e => this.clickAvatar(false)}
                 />}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { OrderedMap } from 'immutable';
+import { OrderedMap, Set } from 'immutable';
 import { saveString, loadString } from '../utils';
 import PlayerCard, { sel } from './PlayerCard';
 import { Header, Sidebar } from '../Header';
@@ -11,14 +11,17 @@ const SAVE_NAME = 'moneysave';
 type Transaction = { action: string; money: number; id: number; };
 
 type Player = {
+    isBank?: boolean;
     name: string;
     score: number;
-    properties: number[];
+    properties: Set<number>;
     prevScore: number[];
 }
 
+type PlayerMap = OrderedMap<string, Player>;
+
 type BankerState = {
-    players: OrderedMap<string, Player>;
+    players: PlayerMap;
     from: string;
     to: string;
     addingPlayer: boolean;
@@ -35,11 +38,8 @@ const SIDE_RANK = 2;
 export default class Banker extends Component<{}, BankerState> {
     constructor(props) {
         super(props);
-        let save = localStorage.getItem(SAVE_NAME);
-        let players = OrderedMap<string, Player>();
-        if (save) {
-            players = OrderedMap(JSON.parse(save));
-        }
+
+        let players = this.loadSave(true)
 
         let propertiesString = localStorage.getItem('properties');
         let properties = null;
@@ -60,23 +60,90 @@ export default class Banker extends Component<{}, BankerState> {
         };
     }
 
-    loadSave() {
+    loadSave(get?: boolean): PlayerMap {
         let save = localStorage.getItem(SAVE_NAME);
-        let players = OrderedMap<string, Player>();
+        let players: PlayerMap = OrderedMap();
         if (save) {
             players = OrderedMap(JSON.parse(save));
         }
-        this.setState({
-            players
-        });
+
+        let thereIsBank = false
+
+        players.forEach((p, k) => {
+            thereIsBank = thereIsBank || p.isBank == true
+            p.properties = Set(p.properties)
+        })
+
+        if (!thereIsBank && players.size > 0) {
+            players.first({ isBank: false }).isBank = true
+        }
+
+        if (get != true) {
+            this.setState({
+                players
+            });
+        }
+        return players
     }
 
     selectPlayer(name: string) {
-        if (this.state.from == null) {
+        let { from, to, selectedProperty, properties } = this.state
+        if (from == null && selectedProperty == null) {
             this.setState({ from: name });
         }
         else {
-            this.setState({ to: name });
+            if (selectedProperty != null) {
+                if (from != null) {
+                    this.setState(state => ({
+                        players: state.players.update(
+                            from,
+                            p => ({
+                                ...p,
+                                properties: p.properties.update(m => {
+                                    return m.delete(properties[selectedProperty].id)
+                                })
+                            })
+                        ).update(
+                            name,
+                            p => {
+                                if (p.isBank) return p
+
+                                if (!p.properties) {
+                                    p.properties = Set()
+                                }
+                                p.properties = p.properties.update(m => {
+                                    return m.add(properties[selectedProperty].id)
+                                })
+                                return p
+                            }
+                        ),
+                        from: null,
+                        selectedProperty: null,
+                    }));
+                }
+                else {
+                    this.setState(state => ({
+                        players: state.players.update(
+                            name,
+                            p => {
+                                if (p.isBank) return p
+
+                                if (!p.properties) {
+                                    p.properties = Set()
+                                }
+                                p.properties = p.properties.update(m => {
+                                    return m.add(properties[selectedProperty].id)
+                                })
+                                return p
+                            }
+                        ),
+                        selectedProperty: null,
+                    }));
+                }
+            }
+            else {
+                this.setState({ to: name });
+            }
         }
     }
 
@@ -94,7 +161,7 @@ export default class Banker extends Component<{}, BankerState> {
                     _ => ({
                         name,
                         score: money,
-                        properties: [],
+                        properties: Set(),
                         prevScore: []
                     })
                 ),
@@ -111,7 +178,8 @@ export default class Banker extends Component<{}, BankerState> {
         if (money === null) {
             this.setState(state => ({
                 from: null,
-                to: null
+                to: null,
+                selectedProperty: null,
             }));
             return;
         }
@@ -165,20 +233,30 @@ export default class Banker extends Component<{}, BankerState> {
 
     render() {
         let players = [];
+        let ownedProperties = [];
 
         this.state.players.forEach((v, k) => {
             let s = sel.Unselected;
+            let isBank = v.isBank == true
 
             if (this.state.from == v.name) s = sel.From;
             if (this.state.to == v.name) s = sel.To;
+
+            let colors: string[] = []
+            if (this.state.properties && v.properties) {
+                colors = Array.from(v.properties).map(v => this.state.properties[v].group)
+                console.log(Array.from(v.properties))
+                ownedProperties = [...ownedProperties, ...Array.from(v.properties)]
+            }
 
             players.push((
                 <PlayerCard
                     key={k}
                     name={v.name}
                     money={v.score}
-                    isBank={players.length == 0}
+                    isBank={isBank}
                     selection={s}
+                    colors={colors}
                     inputCallback={(_, m) => this.sendMoney(m)}
                     onSelection={n => this.selectPlayer(n)}
                 />
@@ -221,15 +299,24 @@ export default class Banker extends Component<{}, BankerState> {
 
         }
 
-        let itemName = players.length > 0
-            ? 'jugador'
-            : 'banco';
 
-        let propertyList = [];
+
+        let shownProperties = [];
 
         if (this.state.properties) {
-            for (let data of this.state.properties) {
-                propertyList.push(<Property data={data} />);
+            if (this.state.from != null) {
+                let p = this.state.players.get(this.state.from).properties
+                if (p) {
+                    for (let id of p) {
+                        shownProperties.push(this.state.properties[id]);
+                    }
+                }
+            }
+            else {
+                for (let data of this.state.properties) {
+                    if (!ownedProperties.includes(data.id))
+                        shownProperties.push(data)
+                }
             }
         }
 
@@ -238,7 +325,7 @@ export default class Banker extends Component<{}, BankerState> {
             <div className="_MP">
 
                 <Header>
-                    <a href="#" className="material-icons" onClick={
+                    <a href="#" about="Abrir" className="material-icons" onClick={
                         () => {
                             loadString(s => {
                                 localStorage.setItem(SAVE_NAME, s);
@@ -248,7 +335,7 @@ export default class Banker extends Component<{}, BankerState> {
                     }>
                         publish
                     </a>
-                    <a href="#" className="material-icons" onClick={
+                    <a href="#" about="Guardar" className="material-icons" onClick={
                         () => {
                             saveString(`score_save${Date.now()}.txt`,
                                 localStorage.getItem(SAVE_NAME));
@@ -256,26 +343,12 @@ export default class Banker extends Component<{}, BankerState> {
                     }>
                         get_app
                     </a>
-                    <a href="#" className="material-icons" onClick={
+                    <a href="#" about="Reiniciar" className="material-icons" onClick={
                         () => { this.setState({ players: OrderedMap() }); }
                     }>
-                        group_add
+                        restore_page
                     </a>
-                    <a href="#" className="material-icons" onClick={
-                        () => {
-                            this.setState(state => (
-                                {
-                                    sidebars: [
-                                        !state.sidebars[SIDE_PROP],
-                                        false, false
-                                    ]
-                                }
-                            ));
-                        }
-                    }>
-                        domain
-                    </a>
-                    <a href="#" className="material-icons" onClick={
+                    <a href="#" about="Historial" className="material-icons" onClick={
                         () => {
                             this.setState(state => (
                                 {
@@ -289,7 +362,7 @@ export default class Banker extends Component<{}, BankerState> {
                     }>
                         history
                     </a>
-                    <a href="#" className="material-icons" onClick={
+                    <a href="#" about="Puestos" className="material-icons" onClick={
                         () => {
                             this.setState(state => (
                                 {
@@ -301,7 +374,7 @@ export default class Banker extends Component<{}, BankerState> {
                             ));
                         }
                     }>
-                        poll
+                        emoji_events
                     </a>
                 </Header>
 
@@ -311,17 +384,6 @@ export default class Banker extends Component<{}, BankerState> {
                         {transactions.reverse()}
                         <p className="empty">Historial vacío.</p>
                     </ul>
-                </Sidebar>
-                <Sidebar open={this.state.sidebars[SIDE_PROP]}>
-                    <div style={{ padding: 8, display: "flex", alignItems: "center", flexDirection: "column" }}>
-                        {
-                            propertyList.length == 0
-                                ? <button onClick={_ => this.loadProperties()}>
-                                    Importar propiedades
-                                </button>
-                                : propertyList
-                        }
-                    </div>
                 </Sidebar>
 
                 <Sidebar open={this.state.sidebars[SIDE_RANK]}>
@@ -346,7 +408,13 @@ export default class Banker extends Component<{}, BankerState> {
                         onSelection={_ => this.setState({ addingPlayer: true })}
                     />
                 </ul>
-                <OwnedProperties properties={this.state.properties} player="Santi"/>
+                <OwnedProperties
+                    properties={shownProperties}
+                    empty={this.state.properties == null || this.state.properties.length == 0}
+                    selected={this.state.selectedProperty}
+                    onImport={() => this.loadProperties()}
+                    onPropertyClicked={id => this.setState({ selectedProperty: id })}
+                />
             </div>
 
         );

@@ -19,15 +19,33 @@ const ContentWrapper = styled.div`
 const Content = styled.div`
     display: flex;
     align-items: flex-end;
-    padding-right: 16px;
+    gap: 16px;
+    padding: 0 16px;
 `
 
 const PeekingProperty = styled(Property)`
-    margin-left: 16px;
     margin-top: 16px;
 `
 
-type Props = { properties: PropertyData[], player: string }
+const ImportButton = styled.button`
+    background: none;
+    color: #000;
+    border: 1px dashed black;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 22px;
+    margin-bottom: 16px;
+    margin-left: auto;
+    margin-right: auto;
+`
+
+type Props = {
+    properties: PropertyData[],
+    empty?: boolean,
+    selected?: number,
+    onImport: () => void,
+    onPropertyClicked: (id: number) => void
+}
 
 export default class OwnedProperties extends Component<Props> {
     render() {
@@ -35,18 +53,30 @@ export default class OwnedProperties extends Component<Props> {
 
         if (this.props.properties) {
             for (let data of this.props.properties) {
-                propertyList.push(<PeekingProperty data={data} />);
+                propertyList.push(
+                    <PeekingProperty
+                        key={data.id}
+                        data={data}
+                        selected={this.props.selected == data.id}
+                        onSelect={this.props.onPropertyClicked}
+                    />
+                );
             }
         }
+
+        let empty = this.props.empty && propertyList.length == 0;
 
         return (
             <List>
                 <ContentWrapper>
                     <Content>
                         {propertyList}
+                        {
+                            empty && <ImportButton onClick={_ => this.props.onImport()}>Importar propiedades</ImportButton>
+                        }
                     </Content>
                 </ContentWrapper>
-            </List>
+            </List >
         )
     }
 }

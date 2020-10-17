@@ -19,9 +19,27 @@ header {
         padding: 8px;
         border-radius: 4px;
         transition: background ease .3s;
+        position: relative;
 
         &:hover {
             background-color: #0004;
+
+            &::before {
+                font-family: 'Manrope';
+                content: attr(about);
+                display: block;
+                z-index: 2;
+                font-size: 12px;
+                left: 50%;
+                top: calc(100% - 4px);
+                transform: translateX(-50%);
+                pointer-events: none;
+                position: absolute;
+                padding: 4px 10px;
+                border-radius: 8px;
+                color: white;
+                background-color: #333;
+            }
         }
     }
 }
