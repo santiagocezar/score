@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, FC } from 'react';
 import { OrderedMap, Set } from 'immutable';
 import { saveString, loadString } from '../utils';
 import PlayerCard, { sel } from './PlayerCard';
@@ -20,403 +20,356 @@ type Player = {
 
 type PlayerMap = OrderedMap<string, Player>;
 
-type BankerState = {
-    players: PlayerMap;
-    from: string;
-    to: string;
-    addingPlayer: boolean;
-    sidebars: boolean[];
-    transactions: Array<Transaction>;
-    properties: PropertyData[];
-    selectedProperty: number | null;
-};
 
 const SIDE_PROP = 0;
 const SIDE_HIST = 1;
 const SIDE_RANK = 2;
 
-export default class Banker extends Component<{}, BankerState> {
-    constructor(props) {
-        super(props);
-
-        let players = this.loadSave(true)
-
-        let propertiesString = localStorage.getItem('properties');
-        let properties = null;
-        if (propertiesString) {
-            let propfile = JSON.parse(propertiesString);
-            properties = propfile.properties;
-        }
-
-        this.state = {
-            players,
-            from: null,
-            to: null,
-            addingPlayer: false,
-            sidebars: [false, false, false],
-            transactions: [],
-            properties,
-            selectedProperty: null
-        };
+function loadSave(): PlayerMap {
+    let save = localStorage.getItem(SAVE_NAME);
+    let players: PlayerMap = OrderedMap();
+    if (save) {
+        players = OrderedMap(JSON.parse(save));
     }
 
-    loadSave(get?: boolean): PlayerMap {
-        let save = localStorage.getItem(SAVE_NAME);
-        let players: PlayerMap = OrderedMap();
-        if (save) {
-            players = OrderedMap(JSON.parse(save));
-        }
+    let thereIsBank = false
 
-        let thereIsBank = false
+    players.forEach((p, k) => {
+        thereIsBank = thereIsBank || p.isBank == true
+        p.properties = Set(p.properties)
+    })
 
-        players.forEach((p, k) => {
-            thereIsBank = thereIsBank || p.isBank == true
-            p.properties = Set(p.properties)
-        })
-
-        if (!thereIsBank && players.size > 0) {
-            players.first({ isBank: false }).isBank = true
-        }
-
-        if (get != true) {
-            this.setState({
-                players
-            });
-        }
-        return players
+    if (!thereIsBank && players.size > 0) {
+        players.first({ isBank: false }).isBank = true
     }
 
-    selectPlayer(name: string) {
-        let { from, to, selectedProperty, properties } = this.state
+    return players
+}
+
+function writeSave(data: PlayerMap) {
+    localStorage.setItem(SAVE_NAME, JSON.stringify(data))
+}
+
+function loadProperties(): PropertyData[] | null {
+    let propertiesString = localStorage.getItem('properties');
+    let properties = null;
+    if (propertiesString) {
+        let propfile = JSON.parse(propertiesString);
+        properties = propfile.properties;
+    }
+
+    return properties
+}
+
+const Banker: FC = _props => {
+
+    const [players, setPlayers] = useState(loadSave())
+    const [properties, setProperties] = useState(loadProperties())
+    const [from, setFrom] = useState<string>(null);
+    const [to, setTo] = useState<string>(null);
+    const [addingPlayer, setAddingPlayer] = useState(false);
+    const [sidebars, setSidebars] = useState([false, false, false])
+    const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [selectedProperty, setSelectedProperty] = useState<number>(null)
+
+    const selectPlayer = (name: string) => {
         if (from == null && selectedProperty == null) {
-            this.setState({ from: name });
+            setFrom(name)
         }
         else {
             if (selectedProperty != null) {
                 if (from != null) {
-                    this.setState(state => ({
-                        players: state.players.update(
-                            from,
-                            p => ({
-                                ...p,
-                                properties: p.properties.update(m => {
-                                    return m.delete(properties[selectedProperty].id)
-                                })
+                    setPlayers(players.update(
+                        from,
+                        p => ({
+                            ...p,
+                            properties: p.properties.update(m => {
+                                return m.delete(properties[selectedProperty].id)
                             })
-                        ).update(
-                            name,
-                            p => {
-                                if (p.isBank) return p
+                        })
+                    ).update(
+                        name,
+                        p => {
+                            if (p.isBank) return p
 
-                                if (!p.properties) {
-                                    p.properties = Set()
-                                }
-                                p.properties = p.properties.update(m => {
-                                    return m.add(properties[selectedProperty].id)
-                                })
-                                return p
+                            if (!p.properties) {
+                                p.properties = Set()
                             }
-                        ),
-                        from: null,
-                        selectedProperty: null,
-                    }));
+                            p.properties = p.properties.update(m => {
+                                return m.add(properties[selectedProperty].id)
+                            })
+                            return p
+                        }
+                    ))
+
+                    setFrom(null)
+                    setSelectedProperty(null)
                 }
                 else {
-                    this.setState(state => ({
-                        players: state.players.update(
-                            name,
-                            p => {
-                                if (p.isBank) return p
+                    setPlayers(players.update(
+                        name,
+                        p => {
+                            if (p.isBank) return p
 
-                                if (!p.properties) {
-                                    p.properties = Set()
-                                }
-                                p.properties = p.properties.update(m => {
-                                    return m.add(properties[selectedProperty].id)
-                                })
-                                return p
+                            if (!p.properties) {
+                                p.properties = Set()
                             }
-                        ),
-                        selectedProperty: null,
-                    }));
+                            p.properties = p.properties.update(m => {
+                                return m.add(properties[selectedProperty].id)
+                            })
+                            return p
+                        }
+                    ))
+                    setSelectedProperty(null);
                 }
             }
             else {
-                this.setState({ to: name });
+                setTo(name)
             }
         }
     }
 
-    addPlayer(cancelled: boolean, name: string, money: number) {
+    const addPlayer = (cancelled: boolean, name: string, money: number) => {
         if (cancelled) {
-            this.setState({
-                addingPlayer: false
-            });
+            setAddingPlayer(false)
             return;
         }
-        this.setState(state => {
-            let newState = {
-                players: state.players.update(
-                    name,
-                    _ => ({
-                        name,
-                        score: money,
-                        properties: Set(),
-                        prevScore: []
-                    })
-                ),
-                addingPlayer: false
-            };
-            this.save(newState);
-            return newState;
-        });
+        let updatedPlayers = players.update(
+            name,
+            _ => ({
+                name,
+                score: money,
+                properties: Set(),
+                prevScore: []
+            })
+        )
+
+        writeSave(updatedPlayers)
+        setPlayers(updatedPlayers)
+        setAddingPlayer(false)
     }
 
-    save = (state) => localStorage.setItem(SAVE_NAME, JSON.stringify(state.players));
-
-    sendMoney(money: number) {
+    const sendMoney = (money: number) => {
         if (money === null) {
-            this.setState(state => ({
-                from: null,
-                to: null,
-                selectedProperty: null,
-            }));
+            setFrom(null)
+            setTo(null)
+            setSelectedProperty(null)
             return;
         }
 
         let t: Transaction = {
-            action: this.state.from + ' a ' + this.state.to,
+            action: from + ' a ' + to,
             money,
-            id: this.state.transactions.length
+            id: transactions.length
         };
 
-        this.setState(state => {
-            let newState = {
-                players: state.players.update(
-                    state.from,
-                    player => ({
-                        ...player,
-                        score: player.score - money,
-                    })
-                ).update(
-                    state.to,
-                    player => ({
-                        ...player,
-                        score: player.score + money,
-                    })
-                ),
-                from: null,
-                to: null,
-                transactions: [...state.transactions, t]
-            };
-            this.save(newState);
-            return newState;
-        });
+        let updatedPlayers = players.update(
+            from,
+            player => ({
+                ...player,
+                score: player.score - money,
+            })
+        ).update(
+            to,
+            player => ({
+                ...player,
+                score: player.score + money,
+            })
+        )
+
+        writeSave(updatedPlayers)
+        setPlayers(updatedPlayers)
+        setFrom(null)
+        setTo(null)
+        setTransactions([...transactions, t])
     }
 
-    getRankings() {
-        let actualPlayers = this.state.players.slice(1); // El banco no cuenta
-        let rankings = Array.from(actualPlayers.values());
-
-        rankings.sort((a, b) => b.score - a.score); // Ordenar por el dinero
-
-        return rankings;
+    const getRankings = () => {
+        let actualPlayers = players.filter(p => !p.isBank); // No incluir al banco
+        actualPlayers.sort((a, b) => b.score - a.score) // Ordenarlos
+        return actualPlayers;
     };
 
-    loadProperties() {
+    const importProperties = () => {
         loadString(s => {
             localStorage.setItem('properties', s);
-            let propfile = JSON.parse(s);
-            this.setState({ properties: propfile.properties });
+            setProperties(loadProperties())
         });
     }
 
-    render() {
-        let players = [];
-        let ownedProperties = [];
+    // Rendering
 
-        this.state.players.forEach((v, k) => {
-            let s = sel.Unselected;
-            let isBank = v.isBank == true
+    let playerCards = [];
+    let ownedProperties = [];
 
-            if (this.state.from == v.name) s = sel.From;
-            if (this.state.to == v.name) s = sel.To;
+    players.forEach((v, k) => {
+        let s = sel.Unselected;
+        let isBank = v.isBank == true
 
-            let colors: string[] = []
-            if (this.state.properties && v.properties) {
-                colors = Array.from(v.properties).map(v => this.state.properties[v].group)
-                console.log(Array.from(v.properties))
-                ownedProperties = [...ownedProperties, ...Array.from(v.properties)]
-            }
+        if (from == v.name) s = sel.From;
+        if (to == v.name) s = sel.To;
 
-            players.push((
-                <PlayerCard
-                    key={k}
-                    name={v.name}
-                    money={v.score}
-                    isBank={isBank}
-                    selection={s}
-                    colors={colors}
-                    inputCallback={(_, m) => this.sendMoney(m)}
-                    onSelection={n => this.selectPlayer(n)}
-                />
-            ));
-
-        });
-
-
-
-        let rankings = [];
-
-        this.getRankings().forEach((players, rank) => {
-
-            rankings.push((
-                <li key={players.name}>
-                    <span className="rank">{rank + 1}°</span>
-                    <div>
-                        <span className="name">{players.name}</span>
-                        <span className="pts">${players.score}</span>
-                    </div>
-                </li>
-            ));
-
-        });
-
-
-
-        let transactions = [];
-
-        for (let t of this.state.transactions) {
-
-            transactions.push((
-                <li key={t.id}>
-                    <div>
-                        <span className="name">{t.action}</span>
-                        <span className="pts">${t.money}</span>
-                    </div>
-                </li>
-            ));
-
+        let colors: string[] = []
+        if (properties && v.properties) {
+            colors = Array.from(v.properties).map(v => properties[v].group)
+            ownedProperties = [...ownedProperties, ...Array.from(v.properties)]
         }
 
+        playerCards.push((
+            <PlayerCard
+                key={k}
+                name={v.name}
+                money={v.score}
+                isBank={isBank}
+                selection={s}
+                colors={colors}
+                inputCallback={(_, m) => sendMoney(m)}
+                onSelection={selectPlayer}
+            />
+        ));
+
+    });
+
+    let rankings = [];
+
+    let rank = 1;
+    for (let p of getRankings().values()) {
+        rankings.push((
+            <li key={p.name}>
+                <span className="rank">{rank}°</span>
+                <div>
+                    <span className="name">{p.name}</span>
+                    <span className="pts">$ {p.score}</span>
+                </div>
+            </li>
+        ));
+        rank++
+    }
+
+    let transactionItems = [];
+
+    for (let t of transactions) {
+        transactionItems.push((
+            <li key={t.id}>
+                <div>
+                    <span className="name">{t.action}</span>
+                    <span className="pts">${t.money}</span>
+                </div>
+            </li>
+        ));
+
+    }
 
 
-        let shownProperties = [];
 
-        if (this.state.properties) {
-            if (this.state.from != null) {
-                let p = this.state.players.get(this.state.from).properties
-                if (p) {
-                    for (let id of p) {
-                        shownProperties.push(this.state.properties[id]);
+    let shownProperties = [];
+
+    if (properties) {
+        if (from != null) {
+            let p = players.get(from).properties
+            if (p) {
+                for (let id of p) {
+                    shownProperties.push(properties[id]);
+                }
+            }
+        }
+        else {
+            for (let data of properties) {
+                if (!ownedProperties.includes(data.id))
+                    shownProperties.push(data)
+            }
+        }
+    }
+
+    return (
+
+        <div className="_MP">
+
+            <Header>
+                <a href="#" about="Abrir" className="material-icons" onClick={
+                    () => {
+                        loadString(s => {
+                            localStorage.setItem(SAVE_NAME, s);
+                            setPlayers(loadSave());
+                        });
                     }
-                }
-            }
-            else {
-                for (let data of this.state.properties) {
-                    if (!ownedProperties.includes(data.id))
-                        shownProperties.push(data)
-                }
-            }
-        }
-
-        return (
-
-            <div className="_MP">
-
-                <Header>
-                    <a href="#" about="Abrir" className="material-icons" onClick={
-                        () => {
-                            loadString(s => {
-                                localStorage.setItem(SAVE_NAME, s);
-                                this.loadSave();
-                            });
-                        }
-                    }>
-                        publish
-                    </a>
-                    <a href="#" about="Guardar" className="material-icons" onClick={
-                        () => {
-                            saveString(`score_save${Date.now()}.txt`,
-                                localStorage.getItem(SAVE_NAME));
-                        }
-                    }>
-                        get_app
-                    </a>
-                    <a href="#" about="Reiniciar" className="material-icons" onClick={
-                        () => { this.setState({ players: OrderedMap() }); }
-                    }>
-                        restore_page
-                    </a>
-                    <a href="#" about="Historial" className="material-icons" onClick={
-                        () => {
-                            this.setState(state => (
-                                {
-                                    sidebars: [
-                                        false, !state.sidebars[SIDE_HIST],
-                                        false
-                                    ]
-                                }
-                            ));
-                        }
-                    }>
-                        history
-                    </a>
-                    <a href="#" about="Puestos" className="material-icons" onClick={
-                        () => {
-                            this.setState(state => (
-                                {
-                                    sidebars: [
-                                        false, false,
-                                        !state.sidebars[SIDE_RANK]
-                                    ]
-                                }
-                            ));
-                        }
-                    }>
-                        emoji_events
-                    </a>
-                </Header>
+                }>
+                    publish
+                </a>
+                <a href="#" about="Guardar" className="material-icons" onClick={
+                    () => {
+                        saveString(`score_save${Date.now()}.txt`,
+                            localStorage.getItem(SAVE_NAME));
+                    }
+                }>
+                    get_app
+                </a>
+                <a href="#" about="Reiniciar" className="material-icons" onClick={
+                    () => setPlayers(OrderedMap())
+                }>
+                    restore_page
+                </a>
+                <a href="#" about="Historial" className="material-icons" onClick={
+                    () => {
+                        setSidebars([
+                            false, !sidebars[SIDE_HIST],
+                            false
+                        ]);
+                    }
+                }>
+                    history
+                </a>
+                <a href="#" about="Puestos" className="material-icons" onClick={
+                    () => {
+                        setSidebars([
+                            false, false,
+                            !sidebars[SIDE_RANK]
+                        ]);
+                    }
+                }>
+                    emoji_events
+                </a>
+            </Header>
 
 
-                <Sidebar open={this.state.sidebars[SIDE_HIST]}>
-                    <ul className="history">
-                        {transactions.reverse()}
-                        <p className="empty">Historial vacío.</p>
-                    </ul>
-                </Sidebar>
-
-                <Sidebar open={this.state.sidebars[SIDE_RANK]}>
-                    <ul className="rankings">
-                        {rankings}
-                    </ul>
-                </Sidebar>
-
-
-
-                <ul>
-                    {players}
-                    <PlayerCard
-                        name='Add'
-                        money={0}
-                        isBank={false}
-                        selection={sel.Unselected}
-                        add={this.state.addingPlayer}
-                        inputCallback={
-                            (n, m) => { this.addPlayer(n == null, n, m); }
-                        }
-                        onSelection={_ => this.setState({ addingPlayer: true })}
-                    />
+            <Sidebar open={sidebars[SIDE_HIST]}>
+                <ul className="history">
+                    {transactionItems.reverse()}
+                    <p className="empty">Historial vacío.</p>
                 </ul>
-                <OwnedProperties
-                    properties={shownProperties}
-                    empty={this.state.properties == null || this.state.properties.length == 0}
-                    selected={this.state.selectedProperty}
-                    onImport={() => this.loadProperties()}
-                    onPropertyClicked={id => this.setState({ selectedProperty: id })}
-                />
-            </div>
+            </Sidebar>
 
-        );
-    }
+            <Sidebar open={sidebars[SIDE_RANK]}>
+                <ul className="rankings">
+                    {rankings}
+                </ul>
+            </Sidebar>
+
+
+
+            <ul>
+                {playerCards}
+                <PlayerCard
+                    name='Add'
+                    money={0}
+                    isBank={false}
+                    selection={sel.Unselected}
+                    add={addingPlayer}
+                    inputCallback={
+                        (n, m) => { addPlayer(n == null, n, m); }
+                    }
+                    onSelection={_ => setAddingPlayer(true)}
+                />
+            </ul>
+            <OwnedProperties
+                properties={shownProperties}
+                empty={properties == null || properties.length == 0}
+                selected={selectedProperty}
+                onImport={loadProperties}
+                onPropertyClicked={id => setSelectedProperty(id)}
+            />
+        </div >
+    );
 }
+
+export default Banker;
