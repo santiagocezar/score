@@ -36,6 +36,7 @@ type PlayerCardProps = {
     add?: boolean;
     colors?: string[];
     inputCallback: (name: string, amount: number) => void;
+    defaultValue: string;
     onSelection: (name: string) => void;
     selection: sel;
 };
@@ -64,7 +65,13 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         // Pressed confirm
         if (selection == sel.To || selection == sel.From || this.props.add == true) {
             if (ok) {
-                let m = Number(this.state.amount);
+                let m = 0
+                if (this.state.amount != '') {
+                    m = Number(this.state.amount);
+                }
+                else {
+                    m = Number(this.props.defaultValue);
+                }
                 if (isNaN(m)) m = 0; // Just in case
                 let n = this.state.name == ''
                     ? null
@@ -102,7 +109,9 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         }
 
         let confirm =
-            this.state.amount != '' || (adding && this.state.name != '');
+            this.state.amount != '' ||
+            (adding && this.state.name != '') ||
+            this.props.defaultValue != '';
 
         let avatarIcon = icon.Human;
         if (confirm) {
@@ -176,7 +185,9 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                                 if (e.key == 'Enter')
                                     this.clickAvatar(true);
                             }}
-                            placeholder={`${this.props.money}...`}
+                            placeholder={this.props.defaultValue == ''
+                                ? `${this.props.money}...`
+                                : this.props.defaultValue}
                         />
                     </label>
                     : !addMode && <span className="money">$ {money}</span>

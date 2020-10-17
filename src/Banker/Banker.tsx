@@ -36,7 +36,15 @@ function loadSave(): PlayerMap {
 
     players.forEach((p, k) => {
         thereIsBank = thereIsBank || p.isBank == true
-        p.properties = Set(p.properties)
+
+        // Compatibilidad con guardados viejos (sin propiedades)
+        if (!p.properties) {
+            p.properties = Set()
+        }
+        else {
+            // El JSON contiene un Array, convertirlo en Set
+            p.properties = Set(p.properties)
+        }
     })
 
     if (!thereIsBank && players.size > 0) {
@@ -63,69 +71,23 @@ function loadProperties(): PropertyData[] | null {
 
 const Banker: FC = _props => {
 
-    const [players, setPlayers] = useState(loadSave())
-    const [properties, setProperties] = useState(loadProperties())
+    const [players, setPlayers] = useState<PlayerMap>(() => loadSave());
+    const [properties, setProperties] = useState<PropertyData[]>(() => loadProperties());
     const [from, setFrom] = useState<string>(null);
     const [to, setTo] = useState<string>(null);
     const [addingPlayer, setAddingPlayer] = useState(false);
-    const [sidebars, setSidebars] = useState([false, false, false])
-    const [transactions, setTransactions] = useState<Transaction[]>([])
-    const [selectedProperty, setSelectedProperty] = useState<number>(null)
+    const [sidebars, setSidebars] = useState([false, false, false]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [selectedProperty, setSelectedProperty] = useState<number>(null);
+
+    const getBank = () => players.find(p => p.isBank)
 
     const selectPlayer = (name: string) => {
         if (from == null && selectedProperty == null) {
             setFrom(name)
         }
         else {
-            if (selectedProperty != null) {
-                if (from != null) {
-                    setPlayers(players.update(
-                        from,
-                        p => ({
-                            ...p,
-                            properties: p.properties.update(m => {
-                                return m.delete(properties[selectedProperty].id)
-                            })
-                        })
-                    ).update(
-                        name,
-                        p => {
-                            if (p.isBank) return p
-
-                            if (!p.properties) {
-                                p.properties = Set()
-                            }
-                            p.properties = p.properties.update(m => {
-                                return m.add(properties[selectedProperty].id)
-                            })
-                            return p
-                        }
-                    ))
-
-                    setFrom(null)
-                    setSelectedProperty(null)
-                }
-                else {
-                    setPlayers(players.update(
-                        name,
-                        p => {
-                            if (p.isBank) return p
-
-                            if (!p.properties) {
-                                p.properties = Set()
-                            }
-                            p.properties = p.properties.update(m => {
-                                return m.add(properties[selectedProperty].id)
-                            })
-                            return p
-                        }
-                    ))
-                    setSelectedProperty(null);
-                }
-            }
-            else {
-                setTo(name)
-            }
+            setTo(name)
         }
     }
 
@@ -157,30 +119,112 @@ const Banker: FC = _props => {
             return;
         }
 
+        /*
+        if (selectedProperty != null) {
+            if (from != null) {
+                setPlayers(players.update(
+                    from,
+                    p => ({
+                        ...p,
+                        properties: p.properties.update(m => {
+                            return m.delete(properties[selectedProperty].id)
+                        })
+                    })
+                ).update(
+                    name,
+                    p => {
+                        if (p.isBank) return p
+
+                        if (!p.properties) {
+                            p.properties = Set()
+                        }
+                        p.properties = p.properties.update(m => {
+                            return m.add(properties[selectedProperty].id)
+                        })
+                        return p
+                    }
+                ))
+
+                setFrom(null)
+                setSelectedProperty(null)
+            }
+            else {
+                setPlayers(players.update(
+                    name,
+                    p => {
+                        if (p.isBank) return p
+
+                        if (!p.properties) {
+                            p.properties = Set()
+                        }
+                        p.properties = p.properties.update(m => {
+                            return m.add(properties[selectedProperty].id)
+                        })
+                        return p
+                    }
+                ))
+                setSelectedProperty(null);
+            }
+        }
+        */
+
+        // Si hay alguna propiedad seleccionada pero no un jugador 
+        // se retira el dinero del banco
+        let actualFrom = from
+        if (selectedProperty != null && actualFrom == null)
+            actualFrom = getBank().name
+
+        // Invertir dinero para que cobre el que entrega la propiedad
+        if (selectedProperty != null) money = -money
+
         let t: Transaction = {
-            action: from + ' a ' + to,
+            action: actualFrom + ' a ' + to,
             money,
             id: transactions.length
         };
 
-        let updatedPlayers = players.update(
-            from,
-            player => ({
-                ...player,
-                score: player.score - money,
-            })
-        ).update(
-            to,
-            player => ({
-                ...player,
-                score: player.score + money,
-            })
-        )
+        let updatedPlayers = players
+            .update(actualFrom, p => ({
+                ...p,
+                score: p.score - money, // Retirar dinero
+            }))
+            .update(to, p => ({
+                ...p,
+                score: p.score + money, // Entregar dinero
+            }))
+
+        // Si hay alguna propiedad seleccionada
+        if (selectedProperty != null) {
+            // Si se entrega la propiedad al banco,
+            // simplemente borrarla del jugador
+            if (!players.get(to).isBank) {
+                updatedPlayers = updatedPlayers
+                    .update(to, p => ({
+                        ...p,
+                        properties: p.properties.update(m => {
+                            // Agregar la id de la propiedad
+                            return m.add(properties[selectedProperty].id)
+                        })
+                    }))
+            }
+            // Y si se entrega del banco, no borrarla (por que 
+            // técnicamente el banco no tiene las propiedades)
+            if (!players.get(actualFrom).isBank) {
+                updatedPlayers = updatedPlayers
+                    .update(actualFrom, p => ({
+                        ...p,
+                        properties: p.properties.update(m => {
+                            return m.delete(properties[selectedProperty].id)
+                        })
+                    }))
+            }
+        }
 
         writeSave(updatedPlayers)
         setPlayers(updatedPlayers)
         setFrom(null)
         setTo(null)
+        setSelectedProperty(null)
         setTransactions([...transactions, t])
     }
 
@@ -205,15 +249,22 @@ const Banker: FC = _props => {
     players.forEach((v, k) => {
         let s = sel.Unselected;
         let isBank = v.isBank == true
+        let defVal = ''
 
         if (from == v.name) s = sel.From;
-        if (to == v.name) s = sel.To;
+        if (to == v.name) {
+            s = sel.To;
+
+            if (selectedProperty != null)
+                defVal = properties[selectedProperty].cost.toString()
+        }
 
         let colors: string[] = []
         if (properties && v.properties) {
             colors = Array.from(v.properties).map(v => properties[v].group)
             ownedProperties = [...ownedProperties, ...Array.from(v.properties)]
         }
+
 
         playerCards.push((
             <PlayerCard
@@ -224,6 +275,7 @@ const Banker: FC = _props => {
                 selection={s}
                 colors={colors}
                 inputCallback={(_, m) => sendMoney(m)}
+                defaultValue={defVal}
                 onSelection={selectPlayer}
             />
         ));
@@ -358,6 +410,7 @@ const Banker: FC = _props => {
                     inputCallback={
                         (n, m) => { addPlayer(n == null, n, m); }
                     }
+                    defaultValue={''}
                     onSelection={_ => setAddingPlayer(true)}
                 />
             </ul>
