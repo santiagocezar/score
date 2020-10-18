@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import Avatar, { icon } from './Avatar'
+import styled, { css } from 'styled-components';
+import Avatar, { icon } from './Avatar';
 
 export type PropertyData = {
-    id: number,
-    name: string,
-    cost: number,
-    group: string,
-    rent?: number[],
+    id: number;
+    name: string;
+    cost: number;
+    group: string;
+    rent?: number[];
     house?: number;
-    type?: 'station' | 'service',
+    type?: 'station' | 'service';
     description?: string;
 };
 
-
-const Card = styled.div<{ expanded: boolean }>`
+const Card = styled.div<{ expanded: boolean; removing: boolean }>`
     border: 1px solid black;
     display: flex;
     padding: 10px 16px 16px;
@@ -26,30 +25,42 @@ const Card = styled.div<{ expanded: boolean }>`
     box-sizing: border-box;
     position: relative;
     background-color: white;
-    height: ${props => props.expanded ? '328px' : '84px'};
+    height: ${(props) => (props.expanded ? '328px' : '84px')};
+    opacity: 1;
 
     &:hover {
         height: 328px;
         transform: translateY(0);
     }
 
+    ${(p) =>
+        p.removing &&
+        css`
+            width: 0;
+            opacity: 0;
+            display: none;
+        `}
 
-    transition: height ease .3s;
+    transition: 
+        width ease 0.3s, 
+        height ease 0.3s, 
+        opacity linear 0.3s, 
+        display 0.3s;
     margin-bottom: 8px;
 `;
 
 const Title = styled.h2`
     &::before {
-        content: "";
+        content: '';
         display: inline-block;
         border-radius: 100%;
         width: 18px;
         height: 18px;
         flex-shrink: 0;
         margin-right: 8px;
-        background-color: ${props => props.color};
+        background-color: ${(props) => props.color};
     }
-    
+
     display: inline-flex;
     align-items: center;
     height: 64px;
@@ -72,7 +83,6 @@ const Content = styled.div`
     align-items: center;
     text-align: center;
     overflow: hidden;
-
 `;
 
 const Rent = styled.p`
@@ -83,7 +93,7 @@ const Rent = styled.p`
 
 const House = styled.li`
     &::before {
-        content: "⌂";
+        content: '⌂';
         color: red;
     }
     list-style-type: none;
@@ -91,68 +101,81 @@ const House = styled.li`
 
 const Train = styled.li`
     &::before {
-        content: "Ferrocarril";
+        content: 'Ferrocarril';
         color: blueviolet;
     }
     list-style-type: none;
 `;
 
 type Props = {
-    data: PropertyData,
-    expanded?: boolean,
-    className?: string,
-    selected?: boolean,
-    onSelect?: (id: number) => void
+    data: PropertyData;
+    expanded?: boolean;
+    className?: string;
+    selected?: boolean;
+    onSelect?: (id: number) => void;
 };
 export default class Property extends Component<Props> {
-
     render() {
         let {
-            data: {
-                id, cost, group, house, name, rent, description, type
-            },
-            selected, onSelect
+            data: { id, cost, group, house, name, rent, description, type },
+            selected,
+            onSelect,
         } = this.props;
         return (
-            <Card onClick={_ => onSelect(selected ? null : id)} className={this.props.className} expanded={this.props.expanded == true} draggable={true}>
+            <Card
+                onClick={(_) => onSelect(selected ? null : id)}
+                className={this.props.className}
+                expanded={this.props.expanded == true}
+                draggable={true}
+            >
                 <Avatar icon={selected ? icon.From : icon.Property}></Avatar>
-                { selected && <Avatar icon={icon.Cancel} ></Avatar>}
+                {selected && <Avatar icon={icon.Cancel}></Avatar>}
                 <Title color={group}>{name}</Title>
-                {type == 'service'
-                    ? <Content>
+                {type == 'service' ? (
+                    <Content>
                         <Separator />
                         <span style={{ display: 'block', height: 200 }}>
-                            Con una tarjeta de servicios, el alquiler es 4 veces lo que haya tocado en los dados. Con las dos tarjetas, sería 10 veces.
+                            Con una tarjeta de servicios, el alquiler es 4 veces
+                            lo que haya tocado en los dados. Con las dos
+                            tarjetas, sería 10 veces.
                         </span>
                         <Separator />
-                        <p><small>Valor de hipoteca $ {cost / 2}</small></p>
+                        <p>
+                            <small>Valor de hipoteca $ {cost / 2}</small>
+                        </p>
                     </Content>
-                    : <Content>
+                ) : (
+                    <Content>
                         <Separator />
 
                         <Rent>Alquiler $ {rent[0]}</Rent>
-                        {type == 'station'
-                            ? <ul style={{ display: 'block', height: 200 }}>
+                        {type == 'station' ? (
+                            <ul style={{ display: 'block', height: 200 }}>
                                 <Train> × 2 — $ {rent[1]}</Train>
                                 <Train> × 3 — $ {rent[2]}</Train>
                                 <Train> × 4 — $ {rent[3]}</Train>
                             </ul>
-                            : <ul>
+                        ) : (
+                            <ul>
                                 <House> × 1 — $ {rent[1]}</House>
                                 <House> × 2 — $ {rent[2]}</House>
                                 <House> × 3 — $ {rent[3]}</House>
                                 <House> × 4 — $ {rent[4]}</House>
                                 <House> Hotel — $ {rent[5]}</House>
                             </ul>
-                        }
+                        )}
                         <br />
 
                         <Separator />
-                        <p><small>Valor de hipoteca $ {cost / 2}</small></p>
-                        <p><small>Costo por casa/hotel $ {house}</small></p>
-                    </Content >
-                }
-            </Card >
+                        <p>
+                            <small>Valor de hipoteca $ {cost / 2}</small>
+                        </p>
+                        <p>
+                            <small>Costo por casa/hotel $ {house}</small>
+                        </p>
+                    </Content>
+                )}
+            </Card>
         );
     }
 }

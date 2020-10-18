@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Property, { PropertyData } from './Property';
 
-
 const List = styled.div`
     display: flex;
     position: absolute;
@@ -10,22 +9,22 @@ const List = styled.div`
     width: 100%;
     bottom: 0;
     align-items: stretch;
-`
+`;
 
 const ContentWrapper = styled.div`
     overflow-x: auto;
     display: block;
-`
+`;
 const Content = styled.div`
     display: flex;
     align-items: flex-end;
     gap: 16px;
     padding: 0 16px;
-`
+`;
 
 const PeekingProperty = styled(Property)`
     margin-top: 16px;
-`
+`;
 
 const ImportButton = styled.button`
     background: none;
@@ -37,15 +36,15 @@ const ImportButton = styled.button`
     margin-bottom: 16px;
     margin-left: auto;
     margin-right: auto;
-`
+`;
 
 type Props = {
-    properties: PropertyData[],
-    empty?: boolean,
-    selected?: number,
-    onImport: () => void,
-    onPropertyClicked: (id: number) => void
-}
+    properties: PropertyData[];
+    empty?: boolean;
+    selected?: number;
+    onImport: () => void;
+    onPropertyClicked: (id: number) => void;
+};
 
 export default class OwnedProperties extends Component<Props> {
     render() {
@@ -71,12 +70,16 @@ export default class OwnedProperties extends Component<Props> {
                 <ContentWrapper>
                     <Content>
                         {propertyList}
-                        {
-                            empty && <ImportButton onClick={_ => this.props.onImport()}>Importar propiedades</ImportButton>
-                        }
+                        {empty && (
+                            <ImportButton
+                                onClick={(_) => this.props.onImport()}
+                            >
+                                Importar propiedades
+                            </ImportButton>
+                        )}
                     </Content>
                 </ContentWrapper>
-            </List >
-        )
+            </List>
+        );
     }
 }
