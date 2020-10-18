@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled, { css, } from 'styled-components';
 import Avatar, { icon } from './Avatar'
 
 export enum sel {
@@ -14,7 +14,7 @@ const Stripe = styled.div<{ c: string }>`
     height: 2px;
     margin: 1px;
     background-color: ${p => p.c};
-`
+`;
 
 const Stripes = styled.div`
     display: flex;
@@ -27,7 +27,114 @@ const Stripes = styled.div`
     top: calc(100% - 66px);
     width: 42px;
     height: 60px;
-`
+`;
+
+const CardItem = styled.li < { add: boolean } > `
+
+    background-color: white;
+    color: black;
+    width: 192px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 10px;
+    border: 1px solid royalblue;
+    position: relative;
+
+    transition: transform ease .3s;
+
+    .name {
+        display: block;
+        margin-left: 20px;
+        font-size: 22px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .money {
+        display: block;
+        font-size: 16px;
+        margin-top: 2px;
+        align-self: stretch;
+    }
+
+    label {
+        display: flex !important;
+    }
+
+    input {
+        flex-grow: 1;
+        width: 0;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        background: none;
+        border-bottom: 1px dashed black;
+
+        &::placeholder {
+            color: #0008;
+        }
+    }
+
+    ${p => p.add && css`
+        border-style: dashed;
+        box-shadow: none;
+    `}
+
+    &:hover {
+        //box-shadow: 0px 6px 12px #0004;
+        transform: translateY(-2px);
+    }
+
+    &:first-child {
+        border-color: black;
+    }
+`;
+
+const NameStyle = css`
+    display: block;
+    margin-left: 20px;
+    font-size: 22px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+const MoneyStyle = css`
+    display: block;
+    font-size: 16px;
+    margin-top: 2px;
+    align-self: stretch;
+`;
+
+const InputStyle = css`
+    flex-grow: 1;
+    width: 0;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    background: none;
+    border-bottom: 1px dashed black;
+
+    &::placeholder {
+        color: #0008;
+    }
+`;
+const LabelStyle = css`
+`;
+
+const Name = styled.h2`${NameStyle}`;
+const Money = styled.span`${MoneyStyle}`;
+const NameInput = styled.input`${NameStyle} ${InputStyle}`;
+const MoneyInput = styled.input`${MoneyStyle} ${InputStyle}`;
+
+
+
+console.log(Name.toString())
 
 type PlayerCardProps = {
     name: string;
@@ -137,7 +244,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
             }
         }
         return (
-            <li className={playerClass} onClick={this.selected.bind(this)}>
+            <CardItem add={addMode} onClick={this.selected.bind(this)}>
                 <Avatar
                     icon={avatarIcon}
                     onClick={e => this.clickAvatar(true)}
@@ -192,7 +299,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                     </label>
                     : !addMode && <span className="money">$ {money}</span>
                 }
-            </li>
+            </CardItem>
         );
     }
 }
