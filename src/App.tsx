@@ -4,6 +4,8 @@ import { Card, Icon } from './CommonComponents';
 import Banker from './Banker/Banker';
 import ScoreSheet from './ScoreSheet';
 
+declare var global_version: string;
+
 const socialStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'row',
@@ -12,11 +14,10 @@ const socialStyle: React.CSSProperties = {
     fontSize: 12,
     fontWeight: 'bold',
     color: 'inherit',
-    gap: 4
+    gap: 4,
 };
 
 export class App extends React.Component {
-
     render() {
         return (
             <Router>
@@ -24,6 +25,9 @@ export class App extends React.Component {
                     <Switch>
                         <Route path="/" exact>
                             <img src="/res/score.svg" height="64" alt="Score" />
+                            <small style={{ fontWeight: 'bold' }}>
+                                ver. {global_version}
+                            </small>
                             <div className="gameSelect">
                                 <Card
                                     src="res/money.svg"
@@ -41,14 +45,19 @@ export class App extends React.Component {
                                     Recomendada para juegos de cartas"
                                 />
                             </div>
-                    <div style={{ ...socialStyle, marginBottom: 4 }}>
-                        <a style={socialStyle} href="https://scez.ar">
-                            <Icon name="icon-scezar" size={20} /> por scezar
-                        </a> —
-                        <a style={socialStyle} href="https://github.com/santiagocezar/score">
-                            <Icon name="icon-github" size={16} /> código
-                        </a>
-                    </div >
+                            <div style={{ ...socialStyle, marginBottom: 4 }}>
+                                <a style={socialStyle} href="https://scez.ar">
+                                    <Icon name="icon-scezar" size={20} /> por
+                                    scezar
+                                </a>{' '}
+                                —
+                                <a
+                                    style={socialStyle}
+                                    href="https://github.com/santiagocezar/score"
+                                >
+                                    <Icon name="icon-github" size={16} /> código
+                                </a>
+                            </div>
                         </Route>
                         <Route path="/money">
                             <Banker />
@@ -57,8 +66,8 @@ export class App extends React.Component {
                             <ScoreSheet />
                         </Route>
                     </Switch>
-                </div >
-            </Router >
+                </div>
+            </Router>
         );
     }
-};;
+}

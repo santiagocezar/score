@@ -5,6 +5,7 @@ env='development'
 watch=
 
 APP_NAME=$(cat package.json | jq -r .name)
+COMMIT="commit $(git rev-parse HEAD)"
 
 while [ "$1" != "" ]
 do
@@ -34,7 +35,10 @@ build() {
 
     node_modules/.bin/sass src/index.scss dist/index.css $sass_prod_args
     
-    node_modules/esbuild/bin/esbuild --bundle src/main.tsx --outfile=dist/main.js $esbuild_args --define:process.env.NODE_ENV="\"${env}\""
+    node_modules/esbuild/bin/esbuild --bundle src/main.tsx \
+    --outfile=dist/main.js $esbuild_args \
+    --define:global_version="\"${COMMIT}\""\
+    --define:process.env.NODE_ENV="\"${env}\""
 
     cp src/index.html src/robots.txt dist/
     cp -r res dist/
