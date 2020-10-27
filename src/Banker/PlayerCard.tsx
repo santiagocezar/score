@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import styled, { css, } from 'styled-components';
-import Avatar, { icon } from './Avatar'
+import styled, { css } from 'styled-components';
+import Avatar, { icon } from './Avatar';
 
 export enum sel {
     Unselected,
     From,
-    To
+    To,
 }
 
 const Stripe = styled.div<{ c: string }>`
@@ -13,7 +13,7 @@ const Stripe = styled.div<{ c: string }>`
     width: 12px;
     height: 2px;
     margin: 1px;
-    background-color: ${p => p.c};
+    background-color: ${(p) => p.c};
 `;
 
 const Stripes = styled.div`
@@ -29,8 +29,7 @@ const Stripes = styled.div`
     height: 60px;
 `;
 
-const CardItem = styled.li < { add: boolean } > `
-
+const CardItem = styled.li<{ add: boolean }>`
     background-color: white;
     color: black;
     width: 192px;
@@ -45,8 +44,9 @@ const CardItem = styled.li < { add: boolean } > `
     margin: 10px;
     border: 1px solid royalblue;
     position: relative;
+    flex-shrink: 0;
 
-    transition: transform ease .3s;
+    transition: transform ease 0.3s;
 
     .name {
         display: block;
@@ -81,10 +81,12 @@ const CardItem = styled.li < { add: boolean } > `
         }
     }
 
-    ${p => p.add && css`
-        border-style: dashed;
-        box-shadow: none;
-    `}
+    ${(p) =>
+        p.add &&
+        css`
+            border-style: dashed;
+            box-shadow: none;
+        `}
 
     &:hover {
         //box-shadow: 0px 6px 12px #0004;
@@ -93,6 +95,10 @@ const CardItem = styled.li < { add: boolean } > `
 
     &:first-child {
         border-color: black;
+    }
+
+    @media only screen and (max-width: 768px) {
+        width: calc(100% - 16px);
     }
 `;
 
@@ -124,17 +130,6 @@ const InputStyle = css`
         color: #0008;
     }
 `;
-const LabelStyle = css`
-`;
-
-const Name = styled.h2`${NameStyle}`;
-const Money = styled.span`${MoneyStyle}`;
-const NameInput = styled.input`${NameStyle} ${InputStyle}`;
-const MoneyInput = styled.input`${MoneyStyle} ${InputStyle}`;
-
-
-
-console.log(Name.toString())
 
 type PlayerCardProps = {
     name: string;
@@ -151,7 +146,7 @@ type PlayerCardProps = {
 export default class PlayerCard extends Component<PlayerCardProps> {
     state = {
         name: '',
-        amount: ''
+        amount: '',
     };
 
     constructor(props) {
@@ -161,7 +156,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
     inputChange(e: React.ChangeEvent<HTMLInputElement>) {
         if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
             this.setState({
-                amount: e.target.value
+                amount: e.target.value,
             });
         }
     }
@@ -170,24 +165,25 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let { selection, inputCallback } = this.props;
 
         // Pressed confirm
-        if (selection == sel.To || selection == sel.From || this.props.add == true) {
+        if (
+            selection == sel.To ||
+            selection == sel.From ||
+            this.props.add == true
+        ) {
             if (ok) {
-                let m = 0
+                let m = 0;
                 if (this.state.amount != '') {
                     m = Number(this.state.amount);
-                }
-                else {
+                } else {
                     m = Number(this.props.defaultValue);
                 }
                 if (isNaN(m)) m = 0; // Just in case
-                let n = this.state.name == ''
-                    ? null
-                    : this.state.name;
+                let n = this.state.name == '' ? null : this.state.name;
 
                 inputCallback(n, m);
                 this.setState({ name: '', amount: '' });
-            }
-            else { // Pressed cancel
+            } else {
+                // Pressed cancel
                 inputCallback(null, null);
                 this.setState({ name: '', amount: '' });
             }
@@ -206,7 +202,6 @@ export default class PlayerCard extends Component<PlayerCardProps> {
 
         let playerClass = 'player';
 
-
         let addMode = false;
         let adding = false;
         if (this.props.add != undefined) {
@@ -223,60 +218,55 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let avatarIcon = icon.Human;
         if (confirm) {
             avatarIcon = icon.Confirm;
-        }
-        else {
+        } else {
             if (selection == sel.From) {
-                avatarIcon = icon.From
-            }
-            else if (selection == sel.To) {
-                avatarIcon = icon.To
-            }
-            else if (isBank) avatarIcon = icon.Bank;
+                avatarIcon = icon.From;
+            } else if (selection == sel.To) {
+                avatarIcon = icon.To;
+            } else if (isBank) avatarIcon = icon.Bank;
             else if (addMode) avatarIcon = icon.Add;
         }
 
-        let stripes = []
+        let stripes = [];
         if (this.props.colors) {
             for (let c of this.props.colors) {
-                stripes.push(
-                    <Stripe c={c} />
-                )
+                stripes.push(<Stripe c={c} />);
             }
         }
         return (
             <CardItem add={addMode} onClick={this.selected.bind(this)}>
                 <Avatar
                     icon={avatarIcon}
-                    onClick={e => this.clickAvatar(true)}
+                    onClick={(e) => this.clickAvatar(true)}
                 />
-                <Stripes>
-                    {stripes}
-                </Stripes>
-                {(selection == sel.To || selection == sel.From || adding) && <Avatar
-                    icon={icon.Cancel}
-                    onClick={e => this.clickAvatar(false)}
-                />}
-                {adding
-                    ? <label className="name">
+                <Stripes>{stripes}</Stripes>
+                {(selection == sel.To || selection == sel.From || adding) && (
+                    <Avatar
+                        icon={icon.Cancel}
+                        onClick={(e) => this.clickAvatar(false)}
+                    />
+                )}
+                {adding ? (
+                    <label className="name">
                         <input
                             className="name"
                             type="text"
                             value={this.state.name}
                             autoFocus={true}
-                            onChange={
-                                e => this.setState({ name: e.target.value })
+                            onChange={(e) =>
+                                this.setState({ name: e.target.value })
                             }
-                            onKeyPress={e => {
-                                if (e.key == 'Enter')
-                                    this.clickAvatar(true);
+                            onKeyPress={(e) => {
+                                if (e.key == 'Enter') this.clickAvatar(true);
                             }}
                             placeholder={`Nombre`}
                         />
                     </label>
-                    : <h2 className="name">{name}</h2>
-                }
-                {selection == sel.To || adding
-                    ? <label className="money">
+                ) : (
+                    <h2 className="name">{name}</h2>
+                )}
+                {selection == sel.To || adding ? (
+                    <label className="money">
                         $&nbsp;
                         <input
                             className="money"
@@ -285,20 +275,20 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                             inputMode="numeric"
                             value={this.state.amount}
                             autoFocus={true && !adding}
-                            onChange={
-                                e => this.inputChange(e)
-                            }
-                            onKeyPress={e => {
-                                if (e.key == 'Enter')
-                                    this.clickAvatar(true);
+                            onChange={(e) => this.inputChange(e)}
+                            onKeyPress={(e) => {
+                                if (e.key == 'Enter') this.clickAvatar(true);
                             }}
-                            placeholder={this.props.defaultValue == ''
-                                ? `${this.props.money}...`
-                                : this.props.defaultValue}
+                            placeholder={
+                                this.props.defaultValue == ''
+                                    ? `${this.props.money}...`
+                                    : this.props.defaultValue
+                            }
                         />
                     </label>
-                    : !addMode && <span className="money">$ {money}</span>
-                }
+                ) : (
+                    !addMode && <span className="money">$ {money}</span>
+                )}
             </CardItem>
         );
     }
