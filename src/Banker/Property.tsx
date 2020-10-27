@@ -13,7 +13,7 @@ export type PropertyData = {
     description?: string;
 };
 
-const Card = styled.div<{ expanded: boolean; removing: boolean }>`
+const Card = styled.div<{ expanded: boolean }>`
     border: 1px solid black;
     display: flex;
     padding: 10px 16px 16px;
@@ -33,19 +33,7 @@ const Card = styled.div<{ expanded: boolean; removing: boolean }>`
         transform: translateY(0);
     }
 
-    ${(p) =>
-        p.removing &&
-        css`
-            width: 0;
-            opacity: 0;
-            display: none;
-        `}
-
-    transition: 
-        width ease 0.3s, 
-        height ease 0.3s, 
-        opacity linear 0.3s, 
-        display 0.3s;
+    transition: height ease 0.3s;
     margin-bottom: 8px;
 `;
 
