@@ -3,6 +3,7 @@
 
 env='development'
 watch=
+upload=
 
 APP_NAME=$(cat package.json | jq -r .name)
 COMMIT="commit $(git rev-parse HEAD)"
@@ -15,6 +16,9 @@ do
             ;;
         -w | --watch )
             watch=1
+            ;;
+        -u | --upload )
+            upload=1
             ;;
         
     esac
@@ -47,6 +51,16 @@ build() {
 rm -r dist/*
 build
 
+if [ $upload ]
+then 
+    if [ ! -f private_host_path ]
+    then
+        echo 'No host defined for upload. Exiting...'
+        exit
+    fi
+    source ./private_host_path
+    scp -r dist/* $HOST:$SRC_PATH
+fi
 if [ ! $watch ]; then echo 'Done!'; exit; fi
 
 # VSCode touches a file two times when saving, making the

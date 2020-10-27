@@ -104,3 +104,4 @@ dist/*
 .tern-port
 .vscode/
 src/arg.json
+private_host_path
