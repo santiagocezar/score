@@ -21,7 +21,7 @@ Para hacer una transacción haga click en el jugador/banco que entrega el dinero
 
 Por precaución, la app no incluye un listado de propiedades. Estas se importan de un archivo JSON con este formato:
 
-```json
+```jsonc
 {
     "properties": [
         {
