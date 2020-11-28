@@ -43,6 +43,12 @@ Un ejemplo son estas propiedades extraídas de un juego de Monopoly: [hasbro_arg
 
 Descargue el archivo, haga clic en importar propiedades y listo.
 
+## Tabla
+
+### Uso
+
+Agregue a un jugador apretando el + en la fila superior. Para sumarle un puntaje apriete el + en la columna bajo el nombre del jugador. En la ultima fila se muestra el puntaje total.
+
 # TODO
 
 -   [ ] Color del jugador

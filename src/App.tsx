@@ -57,6 +57,10 @@ export class App extends React.Component {
                                 >
                                     <Icon name="icon-github" size={16} /> código
                                 </a>
+                                —
+                                <a href="https://github.com/santiagocezar/score/blob/master/README.md">
+                                    Como jugar
+                                </a>
                             </div>
                         </Route>
                         <Route path="/money">
