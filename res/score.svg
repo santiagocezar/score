@@ -44,9 +44,10 @@
      inkscape:cx="244.01611"
      inkscape:cy="165.4745"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg965" />
+     inkscape:current-layer="svg965"
+     inkscape:document-rotation="0" />
   <g
      transform="translate(-48.832 -86.17)"
      id="g963">
@@ -133,23 +134,4 @@
        font-family="Righteous"
        id="path961" />
   </g>
-  <rect
-     style="fill:#fff400;fill-opacity:1;stroke-width:0.529168;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke markers fill"
-     id="rect2943"
-     width="33.528141"
-     height="12.8544"
-     x="68.313843"
-     y="27.381294"
-     ry="4.0239477" />
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:14.2655px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264584"
-     x="72.801041"
-     y="38.684414"
-     id="text2941"><tspan
-       sodipodi:role="line"
-       id="tspan2939"
-       x="72.801041"
-       y="38.684414"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';stroke-width:0.264584">beta</tspan></text>
 </svg>
