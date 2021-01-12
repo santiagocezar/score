@@ -1,8 +1,9 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { Card, Icon } from './CommonComponents';
-import Banker from './Banker/Banker';
-import ScoreSheet from './ScoreSheet';
+import { Card, Icon } from 'components/Commons';
+import Banker from 'views/Banker/Banker';
+import ScoreSheet from 'views/ScoreSheet';
+import Bingo from 'views/Bingo';
 
 declare var global_version: string;
 
@@ -44,6 +45,13 @@ export class App extends React.Component {
                                     description="Planilla de puntaje tradicional. 
                                     Recomendada para juegos de cartas"
                                 />
+                                <Card
+                                    src="res/bingo.svg"
+                                    name="Bingo"
+                                    to="/bingo"
+                                    description="Herramienta para elegir números
+                                    aleatorios para el bingo, sin repetir."
+                                />
                             </div>
                             <div style={{ ...socialStyle, marginBottom: 4 }}>
                                 <a style={socialStyle} href="https://scez.ar">
@@ -68,6 +76,9 @@ export class App extends React.Component {
                         </Route>
                         <Route path="/sheet">
                             <ScoreSheet />
+                        </Route>
+                        <Route path="/bingo">
+                            <Bingo />
                         </Route>
                     </Switch>
                 </div>

@@ -1,10 +1,10 @@
 import React, { useState, FC } from 'react';
 import { OrderedMap, Set } from 'immutable';
-import { saveString, loadString } from '../utils';
-import PlayerCard, { sel } from './PlayerCard';
-import { Header, Sidebar } from '../Header';
-import Property, { PropertyData } from './Property';
-import OwnedProperties from './OwnedProperties';
+import { saveString, loadString } from 'lib/utils';
+import PlayerCard, { sel } from 'components/PlayerCard';
+import { Header, Sidebar } from 'components/Header';
+import Property, { PropertyData } from 'components/Property';
+import OwnedProperties from 'components/OwnedProperties';
 
 const SAVE_NAME = 'moneysave';
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Property, { PropertyData } from './Property';
+import Property, { PropertyData } from 'components/Property';
 
 const List = styled.div`
     display: flex;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Map } from 'immutable';
-import { Player } from './utils';
-import { AddSimple, AddScore } from './Dialogs';
-import { Header, Sidebar } from './Header';
+import { Player } from '../lib/utils';
+import { AddSimple, AddScore } from 'components/Dialogs';
+import { Header, Sidebar } from 'components/Header';
 import styled, { css } from 'styled-components';
 
 const cell = css`

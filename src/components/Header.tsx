@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 
@@ -78,15 +78,39 @@ const StyledHeader = styled.header`
     flex-shrink: 0;
 `;
 
-export class Header extends React.Component {
-    render() {
-        return (
-            <StyledHeader>
+export function Header(p: { children?: ReactNode }) {
+    const [isFullscreen, setFullscreen] = useState(false);
+
+    document.addEventListener('fullscreenchange', (e) =>
+        setFullscreen(Boolean(document.fullscreenElement))
+    );
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    return (
+        <StyledHeader>
+            <nav>
                 <Link to="/" about="Atrás" className="material-icons">
                     arrow_back
                 </Link>
-                <nav>{this.props.children}</nav>
-            </StyledHeader>
-        );
-    }
+                <a
+                    href="#"
+                    about="Número"
+                    className="material-icons"
+                    onClick={toggleFullScreen}
+                >
+                    {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
+                </a>
+            </nav>
+            <nav>{p.children}</nav>
+        </StyledHeader>
+    );
 }
