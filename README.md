@@ -49,6 +49,12 @@ Descargue el archivo, haga clic en importar propiedades y listo.
 
 Agregue a un jugador apretando el + en la fila superior. Para sumarle un puntaje apriete el + en la columna bajo el nombre del jugador. En la ultima fila se muestra el puntaje total.
 
+## Bingo
+
+### Uso
+
+Haga clic en el dado para elegir un número aleatorio y marcarlo en la grilla.
+
 # TODO
 
 -   [ ] Color del jugador
