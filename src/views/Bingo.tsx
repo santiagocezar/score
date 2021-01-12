@@ -23,18 +23,21 @@ const Num = styled.span<{ new?: boolean; played?: boolean }>`
     background-color: #0002;
     color: #000;
     border-radius: 4px;
+    transition: color 0.4s, background-color 0.4s, transform ease 0.4s;
 
     ${(p) =>
         p.played &&
         css`
             background-color: #4169e144;
             color: #4169e1;
+            transform: rotateY(360deg);
         `}
     ${(p) =>
         p.new &&
         css`
             background-color: #4169e1;
             color: #fff;
+            transform: rotateY(360deg);
         `}
 `;
 
