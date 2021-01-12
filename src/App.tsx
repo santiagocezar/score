@@ -27,7 +27,7 @@ export class App extends React.Component {
                         <Route path="/" exact>
                             <img src="/res/score.svg" height="64" alt="Score" />
                             <small style={{ fontWeight: 'bold' }}>
-                                ver. {global_version}
+                                ver. 1.0
                             </small>
                             <div className="gameSelect">
                                 <Card
