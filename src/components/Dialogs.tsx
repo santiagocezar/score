@@ -1,5 +1,119 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
+import styled from 'styled-components';
 
+const ExitButton = styled.button`
+    background: none;
+    text-align: center;
+    padding: 0;
+    border: none;
+    height: 32px;
+    width: 32px;
+    color: var(--fg);
+
+    &::after {
+        content: 'arrow_back';
+    }
+
+    @media only screen and (min-width: 768px) {
+        &::after {
+            content: 'close';
+        }
+    }
+`;
+
+const Background = styled.div`
+    display: inline-flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    background-color: #00000080;
+
+    backdrop-filter: blur(5px);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+
+    @media only screen and (min-width: 768px) {
+        justify-content: center;
+    }
+`;
+
+const DialogHeader = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 48px;
+    overflow-y: hidden;
+    padding: 0 16px;
+    gap: 16px;
+    border-bottom: 1px solid #0004;
+
+    h1 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    @media only screen and (min-width: 768px) {
+        justify-content: space-between;
+        flex-direction: row-reverse;
+    }
+`;
+
+const DialogBody = styled.div`
+    overflow-y: auto;
+`;
+
+const StyledDialog = styled.div`
+    align-self: center;
+    position: relative;
+    text-align: left;
+
+    border-radius: 16px 16px 0 0;
+
+    z-index: 4;
+    display: inline-flex;
+    flex-flow: column;
+    margin: 0;
+    box-shadow: 0px 4px 16px #0002;
+
+    background-color: #fff;
+    background-clip: border-box;
+    background-size: cover;
+    overflow-y: auto;
+
+    @media only screen and (min-width: 768px) {
+        height: unset;
+        border-radius: 16px;
+    }
+`;
+
+export default function Dialog(p: {
+    title: string;
+    open: boolean;
+    onClosed: () => void;
+    children?: ReactNode;
+}) {
+    return (
+        p.open && (
+            <Background>
+                <StyledDialog>
+                    <DialogHeader>
+                        <ExitButton
+                            className="material-icons"
+                            onClick={(e) => p.onClosed()}
+                        />
+                        <h1>{p.title}</h1>
+                    </DialogHeader>
+                    <DialogBody>{p.children}</DialogBody>
+                </StyledDialog>
+            </Background>
+        )
+    );
+}
 interface MoneyInputProps {
     from: string;
     to: string;
