@@ -1,8 +1,10 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useReducer, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Header } from 'components/Header';
-import { range } from 'lib/utils';
+import { range, useEvent } from 'lib/utils';
 import { Set } from 'immutable';
+import StyledBall from 'components/Ball';
+import Dialog from 'components/Dialogs';
 
 const NumberGrid = styled.div`
     display: grid;
@@ -20,15 +22,19 @@ const Num = styled.span<{ new?: boolean; played?: boolean }>`
     justify-content: center;
     font-family: 'Nova Mono', monospace;
     font-size: 24px;
-    background-color: #0002;
+    background-color: #fff0;
     color: #000;
     border-radius: 4px;
-    transition: color 0.4s, background-color 0.4s, transform ease 0.4s;
+    box-sizing: border-box;
+    border: 2px solid #0002;
+    transition: color 0.4s, border-color 0.4s, background-color 0.4s,
+        transform ease 0.4s;
 
     ${(p) =>
         p.played &&
         css`
             background-color: #4169e144;
+            border-color: #4169e144;
             color: #4169e1;
             transform: rotateY(360deg);
         `}
@@ -36,9 +42,14 @@ const Num = styled.span<{ new?: boolean; played?: boolean }>`
         p.new &&
         css`
             background-color: #4169e1;
+            border-color: #4169e1;
             color: #fff;
             transform: rotateY(360deg);
         `}
+`;
+
+const Warranty = styled.div`
+    padding: 16px;
 `;
 
 const NUMBERS = range(90, 1);
@@ -46,35 +57,60 @@ const NUMBERS = range(90, 1);
 export default function Bingo() {
     const [played, setPlayed] = useState(Set<number>());
     const [newNum, setNewNum] = useState(0);
+    const [showBall, setShowBall] = useState(false);
+    const [preventDoubleClick, setPDC] = useState(false);
+    const [showingWarranty, setShowingWarranty] = useState(true);
+
+    /// This is for resetting the ball animation
+    useEffect(() => {
+        if (!showBall && newNum != 0) {
+            setShowBall(true);
+        }
+    }, [newNum]);
+
+    useEffect(() => {
+        if (preventDoubleClick) {
+            setTimeout(() => {
+                setPDC(false);
+            }, 500);
+        }
+    }, [preventDoubleClick]);
+
+    useEvent('keypress', (e) => {
+        if (e.code == 'Space') {
+            random();
+            e.preventDefault();
+        }
+    });
+
+    const hideBall = () => setShowBall(false);
 
     function reset() {
         setPlayed(played.clear());
         setNewNum(0);
     }
     function random() {
-        let available = NUMBERS.filter((n) => !played.has(n));
-        let n = available[Math.floor(Math.random() * available.length)];
-        setPlayed(played.add(n));
-        setNewNum(n);
+        if (!preventDoubleClick) {
+            let available = NUMBERS.filter((n) => !played.has(n));
+            let n = available[Math.floor(Math.random() * available.length)];
+            setPlayed(played.add(n));
+            /// Hide ball first because function is sometimes not batched
+            setShowBall(false);
+            setNewNum(n);
+            setPDC(true);
+        }
     }
+
+    console.log(showingWarranty);
 
     return (
         <div className="_MP">
-            <Header>
-                <a
-                    href="#"
-                    about="Reiniciar"
-                    className="material-icons"
-                    onClick={reset}
-                >
+            {showBall && <StyledBall>{newNum}</StyledBall>}
+            <Header mode="bingo">
+                <a about="Reiniciar" className="material-icons" onClick={reset}>
                     restore_page
                 </a>
-                <a
-                    href="#"
-                    about="Número"
-                    className="material-icons"
-                    onClick={random}
-                >
+                <a about="Número" className="material-icons" onClick={random}>
                     casino
                 </a>
             </Header>
@@ -85,6 +121,22 @@ export default function Bingo() {
                     </Num>
                 ))}
             </NumberGrid>
+            <Dialog
+                open={showingWarranty}
+                onClosed={() => setShowingWarranty(false)}
+                title="Aviso de garantía"
+            >
+                <Warranty>
+                    <b>Hecho por Santiago Cézar</b>
+                    <p>
+                        Este programa se distribuye con la esperanza de que sea
+                        útil, pero SIN NINGUNA GARANTÍA; ni siquiera la garantía
+                        implícita de COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO
+                        PARTICULAR. Vea la Licencia Pública General de GNU para
+                        más detalles.
+                    </p>
+                </Warranty>
+            </Dialog>
         </div>
     );
 }

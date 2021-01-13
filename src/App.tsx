@@ -25,7 +25,12 @@ export class App extends React.Component {
                 <div className="App">
                     <Switch>
                         <Route path="/" exact>
-                            <img src="/res/score.svg" height="64" alt="Score" />
+                            <img
+                                src="/res/score.svg"
+                                style={{ margin: 8 }}
+                                height="48"
+                                alt="Score"
+                            />
                             <small style={{ fontWeight: 'bold' }}>
                                 ver. 1.0
                             </small>
@@ -53,23 +58,6 @@ export class App extends React.Component {
                                     aleatorios para el bingo, sin repetir."
                                 />
                             </div>
-                            <div style={{ ...socialStyle, marginBottom: 4 }}>
-                                <a style={socialStyle} href="https://scez.ar">
-                                    <Icon name="icon-scezar" size={20} /> por
-                                    scezar
-                                </a>{' '}
-                                —
-                                <a
-                                    style={socialStyle}
-                                    href="https://github.com/santiagocezar/score"
-                                >
-                                    <Icon name="icon-github" size={16} /> código
-                                </a>
-                                —
-                                <a href="https://github.com/santiagocezar/score/blob/master/README.md">
-                                    Como jugar
-                                </a>
-                            </div>
                         </Route>
                         <Route path="/money">
                             <Banker />
@@ -81,6 +69,22 @@ export class App extends React.Component {
                             <Bingo />
                         </Route>
                     </Switch>
+                    <div style={{ ...socialStyle, marginBottom: 4 }}>
+                        <a style={socialStyle} href="https://scez.ar">
+                            <Icon name="icon-scezar" size={20} /> por scezar
+                        </a>{' '}
+                        —
+                        <a
+                            style={socialStyle}
+                            href="https://github.com/santiagocezar/score"
+                        >
+                            <Icon name="icon-github" size={16} /> código
+                        </a>
+                        —
+                        <a href="https://github.com/santiagocezar/score/blob/master/README.md">
+                            Como jugar
+                        </a>
+                    </div>
                 </div>
             </Router>
         );

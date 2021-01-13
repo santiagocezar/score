@@ -28,7 +28,7 @@ export const Sidebar = styled.div<{ open: boolean }>`
     }
 `;
 
-const StyledHeader = styled.header`
+const StyledHeader = styled.header<{ color: string }>`
     display: flex;
     height: 48px;
     box-shadow: 0 2px 2px #0004;
@@ -38,21 +38,23 @@ const StyledHeader = styled.header`
     justify-content: space-between;
     margin: 0;
     padding: 0;
-    padding-left: 4px;
-    background-color: white;
+    background-color: ${(p) => p.color};
 
     nav {
         display: flex;
+        align-items: center;
     }
     a {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-decoration: none;
-        color: black;
-        margin-right: 4px;
-        padding: 8px;
-        border-radius: 4px;
+        color: white;
+        width: 48px;
+        height: 48px;
         transition: background ease 0.3s;
         position: relative;
+        cursor: pointer;
 
         &:hover {
             background-color: #0004;
@@ -78,7 +80,10 @@ const StyledHeader = styled.header`
     flex-shrink: 0;
 `;
 
-export function Header(p: { children?: ReactNode }) {
+export function Header(p: {
+    children?: ReactNode;
+    mode: 'card' | 'money' | 'bingo';
+}) {
     const [isFullscreen, setFullscreen] = useState(false);
 
     document.addEventListener('fullscreenchange', (e) =>
@@ -96,19 +101,27 @@ export function Header(p: { children?: ReactNode }) {
     }
 
     return (
-        <StyledHeader>
+        <StyledHeader
+            color={
+                p.mode == 'card'
+                    ? '#1a1a1a'
+                    : p.mode == 'money'
+                    ? '#454837'
+                    : '#3138ad'
+            }
+        >
             <nav>
                 <Link to="/" about="Atrás" className="material-icons">
                     arrow_back
                 </Link>
                 <a
-                    href="#"
-                    about="Número"
+                    about="Pantalla completa"
                     className="material-icons"
                     onClick={toggleFullScreen}
                 >
                     {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
                 </a>
+                <img src={'/res/score.svg#' + p.mode} height="40" alt="Score" />
             </nav>
             <nav>{p.children}</nav>
         </StyledHeader>

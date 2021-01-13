@@ -322,7 +322,7 @@ const Banker: FC = (_props) => {
 
     return (
         <div className="_MP">
-            <Header>
+            <Header mode="money">
                 <a
                     href="#"
                     about="Abrir"

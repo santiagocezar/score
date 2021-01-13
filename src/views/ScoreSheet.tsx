@@ -207,7 +207,7 @@ export default class ScoreSheet extends React.Component<{}, SheetState> {
 
         return (
             <Wrapper>
-                <Header>
+                <Header mode="card">
                     <a
                         href="#"
                         className="material-icons"

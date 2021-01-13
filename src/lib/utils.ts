@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 export interface Player {
     name: string;
     score: number;
@@ -47,4 +49,16 @@ export function loadString(callback: (text: string) => void) {
 
 export function range(size: number, startAt = 0) {
     return [...Array(size).keys()].map((i) => i + startAt);
+}
+
+export function useEvent<
+    K extends keyof DocumentEventMap,
+    C extends (this: Document, ev: DocumentEventMap[K]) => any
+>(type: K, listener: C, options?: boolean | AddEventListenerOptions): void {
+    useEffect(() => {
+        document.addEventListener(type, listener, options);
+        return () => {
+            document.removeEventListener(type, listener, options);
+        };
+    }, [listener]);
 }
