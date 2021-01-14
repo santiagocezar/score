@@ -5,6 +5,7 @@ import { range, useEvent } from 'lib/utils';
 import { Set } from 'immutable';
 import StyledBall from 'components/Ball';
 import Dialog from 'components/Dialogs';
+import { Icon } from 'components/Commons';
 
 const NumberGrid = styled.div`
     display: grid;
@@ -50,6 +51,7 @@ const Num = styled.span<{ new?: boolean; played?: boolean }>`
 
 const Warranty = styled.div`
     padding: 16px;
+    max-width: 512px;
 `;
 
 const NUMBERS = range(90, 1);
@@ -59,7 +61,7 @@ export default function Bingo() {
     const [newNum, setNewNum] = useState(0);
     const [showBall, setShowBall] = useState(false);
     const [preventDoubleClick, setPDC] = useState(false);
-    const [showingWarranty, setShowingWarranty] = useState(true);
+    const [showingWarranty, setShowingWarranty] = useState(false);
 
     /// This is for resetting the ball animation
     useEffect(() => {
@@ -107,11 +109,17 @@ export default function Bingo() {
         <div className="_MP">
             {showBall && <StyledBall>{newNum}</StyledBall>}
             <Header mode="bingo">
-                <a about="Reiniciar" className="material-icons" onClick={reset}>
-                    restore_page
+                <a
+                    about="Condiciones"
+                    onClick={(e) => setShowingWarranty(true)}
+                >
+                    <Icon name="info" />
                 </a>
-                <a about="Número" className="material-icons" onClick={random}>
-                    casino
+                <a about="Reiniciar" onClick={reset}>
+                    <Icon name="restore_page" />
+                </a>
+                <a about="Número" onClick={random}>
+                    <Icon name="casino" />
                 </a>
             </Header>
             <NumberGrid>
@@ -127,13 +135,12 @@ export default function Bingo() {
                 title="Aviso de garantía"
             >
                 <Warranty>
-                    <b>Hecho por Santiago Cézar</b>
                     <p>
-                        Este programa se distribuye con la esperanza de que sea
-                        útil, pero SIN NINGUNA GARANTÍA; ni siquiera la garantía
-                        implícita de COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO
-                        PARTICULAR. Vea la Licencia Pública General de GNU para
-                        más detalles.
+                        Desarrollo de carácter educativo.{' '}
+                        <strong>
+                            No se permite el uso para fines lucrativos.
+                        </strong>{' '}
+                        Sin ninguna garantía para un propósito en particular.
                     </p>
                 </Warranty>
             </Dialog>
