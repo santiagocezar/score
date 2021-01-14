@@ -1,35 +1,47 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
-type CardProps = {
+export function Card(p: {
     src: string;
     name: string;
     to: string;
     description: string;
-};
-
-export class Card extends React.Component<CardProps>{
-    render() {
-        return (
-            <Link to={this.props.to}>
-                <img src={this.props.src} alt={this.props.name} />
-                <div>
-                    <h2>{this.props.name}</h2>
-                    <p>{this.props.description}</p>
-                </div>
-            </Link>
-        );
-    }
+}) {
+    return (
+        <Link to={p.to}>
+            <img src={p.src} alt={p.name} />
+            <div>
+                <h2>{p.name}</h2>
+                <p>{p.description}</p>
+            </div>
+        </Link>
+    );
 }
 
-export const Icon: React.FunctionComponent<{ name: string; size: number; }> = ({ name, size }) => {
-    return (
-        <svg viewBox="0 0 32 32" style={{
-            display: 'inline-block',
-            width: size,
-            height: size,
-        }}>
-            <use xlinkHref={`#${name}`} />
-        </svg>
-    );
-};
+const BaseIcon = styled.i`
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    user-select: none;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -moz-font-feature-settings: 'liga';
+    -moz-osx-font-smoothing: grayscale;
+`;
+
+export const Icon = (p: { name: string; className?: string }) => (
+    <BaseIcon className={p.className}>{p.name}</BaseIcon>
+);
+
+export const InlineIcon = styled(Icon)`
+    display: inline;
+    line-height: inherit;
+    vertical-align: middle;
+`;
