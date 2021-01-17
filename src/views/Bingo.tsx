@@ -5,7 +5,8 @@ import { range, useEvent } from 'lib/utils';
 import { Set } from 'immutable';
 import StyledBall from 'components/Ball';
 import Dialog from 'components/Dialogs';
-import { Icon } from 'components/Commons';
+import { Icon, InlineIcon } from 'components/Commons';
+import TextBody from 'components/TextBody';
 
 const NumberGrid = styled.div`
     display: grid;
@@ -110,7 +111,7 @@ export default function Bingo() {
             {showBall && <StyledBall>{newNum}</StyledBall>}
             <Header mode="bingo">
                 <a
-                    about="Condiciones"
+                    about="Instrucciones"
                     onClick={(e) => setShowingWarranty(true)}
                 >
                     <Icon name="info" />
@@ -122,7 +123,7 @@ export default function Bingo() {
                     <Icon name="casino" />
                 </a>
             </Header>
-            <NumberGrid>
+            <NumberGrid onTouchEnd={random}>
                 {NUMBERS.map((n) => (
                     <Num new={n == newNum} played={played.has(n)} key={n}>
                         {('0' + n).slice(-2)}
@@ -134,7 +135,18 @@ export default function Bingo() {
                 onClosed={() => setShowingWarranty(false)}
                 title="Aviso de garantía"
             >
-                <Warranty>
+                <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
+                    <h2 id="modo-bingo">Modo Bingo</h2>
+                    <p>
+                        Haga clic en
+                        <InlineIcon name="casino" />
+                        para sacar un número aleatorio y marcarlo en la grilla.
+                        <InlineIcon name="restore_page" />
+                        para limpiar la grilla. Otra manera para sacar los
+                        números es presionado la tecla espacio o en el celular
+                        tocando la grilla
+                    </p>
+                    <h2 id="condiciones-de-uso">Condiciones de Uso</h2>
                     <p>
                         Desarrollo de carácter educativo.{' '}
                         <strong>
@@ -142,7 +154,7 @@ export default function Bingo() {
                         </strong>{' '}
                         Sin ninguna garantía para un propósito en particular.
                     </p>
-                </Warranty>
+                </TextBody>
             </Dialog>
         </div>
     );
