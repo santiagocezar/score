@@ -4,7 +4,7 @@ import { Header } from 'components/Header';
 import { range, useEvent } from 'lib/utils';
 import { Set } from 'immutable';
 import StyledBall from 'components/Ball';
-import Dialog from 'components/Dialogs';
+import Dialog, { Action } from 'components/Dialogs';
 import { Icon, InlineIcon } from 'components/Commons';
 import TextBody from 'components/TextBody';
 
@@ -62,7 +62,8 @@ export default function Bingo() {
     const [newNum, setNewNum] = useState(0);
     const [showBall, setShowBall] = useState(false);
     const [preventDoubleClick, setPDC] = useState(false);
-    const [showingWarranty, setShowingWarranty] = useState(false);
+    const [showingHelp, setShowingHelp] = useState(false);
+    const [showingConfirm, setShowingConfirm] = useState(false);
 
     /// This is for resetting the ball animation
     useEffect(() => {
@@ -90,6 +91,7 @@ export default function Bingo() {
 
     function reset() {
         setPlayed(played.clear());
+        setShowingConfirm(false);
         setNewNum(0);
     }
     function random() {
@@ -104,19 +106,16 @@ export default function Bingo() {
         }
     }
 
-    console.log(showingWarranty);
+    console.log(showingHelp);
 
     return (
         <div className="_MP">
             {showBall && <StyledBall>{newNum}</StyledBall>}
             <Header mode="bingo">
-                <a
-                    about="Instrucciones"
-                    onClick={(e) => setShowingWarranty(true)}
-                >
+                <a about="Ayuda" onClick={(e) => setShowingHelp(true)}>
                     <Icon name="info" />
                 </a>
-                <a about="Reiniciar" onClick={reset}>
+                <a about="Reiniciar" onClick={() => setShowingConfirm(true)}>
                     <Icon name="restore_page" />
                 </a>
                 <a about="Número" onClick={random}>
@@ -131,20 +130,35 @@ export default function Bingo() {
                 ))}
             </NumberGrid>
             <Dialog
-                open={showingWarranty}
-                onClosed={() => setShowingWarranty(false)}
-                title="Aviso de garantía"
+                open={showingConfirm}
+                onClosed={() => setShowingConfirm(false)}
+                title="Confirmar"
             >
                 <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
-                    <h2 id="modo-bingo">Modo Bingo</h2>
+                    Seguro que quiere empezar de nuevo?
+                </TextBody>
+                <Action name="Si" do={reset} />
+                <Action
+                    name="No"
+                    do={() => setShowingConfirm(false)}
+                    highlight
+                />
+            </Dialog>
+            <Dialog
+                open={showingHelp}
+                onClosed={() => setShowingHelp(false)}
+                title="Ayuda"
+            >
+                <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
+                    <h2 id="modo-bingo">Instrucciones</h2>
                     <p>
-                        Haga clic en
-                        <InlineIcon name="casino" />
-                        para sacar un número aleatorio y marcarlo en la grilla.
+                        Para sortear un número haga clic en
+                        <InlineIcon name="casino" />, presione la tecla espacio
+                        o toque la grilla (solo en teléfonos).
+                    </p>
+                    <p>
+                        Para empezar de nuevo haga clic en{' '}
                         <InlineIcon name="restore_page" />
-                        para limpiar la grilla. Otra manera para sacar los
-                        números es presionado la tecla espacio o en el celular
-                        tocando la grilla
                     </p>
                     <h2 id="condiciones-de-uso">Condiciones de Uso</h2>
                     <p>

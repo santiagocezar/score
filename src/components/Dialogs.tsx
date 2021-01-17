@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import styled from 'styled-components';
 
 const ExitButton = styled.button`
@@ -91,12 +91,67 @@ const StyledDialog = styled.div`
     }
 `;
 
+const DialogActions = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-shrink: 0;
+    height: 48px;
+    overflow-y: hidden;
+    border-top: 1px solid #0004;
+
+    button {
+        flex-grow: 1;
+        background: none;
+        border: none;
+        padding: none;
+        margin: none;
+        font-size: 20px;
+        font-weight: bold;
+        color: black;
+        &.highlight {
+            color: white;
+            background-color: #ff007f;
+        }
+    }
+`;
+export function Action(p: {
+    name: string;
+    do: () => void;
+    highlight?: boolean;
+}) {
+    return (
+        <button onClick={p.do} className={p.highlight ? 'highlight' : ''}>
+            {p.name}
+        </button>
+    );
+}
+
+function isElement(el: ReactNode): el is ReactElement {
+    return (
+        el !== null &&
+        typeof el !== 'boolean' &&
+        typeof el !== 'undefined' &&
+        !Array.isArray(el)
+    );
+}
+
 export default function Dialog(p: {
     title: string;
     open: boolean;
     onClosed: () => void;
     children?: ReactNode;
 }) {
+    const children = [];
+    const actions = [];
+    React.Children.forEach(p.children, (child) => {
+        if (isElement(child) && child.type == Action) {
+            actions.push(child);
+        } else {
+            children.push(child);
+        }
+    });
     return (
         p.open && (
             <Background>
@@ -108,7 +163,10 @@ export default function Dialog(p: {
                         />
                         <h1>{p.title}</h1>
                     </DialogHeader>
-                    <DialogBody>{p.children}</DialogBody>
+                    <DialogBody>{children}</DialogBody>
+                    {actions.length != 0 && (
+                        <DialogActions>{actions}</DialogActions>
+                    )}
                 </StyledDialog>
             </Background>
         )
