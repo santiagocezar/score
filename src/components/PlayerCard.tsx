@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled, { css } from 'styled-components';
 import Avatar, { icon } from './Avatar';
 
-export enum sel {
+export enum Selection {
     Unselected,
     From,
     To,
@@ -136,11 +136,11 @@ type PlayerCardProps = {
     money: number;
     isBank: boolean;
     add?: boolean;
-    colors?: string[];
+    stripes?: string[];
     inputCallback: (name: string, amount: number) => void;
-    defaultValue: string;
+    defaultInputValue: string;
     onSelection: (name: string) => void;
-    selection: sel;
+    selection: Selection;
 };
 
 export default class PlayerCard extends Component<PlayerCardProps> {
@@ -166,8 +166,8 @@ export default class PlayerCard extends Component<PlayerCardProps> {
 
         // Pressed confirm
         if (
-            selection == sel.To ||
-            selection == sel.From ||
+            selection == Selection.To ||
+            selection == Selection.From ||
             this.props.add == true
         ) {
             if (ok) {
@@ -175,7 +175,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                 if (this.state.amount != '') {
                     m = Number(this.state.amount);
                 } else {
-                    m = Number(this.props.defaultValue);
+                    m = Number(this.props.defaultInputValue);
                 }
                 if (isNaN(m)) m = 0; // Just in case
                 let n = this.state.name == '' ? null : this.state.name;
@@ -191,7 +191,10 @@ export default class PlayerCard extends Component<PlayerCardProps> {
     }
 
     selected(e: React.MouseEvent<HTMLLIElement>) {
-        if (this.props.selection == sel.Unselected && this.props.add != true) {
+        if (
+            this.props.selection == Selection.Unselected &&
+            this.props.add != true
+        ) {
             this.props.onSelection(this.props.name);
             e.preventDefault();
         }
@@ -213,23 +216,23 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         let confirm =
             this.state.amount != '' ||
             (adding && this.state.name != '') ||
-            this.props.defaultValue != '';
+            this.props.defaultInputValue != '';
 
         let avatarIcon = icon.Human;
         if (confirm) {
             avatarIcon = icon.Confirm;
         } else {
-            if (selection == sel.From) {
+            if (selection == Selection.From) {
                 avatarIcon = icon.From;
-            } else if (selection == sel.To) {
+            } else if (selection == Selection.To) {
                 avatarIcon = icon.To;
             } else if (isBank) avatarIcon = icon.Bank;
             else if (addMode) avatarIcon = icon.Add;
         }
 
         let stripes = [];
-        if (this.props.colors) {
-            for (let c of this.props.colors) {
+        if (this.props.stripes) {
+            for (let c of this.props.stripes) {
                 stripes.push(<Stripe c={c} />);
             }
         }
@@ -240,7 +243,9 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                     onClick={(e) => this.clickAvatar(true)}
                 />
                 <Stripes>{stripes}</Stripes>
-                {(selection == sel.To || selection == sel.From || adding) && (
+                {(selection == Selection.To ||
+                    selection == Selection.From ||
+                    adding) && (
                     <Avatar
                         icon={icon.Cancel}
                         onClick={(e) => this.clickAvatar(false)}
@@ -265,7 +270,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                 ) : (
                     <h2 className="name">{name}</h2>
                 )}
-                {selection == sel.To || adding ? (
+                {selection == Selection.To || adding ? (
                     <label className="money">
                         $&nbsp;
                         <input
@@ -280,9 +285,9 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                                 if (e.key == 'Enter') this.clickAvatar(true);
                             }}
                             placeholder={
-                                this.props.defaultValue == ''
+                                this.props.defaultInputValue == ''
                                     ? `${this.props.money}...`
-                                    : this.props.defaultValue
+                                    : this.props.defaultInputValue
                             }
                         />
                     </label>

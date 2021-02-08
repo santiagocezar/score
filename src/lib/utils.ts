@@ -19,6 +19,10 @@ export function saveString(name: string, text: string) {
     document.body.removeChild(el);
 }
 
+/**
+ * Load a file
+ * @param callback A function called with the text inside the file
+ */
 export function loadString(callback: (text: string) => void) {
     let inp = document.createElement('input');
     inp.setAttribute('type', 'file');

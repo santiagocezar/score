@@ -40,6 +40,11 @@ const StyledHeader = styled.header<{ color: string }>`
     padding: 0;
     background-color: ${(p) => p.color};
 
+    @media screen and (max-width: 500px) {
+        img {
+            display: none;
+        }
+    }
     nav {
         display: flex;
         align-items: center;
@@ -121,7 +126,7 @@ export function Header(p: {
                 >
                     {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
                 </a>
-                <img src={'/res/score.svg#' + p.mode} height="40" alt="Score" />
+                <img src={'/res/score.svg#' + p.mode} alt="Score" />
             </nav>
             <nav>{p.children}</nav>
         </StyledHeader>
