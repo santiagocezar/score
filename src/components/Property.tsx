@@ -1,17 +1,7 @@
+import { PropertyData } from 'lib/types';
 import React, { Component } from 'react';
 import styled, { css } from 'styled-components';
 import Avatar, { icon } from './Avatar';
-
-export type PropertyData = {
-    id: number;
-    name: string;
-    cost: number;
-    group: string;
-    rent?: number[];
-    house?: number;
-    type?: 'station' | 'service';
-    description?: string;
-};
 
 const Card = styled.div<{ expanded: boolean }>`
     border: 1px solid black;

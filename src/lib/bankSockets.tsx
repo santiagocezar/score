@@ -1,72 +1,96 @@
-import React, { Component, useEffect, useRef } from 'react';
-import { BankContext, useBank } from './bankContext';
+import { OrderedMap } from 'immutable';
+import { type } from 'os';
+import React, { Component, useEffect, useRef, useState } from 'react';
+import { BankContext, useBank, Player, encodePlayers } from './bankContext';
+import { Action } from './types';
+import { useEvent } from './utils';
 
-const FARO = 'ws://localhost:8080';
+const SERVER = 'ws://localhost:2404';
 
-export default function BankRTC() {
+export default function BankSocket() {
     const bank = useBank();
-    const peer = useRef<RTCPeerConnection>();
-    const faro = useRef<WebSocket>(new WebSocket(FARO + '?id=' + 'SCSC'));
-    const channel = useRef<RTCDataChannel>();
+    const server = useRef<WebSocket>(new WebSocket(SERVER));
+    const ID = useRef<string>();
+    const onlinePlayers = useRef(OrderedMap<string, Player>());
 
-    function handleDataChannel(e: RTCDataChannelEvent) {
-        console.log('Channel');
-        channel.current = e.channel;
-        channel.current.addEventListener('message', (e) => {
-            console.log(e.data);
-        });
+    function sendAction(action: Action) {
+        if (server.current.readyState == 1)
+            server.current.send(JSON.stringify(action));
     }
-
-    function handleSignal(this: WebSocket, e: MessageEvent<any>) {
-        console.log(e.data);
-        const msg = JSON.parse(e.data);
-        if (msg.offer) {
-            const desc = new RTCSessionDescription(msg.offer);
-            peer.current.setRemoteDescription(desc);
-            peer.current.createAnswer().then((a) => {
-                peer.current.setLocalDescription(a);
-                this.send(JSON.stringify({ answer: a }));
-            });
+    function handleMessage(e: MessageEvent<ArrayBuffer | string>) {
+        let data =
+            typeof e.data == 'string'
+                ? e.data
+                : new TextDecoder('utf-8').decode(e.data);
+        console.log(data);
+        const action: Action = JSON.parse(data);
+        switch (action.type) {
+            case 'REGISTERED': {
+                ID.current = action.id;
+                break;
+            }
+            case 'JOIN': {
+                const player = bank.players.get(action.name);
+                if (player && !onlinePlayers.current.has(action.id)) {
+                    onlinePlayers.current = onlinePlayers.current.set(
+                        action.id,
+                        player
+                    );
+                    console.log(ID.current);
+                    sendAction({
+                        type: 'GAME_STATE',
+                        admin_id: ID.current,
+                        state: {
+                            players: encodePlayers(bank.players),
+                            properties: bank.properties,
+                        },
+                    });
+                } else {
+                    sendAction({
+                        type: 'UNAVAILABLE',
+                        id: action.id,
+                    });
+                }
+                break;
+            }
+            case 'DISCONNECTED': {
+                onlinePlayers.current = onlinePlayers.current.remove(action.id);
+                break;
+            }
+            case 'SEND': {
+                const name = onlinePlayers.current.get(action.id).name;
+                const to = bank.players.has(action.to) ? action.to : name;
+                const amount = isNaN(action.amount)
+                    ? 0
+                    : Math.floor(action.amount);
+                const property = bank.players
+                    .get(name)
+                    .properties.has(action.with_property)
+                    ? action.with_property
+                    : null;
+                bank.sendMoney(name, to, amount, property);
+            }
         }
-        if (msg.iceCandidate) {
-            console.log('accepting candidate');
-            const canditate = new RTCIceCandidate(msg.iceCandidate);
-            peer.current.addIceCandidate(canditate).catch(console.error);
-        }
-    }
-
-    async function createPeer() {
-        console.log('a');
-        peer.current = new RTCPeerConnection({
-            iceServers: [
-                {
-                    urls: 'stun:stun.stunprotocol.org',
-                },
-            ],
-        });
-
-        peer.current.onconnectionstatechange = () =>
-            console.log(peer.current.connectionState);
-        peer.current.ondatachannel = handleDataChannel;
-        faro.current.onmessage = handleSignal;
-    }
-
-    function close() {
-        peer.current.close();
     }
 
     useEffect(() => {
-        console.log(bank.players);
-        if (channel.current) {
-            console.log('b');
-            channel.current.send(JSON.stringify(bank.players));
-        }
+        sendAction({
+            type: 'GAME_STATE',
+            admin_id: ID.current,
+            state: {
+                players: encodePlayers(bank.players),
+                properties: bank.properties,
+            },
+        });
     }, [bank]);
 
     useEffect(() => {
-        createPeer();
-        return () => close;
+        server.current.binaryType = 'arraybuffer';
     }, []);
 
-    return <p>id SCSC</p>;
+    useEvent(server.current, 'message', (e) => {
+        handleMessage(e);
+    });
+
+    return null;
 }

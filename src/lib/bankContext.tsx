@@ -1,6 +1,6 @@
-import { PropertyData } from 'components/Property';
 import { List, OrderedMap, Set } from 'immutable';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { JSONPlayer, PropertyData } from './types';
 
 export const LOCALSTORAGE_KEY = 'moneysave';
 
@@ -11,7 +11,7 @@ function PlayerMap(...p: Parameters<typeof OrderedMap>): PlayerMap {
 
 type Transaction = { action: string; money: number; id: number };
 
-type Player = {
+export type Player = {
     isBank: boolean;
     name: string;
     money: number;
@@ -19,28 +19,26 @@ type Player = {
     prevScore: number[];
 };
 
-type PlayerSave = {
-    isBank: boolean;
-    name: string;
-    money: number;
-    properties: number[];
-};
-
-function writeSave(players: PlayerMap) {
-    let saveData: Record<string, PlayerSave> = {};
+export function encodePlayers(players: PlayerMap) {
+    let encoded: Record<string, JSONPlayer> = {};
     for (let [key, player] of players) {
-        saveData[key] = {
+        encoded[key] = {
             isBank: player.isBank,
             name: player.name,
             money: player.money,
             properties: player.properties.toArray(),
         };
     }
+    return encoded;
+}
+
+function writeSave(players: PlayerMap) {
+    let saveData = encodePlayers(players);
     console.log('saving ', saveData);
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(saveData));
 }
 
-function isPlayer(player: any): player is PlayerSave {
+function isPlayer(player: any): player is JSONPlayer {
     if (typeof player === 'object') {
         if (
             'name' in player &&

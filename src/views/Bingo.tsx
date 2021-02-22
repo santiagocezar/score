@@ -80,7 +80,7 @@ export default function Bingo() {
         }
     }, [preventDoubleClick]);
 
-    useEvent('keypress', (e) => {
+    useEvent(document, 'keypress', (e) => {
         if (e.code == 'Space') {
             random();
             e.preventDefault();

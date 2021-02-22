@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import TextBody from 'components/TextBody';
 import Usage from 'views/Usage';
 import BankProvider from 'lib/bankContext';
-import BankRTC from 'lib/bankSockets';
+import BankSocket from 'lib/bankSockets';
 
 const SC = () => (
     <a
@@ -77,7 +77,7 @@ export default function App() {
                     <Route path="/money">
                         <BankProvider>
                             <Banker />
-                            {/* <BankRTC />*/}
+                            <BankSocket />
                         </BankProvider>
                     </Route>
                     <Route path="/sheet">

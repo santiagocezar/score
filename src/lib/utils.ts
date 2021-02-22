@@ -1,11 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-export interface Player {
-    name: string;
-    score: number;
-    prevScore: number[];
-}
-
 export function saveString(name: string, text: string) {
     let el = document.createElement('a');
     el.setAttribute(
@@ -55,14 +49,27 @@ export function range(size: number, startAt = 0) {
     return [...Array(size).keys()].map((i) => i + startAt);
 }
 
+export type EventMap<T extends EventTarget> = T extends Window
+    ? WindowEventMap
+    : T extends Document
+    ? DocumentEventMap
+    : T extends WebSocket
+    ? WebSocketEventMap
+    : Parameters<T['addEventListener']>[0];
+
 export function useEvent<
-    K extends keyof DocumentEventMap,
-    C extends (this: Document, ev: DocumentEventMap[K]) => any
->(type: K, listener: C, options?: boolean | AddEventListenerOptions): void {
+    T extends EventTarget,
+    K extends keyof EventMap<T> & string
+>(
+    target: T,
+    type: K,
+    listener: (this: T, evt: EventMap<T>[K] & Event) => any,
+    options?: boolean | AddEventListenerOptions
+): void {
     useEffect(() => {
-        document.addEventListener(type, listener, options);
+        target.addEventListener(type, listener, options);
         return () => {
-            document.removeEventListener(type, listener, options);
+            target.removeEventListener(type, listener, options);
         };
     }, [listener]);
 }
