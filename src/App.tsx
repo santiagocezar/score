@@ -50,7 +50,7 @@ export default function App() {
                         </p>
                         <div className="gameSelect">
                             <Card
-                                src="res/money.svg"
+                                src="/res/money.svg"
                                 name="Dinero"
                                 to="/money"
                                 description="Para juegos en donde hay un banco 
@@ -58,14 +58,14 @@ export default function App() {
                                      Acepta transferencias y rankings"
                             />
                             <Card
-                                src="res/cards.svg"
+                                src="/res/cards.svg"
                                 name="Tabla"
                                 to="/sheet"
                                 description="Planilla de puntaje tradicional. 
                                     Recomendada para juegos de cartas"
                             />
                             <Card
-                                src="res/bingo.svg"
+                                src="/res/bingo.svg"
                                 name="Bingo"
                                 to="/bingo"
                                 description="Herramienta para elegir números

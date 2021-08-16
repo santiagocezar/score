@@ -28,7 +28,7 @@ const StyledBall = styled.div`
     height: 128px;
     background-color: #cd4fd1;
     background-image: linear-gradient(to bottom, #fff4, #fff0),
-        url('res/ballground.svg');
+        url('/res/ballground.svg');
     box-shadow: 0 0 32px #0008;
     top: 50%;
     left: 50%;
