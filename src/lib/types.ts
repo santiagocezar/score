@@ -17,35 +17,35 @@ export type PropertyData = {
 };
 
 export type GameState = {
-    players?: { [key: string]: JSONPlayer };
+    players?: { [key: string]: JSONPlayer; };
     properties?: PropertyData[];
 };
 
 export type Action =
     | {
-          type: 'REGISTERED';
-          admin_id: string;
-          id: string;
-      }
-    | { type: 'DISCONNECTED'; id: string }
+        type: 'REGISTERED';
+        admin_id: string;
+        id: string;
+    }
+    | { type: 'DISCONNECTED'; id: string; }
     | {
-          type: 'GAME_STATE';
-          admin_id: string;
-          state: GameState;
-      }
+        type: 'GAME_STATE';
+        admin_id: string;
+        state: GameState;
+    }
     | {
-          type: 'JOIN';
-          name: string;
-          id: string;
-      }
+        type: 'JOIN';
+        name: string;
+        id: string;
+    }
     | {
-          type: 'UNAVAILABLE';
-          id: string;
-      }
+        type: 'UNAVAILABLE';
+        id: string;
+    }
     | {
-          type: 'SEND';
-          to: string;
-          amount: number;
-          with_property?: number;
-          id: string;
-      };
+        type: 'SEND';
+        to: string;
+        amount: number;
+        with_property?: number;
+        id: string;
+    };

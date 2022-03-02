@@ -67,9 +67,13 @@ export function useEvent<
     options?: boolean | AddEventListenerOptions
 ): void {
     useEffect(() => {
+        //@ts-expect-error
         target.addEventListener(type, listener, options);
         return () => {
+            //@ts-expect-error
             target.removeEventListener(type, listener, options);
         };
     }, [listener]);
 }
+
+export const tuple = <T extends [...any[]]>(...args: T): T => args;

@@ -1,15 +1,24 @@
-import { List, OrderedMap, Set } from 'immutable';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { JSONPlayer, PropertyData } from './types';
 
 export const LOCALSTORAGE_KEY = 'moneysave';
 
-type PlayerMap = OrderedMap<string, Player>;
-function PlayerMap(...p: Parameters<typeof OrderedMap>): PlayerMap {
-    return OrderedMap(...p);
-}
+class PlayerMap extends Map<string, Player> {
+    serialize() {
+        let encoded: Record<string, JSONPlayer> = {};
+        for (let [key, player] of this) {
+            encoded[key] = {
+                isBank: player.isBank,
+                name: player.name,
+                money: player.money,
+                properties: [...player.properties],
+            };
+        }
+        return encoded;
+    }
+};
 
-type Transaction = { action: string; money: number; id: number };
+type Transaction = { action: string; money: number; id: number; };
 
 export type Player = {
     isBank: boolean;
@@ -19,21 +28,8 @@ export type Player = {
     prevScore: number[];
 };
 
-export function encodePlayers(players: PlayerMap) {
-    let encoded: Record<string, JSONPlayer> = {};
-    for (let [key, player] of players) {
-        encoded[key] = {
-            isBank: player.isBank,
-            name: player.name,
-            money: player.money,
-            properties: player.properties.toArray(),
-        };
-    }
-    return encoded;
-}
-
 function writeSave(players: PlayerMap) {
-    let saveData = encodePlayers(players);
+    let saveData = players.serialize();
     console.log('saving ', saveData);
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(saveData));
 }
@@ -55,10 +51,10 @@ function isPlayer(player: any): player is JSONPlayer {
 }
 
 export function loadSave(save?: string): PlayerMap {
-    save ??= localStorage.getItem(LOCALSTORAGE_KEY) ?? '{}';
-    let players = PlayerMap();
+    const usedSave = save ?? localStorage.getItem(LOCALSTORAGE_KEY) ?? '{}';
+    let players = new PlayerMap();
 
-    let savedPlayers: Record<string, any> = JSON.parse(save);
+    let savedPlayers: Record<string, any> = JSON.parse(usedSave);
     let thereIsBank = false;
     for (let name in savedPlayers) {
         console.info(name);
@@ -69,7 +65,7 @@ export function loadSave(save?: string): PlayerMap {
                 isBank: player.isBank ?? false,
                 name: player.name,
                 money: player.money,
-                properties: Set(player.properties),
+                properties: new Set(player.properties),
                 prevScore: [],
             });
         } else {
@@ -113,11 +109,11 @@ export const BankContext = createContext<BankContextType>({
     properties: [],
     ownedProperties: Set(),
     history: List(),
-    sendMoney(from: string, to: string, amount: number, property?: number) {},
-    setPlayers(players: PlayerMap) {},
-    createPlayer(name: string, amount: number) {},
-    reloadProperties() {},
-    restart() {},
+    sendMoney(from: string, to: string, amount: number, property?: number) { },
+    setPlayers(players: PlayerMap) { },
+    createPlayer(name: string, amount: number) { },
+    reloadProperties() { },
+    restart() { },
 });
 
 function loadProperties(): PropertyData[] | null {
@@ -131,7 +127,7 @@ function loadProperties(): PropertyData[] | null {
     return properties;
 }
 
-export default function BankProvider(p: { children: ReactNode }) {
+export default function BankProvider(p: { children: ReactNode; }) {
     const [players, setPlayers] = useState(() => loadSave());
     const [properties, setProperties] = useState(() => loadProperties());
     const [ownedProperties, setOwnedProperties] = useState(() =>

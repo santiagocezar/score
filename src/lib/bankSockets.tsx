@@ -1,7 +1,7 @@
 import { OrderedMap } from 'immutable';
 import { type } from 'os';
 import React, { Component, useEffect, useRef, useState } from 'react';
-import { BankContext, useBank, Player, encodePlayers } from './bankContext';
+import { BankContext, useBank, Player, serializePlayers } from './bankContext';
 import { Action } from './types';
 import { useEvent } from './utils';
 
@@ -41,7 +41,7 @@ export default function BankSocket() {
                         type: 'GAME_STATE',
                         admin_id: ID.current,
                         state: {
-                            players: encodePlayers(bank.players),
+                            players: serializePlayers(bank.players),
                             properties: bank.properties,
                         },
                     });
@@ -78,7 +78,7 @@ export default function BankSocket() {
             type: 'GAME_STATE',
             admin_id: ID.current,
             state: {
-                players: encodePlayers(bank.players),
+                players: serializePlayers(bank.players),
                 properties: bank.properties,
             },
         });
