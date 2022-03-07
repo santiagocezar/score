@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Property, { PropertyData } from 'components/Property';
+import Property from 'components/Property';
+import { MonopolyProperty } from 'games/monopoly';
 
 const List = styled.div`
     display: flex;
@@ -39,11 +40,11 @@ const ImportButton = styled.button`
 `;
 
 type Props = {
-    properties: PropertyData[];
+    properties: MonopolyProperty[];
     empty?: boolean;
-    selected?: number;
-    onImport: () => void;
-    onPropertyClicked: (id: number) => void;
+    selected: number | null;
+    onImport?: () => void;
+    onPropertyClicked: (id: number | null) => void;
 };
 
 export default class OwnedProperties extends Component<Props> {
@@ -72,7 +73,7 @@ export default class OwnedProperties extends Component<Props> {
                         {propertyList}
                         {empty && (
                             <ImportButton
-                                onClick={(_) => this.props.onImport()}
+                                onClick={(_) => this.props.onImport?.()}
                             >
                                 Importar propiedades
                             </ImportButton>

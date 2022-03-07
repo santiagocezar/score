@@ -1,3 +1,3 @@
 export * from './board';
-export * from './react';
+export * from './registry';
 export * from './facet';

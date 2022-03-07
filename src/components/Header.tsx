@@ -1,8 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import scoreURL from 'res/score.svg';
 
-export const Sidebar = styled.div<{ open: boolean }>`
+export const Sidebar = styled.div<{ open: boolean; }>`
     display: block;
     position: fixed;
     top: 56px;
@@ -28,7 +29,7 @@ export const Sidebar = styled.div<{ open: boolean }>`
     }
 `;
 
-const StyledHeader = styled.header<{ color: string }>`
+const StyledHeader = styled.header<{ color: string; }>`
     display: flex;
     height: 48px;
     box-shadow: 0 2px 2px #0004;
@@ -111,8 +112,8 @@ export function Header(p: {
                 p.mode == 'card'
                     ? '#1a1a1a'
                     : p.mode == 'money'
-                    ? '#454837'
-                    : '#3138ad'
+                        ? '#454837'
+                        : '#3138ad'
             }
         >
             <nav>
@@ -126,7 +127,7 @@ export function Header(p: {
                 >
                     {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
                 </a>
-                <img src={'/res/score.svg#' + p.mode} alt="Score" />
+                <img src={`${scoreURL}#${p.mode}`} alt="Score" />
             </nav>
             <nav>{p.children}</nav>
         </StyledHeader>

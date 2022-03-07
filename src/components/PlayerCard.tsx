@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import styled, { css } from 'styled-components';
-import Avatar, { icon } from './Avatar';
+import { PlayerID } from 'lib/bx';
+import { styled } from 'lib/theme';
+import React, { Component, ComponentProps, FC, useMemo } from 'react';
+import { Avatar, Icon } from './Avatar';
 
 export enum Selection {
     Unselected,
@@ -8,138 +9,110 @@ export enum Selection {
     To,
 }
 
-const Stripe = styled.div<{ c: string }>`
-    display: block;
-    width: 12px;
-    height: 2px;
-    margin: 1px;
-    background-color: ${(p) => p.c};
-`;
+const StyledStripe = styled('div', {
+    display: 'block',
+    width: '12px',
+    height: '2px',
+    margin: '1px',
+});
 
-const Stripes = styled.div`
-    display: flex;
-    position: absolute;
-    flex-wrap: wrap-reverse;
-    align-items: flex-end;
-    align-content: flex-start;
-    flex-direction: row-reverse;
-    left: calc(100% - 48px);
-    top: calc(100% - 66px);
-    width: 42px;
-    height: 60px;
-`;
+const Stripe: FC<{ c: string; }> = ({ c }) =>
+    useMemo(() => <StyledStripe css={{ backgroundColor: c }} />, [c]);
 
-const CardItem = styled.li<{ add: boolean }>`
-    background-color: white;
-    color: black;
-    width: 192px;
-    height: 64px;
-    display: flex;
-    flex-direction: column;
-    padding-top: 2px;
-    padding-left: 8px;
-    padding-right: 8px;
-    border-radius: 8px;
-    box-sizing: border-box;
-    margin: 10px;
-    border: 1px solid royalblue;
-    position: relative;
-    flex-shrink: 0;
+const Stripes = styled('div', {
+    display: 'flex',
+    position: 'absolute',
+    flexWrap: 'wrap-reverse',
+    alignItems: 'flex-end',
+    alignContent: 'flex-start',
+    flexDirection: 'row-reverse',
+    left: 'calc(100% - 48px)',
+    top: 'calc(100% - 66px)',
+    width: '42px',
+    height: '60px',
+});
 
-    transition: transform ease 0.3s;
+const StyledCard = styled('li', {
+    backgroundColor: 'white',
+    color: 'black',
+    width: '12rem',
+    height: '5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: '2px',
+    paddingLeft: '8px',
+    paddingRight: '8px',
+    borderRadius: '1rem',
+    boxSizing: 'border-box',
+    margin: '10px',
+    border: '.25rem solid royalblue',
+    position: 'relative',
+    flexShrink: '0',
 
-    .name {
-        display: block;
-        margin-left: 20px;
-        font-size: 22px;
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    transition: 'transform ease 0.3s',
 
-    .money {
-        display: block;
-        font-size: 16px;
-        margin-top: 2px;
-        align-self: stretch;
-    }
+    '.name': {
+        display: 'block',
+        marginLeft: '20px',
+        fontSize: '22px',
+        fontWeight: '500',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+    },
 
-    label {
-        display: flex !important;
-    }
+    '.money': {
+        display: 'block',
+        fontSize: '16px',
+        marginTop: '2px',
+        alignSelf: 'stretch',
+    },
 
-    input {
-        flex-grow: 1;
-        width: 0;
-        margin-top: 0 !important;
-        margin-left: 0 !important;
-        background: none;
-        border-bottom: 1px dashed black;
+    'label': {
+        display: 'flex !important',
+    },
 
-        &::placeholder {
-            color: #0008;
+    'input': {
+        flexGrow: 1,
+        width: 0,
+        marginTop: '0 !important',
+        marginLeft: '0 !important',
+        background: 'none',
+        borderBottom: '1px dashed black',
+
+        '&::placeholder': {
+            color: '#0008',
+        }
+    },
+
+    '&:hover': {
+        //boxShadow: 0px 6px 12px #0004,
+        transform: 'translateY(-2px)',
+    },
+
+    '@media only screen and (maxWidth: 768px) ': {
+        width: 'calc(100% - 16px)',
+    },
+
+    variants: {
+        add: {
+            true: {
+                borderColor: '$bg300',
+                boxShadow: 'none',
+            }
         }
     }
-
-    ${(p) =>
-        p.add &&
-        css`
-            border-style: dashed;
-            box-shadow: none;
-        `}
-
-    &:hover {
-        //box-shadow: 0px 6px 12px #0004;
-        transform: translateY(-2px);
-    }
-
-    &:first-child {
-        border-color: black;
-    }
-
-    @media only screen and (max-width: 768px) {
-        width: calc(100% - 16px);
-    }
-`;
-
-const NameStyle = css`
-    display: block;
-    margin-left: 20px;
-    font-size: 22px;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-`;
-
-const MoneyStyle = css`
-    display: block;
-    font-size: 16px;
-    margin-top: 2px;
-    align-self: stretch;
-`;
-
-const InputStyle = css`
-    flex-grow: 1;
-    width: 0;
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    background: none;
-    border-bottom: 1px dashed black;
-
-    &::placeholder {
-        color: #0008;
-    }
-`;
+});
 
 type PlayerCardProps = {
+    pid: PlayerID;
     name: string;
     money: number;
-    isBank: boolean;
+    isBank?: boolean;
     add?: boolean;
     stripes?: string[];
-    inputCallback: (name: string, amount: number) => void;
+    inputCallback: (amount?: number, name?: string) => void;
     defaultInputValue: string;
-    onSelection: (name: string) => void;
+    onSelection: (pid: PlayerID) => void;
     selection: Selection;
 };
 
@@ -148,10 +121,6 @@ export default class PlayerCard extends Component<PlayerCardProps> {
         name: '',
         amount: '',
     };
-
-    constructor(props) {
-        super(props);
-    }
 
     inputChange(e: React.ChangeEvent<HTMLInputElement>) {
         if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
@@ -180,11 +149,11 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                 if (isNaN(m)) m = 0; // Just in case
                 let n = this.state.name == '' ? null : this.state.name;
 
-                inputCallback(n, m);
+                inputCallback(m, this.state.name);
                 this.setState({ name: '', amount: '' });
             } else {
                 // Pressed cancel
-                inputCallback(null, null);
+                inputCallback();
                 this.setState({ name: '', amount: '' });
             }
         }
@@ -195,7 +164,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
             this.props.selection == Selection.Unselected &&
             this.props.add != true
         ) {
-            this.props.onSelection(this.props.name);
+            this.props.onSelection(this.props.pid);
             e.preventDefault();
         }
     }
@@ -218,16 +187,16 @@ export default class PlayerCard extends Component<PlayerCardProps> {
             (adding && this.state.name != '') ||
             this.props.defaultInputValue != '';
 
-        let avatarIcon = icon.Human;
+        let avatarIcon: Icon = 'human';
         if (confirm) {
-            avatarIcon = icon.Confirm;
+            avatarIcon = 'confirm';
         } else {
             if (selection == Selection.From) {
-                avatarIcon = icon.From;
+                avatarIcon = 'from';
             } else if (selection == Selection.To) {
-                avatarIcon = icon.To;
-            } else if (isBank) avatarIcon = icon.Bank;
-            else if (addMode) avatarIcon = icon.Add;
+                avatarIcon = 'to';
+            } else if (isBank) avatarIcon = 'bank';
+            else if (addMode) avatarIcon = 'add';
         }
 
         let stripes = [];
@@ -237,7 +206,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
             }
         }
         return (
-            <CardItem add={addMode} onClick={this.selected.bind(this)}>
+            <StyledCard add={addMode} onClick={this.selected.bind(this)}>
                 <Avatar
                     icon={avatarIcon}
                     onClick={(e) => this.clickAvatar(true)}
@@ -246,11 +215,11 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                 {(selection == Selection.To ||
                     selection == Selection.From ||
                     adding) && (
-                    <Avatar
-                        icon={icon.Cancel}
-                        onClick={(e) => this.clickAvatar(false)}
-                    />
-                )}
+                        <Avatar
+                            icon="cancel"
+                            onClick={(e) => this.clickAvatar(false)}
+                        />
+                    )}
                 {adding ? (
                     <label className="name">
                         <input
@@ -294,7 +263,7 @@ export default class PlayerCard extends Component<PlayerCardProps> {
                 ) : (
                     !addMode && <span className="money">$ {money}</span>
                 )}
-            </CardItem>
+            </StyledCard>
         );
     }
 }

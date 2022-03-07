@@ -10,18 +10,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;700;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nova+Mono&display=swap">
-    <link rel="stylesheet" href="/index.css?v=130121">
-    <link rel="preload" as="image" href="/res/loading.webp">
+    <link rel="preload" as="image" href="./src/res/loading.webp">
+    <link rel="stylesheet" href="./src/lib/cssreset.css">
+    <link rel="stylesheet" href="./src/index.scss">
+    <script type="module" src="./src/main.tsx" defer="true"></script>
 </head>
 
 <body>
-    <style>
-        html,
-        body {
-            margin: 0;
-            height: 100%;
-        }
-    </style>
     <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1"
         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
@@ -57,7 +52,6 @@
         </defs>
     </svg>
     <div id="root" style="display: contents;"></div>
-    <script src="/main.js?v=130121" defer="true"></script>
 </body>
 
 </html>

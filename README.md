@@ -1,11 +1,11 @@
-# <img src="/res/score.svg" height="64" />
+# <img src="/src/res/score.svg" height="64" />
 
 Pruébelo en [score.scez.ar](https://score.scez.ar/)!
 
 Un contador de puntos web para tus juegos de mesa.
 
-![screenshot](/res/screenshot.png)
-![screenshot](/res/moneyscreenshot.png)
+![screenshot](/src/res/screenshot.png)
+![screenshot](/src/res/moneyscreenshot.png)
 
 <small>\*propiedades no incluidas</small>
 

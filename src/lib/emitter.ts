@@ -1,3 +1,5 @@
+import { DependencyList, useEffect, useRef, useState } from 'react';
+
 export class Emitter<A extends (readonly any[]) = []> {
     subscribers = new Set<(...args: A) => void>();
 

@@ -1,7 +1,7 @@
-import { PropertyData } from 'lib/types';
+import { MonopolyProperty } from 'games/monopoly';
 import React, { Component } from 'react';
 import styled, { css } from 'styled-components';
-import Avatar, { icon } from './Avatar';
+import { Avatar } from './Avatar';
 
 const Card = styled.div<{ expanded: boolean }>`
     border: 1px solid black;
@@ -86,30 +86,30 @@ const Train = styled.li`
 `;
 
 type Props = {
-    data: PropertyData;
+    data: MonopolyProperty;
     expanded?: boolean;
     className?: string;
     selected?: boolean;
-    onSelect?: (id: number) => void;
+    onSelect?: (id: number | null) => void;
 };
 export default class Property extends Component<Props> {
     render() {
         let {
-            data: { id, cost, group, house, name, rent, description, type },
+            data: { id, price, block, housing, name, rent, description, special },
             selected,
             onSelect,
         } = this.props;
         return (
             <Card
-                onClick={(_) => onSelect(selected ? null : id)}
+                onClick={(_) => onSelect?.(selected ? null : id)}
                 className={this.props.className}
                 expanded={this.props.expanded == true}
                 draggable={true}
             >
-                <Avatar icon={selected ? icon.From : icon.Property}></Avatar>
-                {selected && <Avatar icon={icon.Cancel}></Avatar>}
-                <Title color={group}>{name}</Title>
-                {type == 'service' ? (
+                <Avatar icon={selected ? "from" : "property"}></Avatar>
+                {selected && <Avatar icon="cancel"></Avatar>}
+                <Title color={block}>{name}</Title>
+                {special == 'service' ? (
                     <Content>
                         <Separator />
                         <span style={{ display: 'block', height: 200 }}>
@@ -119,37 +119,37 @@ export default class Property extends Component<Props> {
                         </span>
                         <Separator />
                         <p>
-                            <small>Valor de hipoteca $ {cost / 2}</small>
+                            <small>Valor de hipoteca $ {price / 2}</small>
                         </p>
                     </Content>
                 ) : (
                     <Content>
                         <Separator />
 
-                        <Rent>Alquiler $ {rent[0]}</Rent>
-                        {type == 'station' ? (
+                        <Rent>Alquiler $ {rent![0]}</Rent>
+                        {special == 'station' ? (
                             <ul style={{ display: 'block', height: 200 }}>
-                                <Train> × 2 — $ {rent[1]}</Train>
-                                <Train> × 3 — $ {rent[2]}</Train>
-                                <Train> × 4 — $ {rent[3]}</Train>
+                                <Train> × 2 — $ {rent![1]}</Train>
+                                <Train> × 3 — $ {rent![2]}</Train>
+                                <Train> × 4 — $ {rent![3]}</Train>
                             </ul>
                         ) : (
                             <ul>
-                                <House> × 1 — $ {rent[1]}</House>
-                                <House> × 2 — $ {rent[2]}</House>
-                                <House> × 3 — $ {rent[3]}</House>
-                                <House> × 4 — $ {rent[4]}</House>
-                                <House> Hotel — $ {rent[5]}</House>
+                                <House> × 1 — $ {rent![1]}</House>
+                                <House> × 2 — $ {rent![2]}</House>
+                                <House> × 3 — $ {rent![3]}</House>
+                                <House> × 4 — $ {rent![4]}</House>
+                                <House> Hotel — $ {rent![5]}</House>
                             </ul>
                         )}
                         <br />
 
                         <Separator />
                         <p>
-                            <small>Valor de hipoteca $ {cost / 2}</small>
+                            <small>Valor de hipoteca $ {price / 2}</small>
                         </p>
                         <p>
-                            <small>Costo por casa/hotel $ {house}</small>
+                            <small>Costo por casa/hotel $ {housing}</small>
                         </p>
                     </Content>
                 )}

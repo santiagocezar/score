@@ -36,7 +36,7 @@ const BaseIcon = styled.i`
     -moz-osx-font-smoothing: grayscale;
 `;
 
-export const Icon = (p: { name: string; className?: string }) => (
+export const Icon = (p: { name: string; className?: string; }) => (
     <BaseIcon className={p.className}>{p.name}</BaseIcon>
 );
 

@@ -1,14 +1,19 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { Card } from 'components/Commons';
-import Banker from 'views/Banker/Banker';
-import ScoreSheet from 'views/ScoreSheet';
+// import ScoreSheet from 'views/ScoreSheet';
 import Bingo from 'views/Bingo';
 import styled from 'styled-components';
 import TextBody from 'components/TextBody';
 import Usage from 'views/Usage';
-import BankProvider from 'lib/bankContext';
-import BankSocket from 'lib/bankSockets';
+//import BankProvider from 'lib/bankContext';
+import { Games } from 'games';
+// import BankSocket from 'lib/bankSockets';
+
+import scoreURL from 'res/score.svg';
+import moneyURL from 'res/money.svg';
+import cardsURL from 'res/cards.svg';
+import bingoURL from 'res/bingo.svg';
 
 const SC = () => (
     <a
@@ -40,7 +45,7 @@ export default function App() {
                 <Switch>
                     <Route path="/" exact>
                         <img
-                            src="/res/score.svg"
+                            src={scoreURL}
                             style={{ margin: 8, marginBottom: 0 }}
                             height="48"
                             alt="Score"
@@ -50,7 +55,7 @@ export default function App() {
                         </p>
                         <div className="gameSelect">
                             <Card
-                                src="/res/money.svg"
+                                src={moneyURL}
                                 name="Dinero"
                                 to="/money"
                                 description="Para juegos en donde hay un banco 
@@ -58,14 +63,14 @@ export default function App() {
                                      Acepta transferencias y rankings"
                             />
                             <Card
-                                src="/res/cards.svg"
+                                src={cardsURL}
                                 name="Tabla"
                                 to="/sheet"
                                 description="Planilla de puntaje tradicional. 
                                     Recomendada para juegos de cartas"
                             />
                             <Card
-                                src="/res/bingo.svg"
+                                src={bingoURL}
                                 name="Bingo"
                                 to="/bingo"
                                 description="Herramienta para elegir números
@@ -75,17 +80,15 @@ export default function App() {
                         <Usage />
                     </Route>
                     <Route path="/money">
-                        <BankProvider>
-                            <Banker />
-                            <BankSocket />
-                        </BankProvider>
+                        <Games.Monopoly />
+                        {/* <BankSocket /> */}
                     </Route>
-                    <Route path="/sheet">
+                    {/* <Route path="/sheet">
                         <ScoreSheet />
                     </Route>
                     <Route path="/bingo">
                         <Bingo />
-                    </Route>
+                    </Route> */}
                 </Switch>
             </Router>
         </StyledApp>

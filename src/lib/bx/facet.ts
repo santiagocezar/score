@@ -1,11 +1,4 @@
-
-export type Facet<T, J extends Json> = {
-    name: string;
-    default: () => T;
-    ser: (value: T) => J;
-    des: (value: J) => T;
-    id: symbol;
-};
+import { Number, Runtype, Static } from 'runtypes';
 
 export type JsonMap = { [k in string]?: Json; };
 export type Json =
@@ -16,50 +9,82 @@ export type Json =
     | Json[]
     | JsonMap;
 
-interface SerDes<T, J extends Json> {
-    ser(value: T): J;
-    des(value: J): T;
+type JsonTransform<J extends Runtype, T> = {
+    fromJSON: (json: Static<J>) => T;
+    toJSON: (obj: T) => Static<J>;
+};
+
+export type FacetDecl<J extends Runtype, T = Static<J>> = {
+    guard: J;
+    default: () => T;
+} & (T extends Static<J> ? {} : {
+    transform: JsonTransform<J, T>;
+});
+
+// export function createFacet<T>(builder: (T extends Json ? () => T : never) | FacetDecl<T>): FacetDecl<T> {
+//     if (builder instanceof Function) {
+//         return {
+//             default: builder,
+//             //@ts-expect-error
+//             deserialize: v => v,
+//             serialize: v => v,
+//         };
+//     } else {
+//         return builder;
+//     }
+// };
+
+
+export function createFacet<J extends Runtype>(type: J, def: () => Static<J>): FacetDecl<J>;
+export function createFacet<J extends Runtype, T>(type: J, def: () => T, transform: JsonTransform<J, T>): FacetDecl<J, T>;
+export function createFacet<J extends Runtype, T = Static<J>>(type: J, def: () => T, transform?: JsonTransform<J, T>): FacetDecl<J, T> {
+    if (transform) {
+        return {
+            guard: type,
+            default: def,
+            transform
+        } as any as FacetDecl<J, T>;
+    } else {
+        return {
+            guard: type,
+            default: def,
+        } as any as FacetDecl<J, T>;
+    }
+};
+
+export type FacetDeclarations = {
+    [key: string]: FacetDecl<any>;
+};
+export type FacetValue<F extends FacetDecl<any>> =
+    F extends FacetDecl<any, infer T>
+    ? T
+    : never;
+
+
+export type Facets<F extends FacetDeclarations> = {
+    [K in keyof F]: FacetValue<F[K]>
+};
+
+export function buildFacets<F extends FacetDeclarations>(builders: F): Facets<F> {
+    //@ts-expect-error
+    const facets: Record<keyof F, any> = {};
+    for (const name in builders) {
+        facets[name] = builders[name].default();
+    }
+    return facets as Facets<F>;
 }
 
-/**
- * For T to be valid, it has to be defined as a type, not an interface
- * 
- * @param key name for the facet, used for loading and saving it's state
- * @param defaultValue construct the value
- * @returns the facet with automatic deserialization
- */
-export function createFacet<T extends Json>(key: string, defaultValue: () => T): Facet<T, T> {
-    return createFacetSerde<T, T>(key, defaultValue, {
-        ser: (v) => v,
-        des: (v) => v,
-    });
-};
-export function createFacetSerde<T, J extends Json>(key: string, defaultValue: () => T, serdes: SerDes<T, J>): Facet<T, J> {
-    return {
-        name: key,
-        default: defaultValue,
-        ser: serdes.ser,
-        des: serdes.des,
-        id: Symbol(),
-    };
-};
 
-export class FacetPool extends Map<symbol, any> { };
+// const facetBuilders = {
+//     money: () => 0,
+//     name: () => '',
+// };
 
-export type OrUndefined<T> = { [P in keyof T]: T[P] | undefined; };
+// declare const facets: Facets<typeof facetBuilders>;
+// declare function facetTuple
+//     <F extends FacetBuilders, T extends FacetKeyTuple<F>>
+//     (fb: F, ...key: T): FacetTuple<F, T>;
 
-export type FacetValue<D> = D extends Facet<infer T, any> ? T : never;
+// facets.money;
 
-export type FacetTuple<Vs extends [...any[]] = [...any[]]> = {
-    [K in keyof Vs]: Facet<Vs[K], any>
-};
-
-/*export type OptionPartial<T extends readonly any[]> = {
-    [K in keyof T]: Option<T[K]>
-};*/
-
-export type FacetTupleValues<Ds extends FacetTuple> = {
-    [K in keyof Ds]: FacetValue<Ds[K]>
-};
-
-export type FacetTuplePartial<Ds extends FacetTuple> = OrUndefined<FacetTupleValues<Ds>>;
+// const [money, name] = facetTuple(facetBuilders, 'money', 'name');

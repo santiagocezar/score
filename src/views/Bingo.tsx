@@ -2,11 +2,13 @@ import React, { ReactNode, useEffect, useReducer, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Header } from 'components/Header';
 import { range, useEvent } from 'lib/utils';
-import { Set } from 'immutable';
 import StyledBall from 'components/Ball';
-import Dialog, { Action } from 'components/Dialogs';
+import { Dialog, DialogClose } from 'components/Dialog';
 import { Icon, InlineIcon } from 'components/Commons';
 import TextBody from 'components/TextBody';
+import { useImmer } from 'use-immer';
+import MdCasino from '~icons/ic/baseline-casino';
+import MdRestorePage from '~icons/ic/baseline-restore-page';
 
 const NumberGrid = styled.div`
     display: grid;
@@ -18,7 +20,7 @@ const NumberGrid = styled.div`
     grid-template-rows: repeat(9, 1fr);
 `;
 
-const Num = styled.span<{ new?: boolean; played?: boolean }>`
+const Num = styled.span<{ new?: boolean; played?: boolean; }>`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,7 +60,7 @@ const Warranty = styled.div`
 const NUMBERS = range(90, 1);
 
 export default function Bingo() {
-    const [played, setPlayed] = useState(Set<number>());
+    const [played, producePlayed] = useImmer(new Set<number>());
     const [newNum, setNewNum] = useState(0);
     const [showBall, setShowBall] = useState(false);
     const [preventDoubleClick, setPDC] = useState(false);
@@ -90,7 +92,9 @@ export default function Bingo() {
     const hideBall = () => setShowBall(false);
 
     function reset() {
-        setPlayed(played.clear());
+        producePlayed(draft => {
+            draft.clear();
+        });
         setShowingConfirm(false);
         setNewNum(0);
     }
@@ -98,7 +102,9 @@ export default function Bingo() {
         if (!preventDoubleClick) {
             let available = NUMBERS.filter((n) => !played.has(n));
             let n = available[Math.floor(Math.random() * available.length)];
-            setPlayed(played.add(n));
+            producePlayed(draft => {
+                draft.add(n);
+            });
             /// Hide ball first because function is sometimes not batched
             setShowBall(false);
             setNewNum(n);
@@ -131,34 +137,34 @@ export default function Bingo() {
             </NumberGrid>
             <Dialog
                 open={showingConfirm}
-                onClosed={() => setShowingConfirm(false)}
+                onOpenChange={setShowingConfirm}
                 title="Confirmar"
             >
-                <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
+                <p>
                     Seguro que quiere empezar de nuevo?
-                </TextBody>
-                <Action name="Si" do={reset} />
-                <Action
-                    name="No"
-                    do={() => setShowingConfirm(false)}
-                    highlight
-                />
+                </p>
+                <DialogClose asChild>
+                    <button onClick={reset} >Si</button>
+                </DialogClose>
+                <DialogClose asChild>
+                    <button>No</button>
+                </DialogClose>
             </Dialog>
             <Dialog
                 open={showingHelp}
-                onClosed={() => setShowingHelp(false)}
+                onOpenChange={setShowingHelp}
                 title="Ayuda"
             >
                 <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
                     <h2 id="modo-bingo">Instrucciones</h2>
                     <p>
                         Para sortear un número haga clic en
-                        <InlineIcon name="casino" />, presione la tecla espacio
+                        <MdCasino />, presione la tecla espacio
                         o toque la grilla (solo en teléfonos).
                     </p>
                     <p>
                         Para empezar de nuevo haga clic en{' '}
-                        <InlineIcon name="restore_page" />
+                        <MdRestorePage />
                     </p>
                     <h2 id="condiciones-de-uso">Condiciones de Uso</h2>
                     <p>

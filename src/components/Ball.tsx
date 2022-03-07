@@ -39,4 +39,5 @@ const StyledBall = styled.div`
     animation-fill-mode: forwards;
     text-decoration: underline;
 `;
+// TODO: fix ball background (/res url)
 export default StyledBall;
