@@ -14,6 +14,7 @@ import scoreURL from 'res/score.svg';
 import moneyURL from 'res/money.svg';
 import cardsURL from 'res/cards.svg';
 import bingoURL from 'res/bingo.svg';
+import { Header } from 'components/Header';
 
 const SC = () => (
     <a
@@ -26,71 +27,60 @@ const SC = () => (
     </a>
 );
 
-const StyledApp = styled.main`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-    width: 100%;
-    height: 100%;
-    img {
-        flex-shrink: 0;
-    }
-`;
-
 export default function App() {
     return (
-        <StyledApp>
-            <Router>
-                <Switch>
-                    <Route path="/" exact>
-                        <img
-                            src={scoreURL}
-                            style={{ margin: 8, marginBottom: 0 }}
-                            height="48"
-                            alt="Score"
-                        />
-                        <p style={{ fontWeight: 'bold' }}>
-                            hecho por <SC />
-                        </p>
-                        <div className="gameSelect">
-                            <Card
-                                src={moneyURL}
-                                name="Dinero"
-                                to="/money"
-                                description="Para juegos en donde hay un banco 
+        <Router>
+            <Switch>
+                <Route path="/" exact>
+                    <img
+                        src={scoreURL}
+                        style={{ margin: 8, marginBottom: 0 }}
+                        height="48"
+                        alt="Score"
+                    />
+                    <p style={{ fontWeight: 'bold' }}>
+                        hecho por <SC />
+                    </p>
+                    <div className="gameSelect">
+                        <Card
+                            src={moneyURL}
+                            name="Dinero"
+                            to="/money"
+                            description="Para juegos en donde hay un banco 
                                      y cada jugador tiene su propio dinero. 
                                      Acepta transferencias y rankings"
-                            />
-                            <Card
-                                src={cardsURL}
-                                name="Tabla"
-                                to="/sheet"
-                                description="Planilla de puntaje tradicional. 
+                        />
+                        <Card
+                            src={cardsURL}
+                            name="Tabla"
+                            to="/sheet"
+                            description="Planilla de puntaje tradicional. 
                                     Recomendada para juegos de cartas"
-                            />
-                            <Card
-                                src={bingoURL}
-                                name="Bingo"
-                                to="/bingo"
-                                description="Herramienta para elegir números
+                        />
+                        <Card
+                            src={bingoURL}
+                            name="Bingo"
+                            to="/bingo"
+                            description="Herramienta para elegir números
                                     aleatorios para el bingo, sin repetir."
-                            />
-                        </div>
-                        <Usage />
-                    </Route>
-                    <Route path="/money">
-                        <Games.Monopoly />
-                        {/* <BankSocket /> */}
-                    </Route>
-                    {/* <Route path="/sheet">
+                        />
+                    </div>
+                    <Usage />
+                </Route>
+                <Route path="/money">
+                    <Games.Monopoly useSavedMatch='kiricocho' settings={{
+                        defaultMoney: 1500,
+                    }} />
+                    {/* <BankSocket /> */}
+                </Route>
+                {/* <Route path="/sheet">
                         <ScoreSheet />
                     </Route>
                     <Route path="/bingo">
                         <Bingo />
                     </Route> */}
-                </Switch>
-            </Router>
-        </StyledApp>
+            </Switch>
+            <Header />
+        </Router>
     );
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Property from 'components/Property';
-import { MonopolyProperty } from 'games/monopoly';
+import Property from './Property';
+import { MonopolyProperty } from '.';
 
 const List = styled.div`
     display: flex;

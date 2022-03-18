@@ -1,94 +1,89 @@
+import { styled } from 'lib/theme';
 import React, { ReactNode, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 import scoreURL from 'res/score.svg';
 
-export const Sidebar = styled.div<{ open: boolean; }>`
-    display: block;
-    position: fixed;
-    top: 56px;
-    right: 8px;
-    transform: translateX(calc(100% + 16px));
-    border-radius: 4px;
-    background-color: white;
-    box-shadow: 0 2px 4px #0004;
-    z-index: 3;
-    height: calc(100% - 64px);
-    width: 432px;
-    transition: transform cubic-bezier(1, 0, 0, 1) 0.3s;
-    overflow: auto;
+import MdRight from '~icons/ic/round-chevron-right';
+import MdBack from '~icons/ic/round-arrow-back';
+import MdFullscreen from '~icons/ic/round-fullscreen';
+import MdFullscreenExit from '~icons/ic/round-fullscreen-exit';
 
-    ${(p) =>
-        p.open &&
-        css`
-            transform: translateX(0);
-        `}
+export const HEADER_HEIGHT = '3rem';
 
-    @media only screen and (max-width: 768px) {
-        width: calc(100% - 16px);
-    }
-`;
+const StyledHeader = styled('header', {
+    display: 'flex',
+    height: HEADER_HEIGHT,
+    borderBottomRightRadius: '2rem',
+    boxShadow: '0 0 .25rem #0008',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    alignSelf: 'stretch',
+    justifyContent: 'space-between',
+    margin: 0,
+    backgroundColor: '$bg100',
+    color: '$text',
+    position: 'fixed',
+    top: 0,
+    left: '-6rem',
+    flexShrink: 0,
+    paddingRight: '1rem',
+    transition: 'transform .2s cubic-bezier(0.79,0.14,0.15,0.86)',
+    zIndex: '$header',
 
-const StyledHeader = styled.header<{ color: string; }>`
-    display: flex;
-    height: 48px;
-    box-shadow: 0 2px 2px #0004;
-    flex-direction: row;
-    align-items: center;
-    align-self: stretch;
-    justify-content: space-between;
-    margin: 0;
-    padding: 0;
-    background-color: ${(p) => p.color};
+    'img': {
+        filter: 'invert(100%) grayscale(100%) contrast(150%)',
+        transition: 'filter .2s, opacity .2s',
+        opacity: .5,
+        paddingLeft: '1rem',
+        paddingRight: '.5rem',
+    },
+    '&:hover': {
+        transform: 'translateX(6rem)',
+        'img': {
+            opacity: 1,
+            filter: 'none',
+        },
+    },
+    'nav': {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    'a': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textDecoration: 'none',
+        width: '48px',
+        height: '48px',
+        transition: 'background ease 0.3s',
+        position: 'relative',
+        cursor: 'pointer',
 
-    @media screen and (max-width: 500px) {
-        img {
-            display: none;
-        }
-    }
-    nav {
-        display: flex;
-        align-items: center;
-    }
-    a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: white;
-        width: 48px;
-        height: 48px;
-        transition: background ease 0.3s;
-        position: relative;
-        cursor: pointer;
+        '&:hover:not([disabled]) ': {
+            backgroundColor: '#0004',
 
-        &:hover {
-            background-color: #0004;
-
-            &::before {
-                font-family: 'Manrope';
-                content: attr(about);
-                display: block;
-                z-index: 2;
-                font-size: 12px;
-                left: 50%;
-                top: calc(100% - 4px);
-                transform: translateX(-50%);
-                pointer-events: none;
-                position: absolute;
-                padding: 4px 10px;
-                border-radius: 8px;
-                color: white;
-                background-color: #333;
+            '&::before ': {
+                fontFamily: 'Manrope',
+                content: 'attr(about)',
+                display: 'block',
+                zIndex: '2',
+                fontSize: '12px',
+                left: '50%',
+                top: 'calc(100% - 4px)',
+                transform: 'translateX(-50%)',
+                pointerEvents: 'none',
+                position: 'absolute',
+                padding: '4px 10px',
+                borderRadius: '8px',
+                color: 'white',
+                backgroundColor: '#333',
             }
         }
     }
-    flex-shrink: 0;
-`;
+});
 
 export function Header(p: {
     children?: ReactNode;
-    mode: 'card' | 'money' | 'bingo';
 }) {
     const [isFullscreen, setFullscreen] = useState(false);
 
@@ -107,29 +102,21 @@ export function Header(p: {
     }
 
     return (
-        <StyledHeader
-            color={
-                p.mode == 'card'
-                    ? '#1a1a1a'
-                    : p.mode == 'money'
-                        ? '#454837'
-                        : '#3138ad'
-            }
-        >
+        <StyledHeader>
             <nav>
                 <Link to="/" about="Atrás" className="material-icons">
-                    arrow_back
+                    <MdBack />
                 </Link>
                 <a
                     about="Pantalla completa"
                     className="material-icons"
                     onClick={toggleFullScreen}
                 >
-                    {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
+                    {isFullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
                 </a>
-                <img src={`${scoreURL}#${p.mode}`} alt="Score" />
+                <img src={`${scoreURL}`} alt="Score" />
+                <MdRight />
             </nav>
-            <nav>{p.children}</nav>
         </StyledHeader>
     );
 }

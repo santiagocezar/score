@@ -7,11 +7,11 @@ export class Emitter<A extends (readonly any[]) = []> {
         this.subscribers.forEach(fn => fn(...args));
     }
 
-    subscribe(fn: (...args: A) => void) {
+    do(fn: (...args: A) => void) {
         this.subscribers.add(fn);
     }
 
-    unsubscribe(fn: (...args: A) => void) {
+    dont(fn: (...args: A) => void) {
         this.subscribers.delete(fn);
     }
 
@@ -19,8 +19,8 @@ export class Emitter<A extends (readonly any[]) = []> {
         const [ret, setRet] = useState<R>();
         useEffect(() => {
             const wrapped = (...args: A) => setRet(fn(...args));
-            this.subscribe(wrapped);
-            return () => this.unsubscribe(wrapped);
+            this.do(wrapped);
+            return () => this.dont(wrapped);
         }, deps);
         return ret!;
     }
