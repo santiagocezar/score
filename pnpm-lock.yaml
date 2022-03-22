@@ -25,6 +25,7 @@ specifiers:
   react-redux: ^7.2.6
   react-responsive: ^9.0.0-beta.6
   react-router-dom: ^5.3.0
+  react-transition-group: ^4.4.2
   redux: ^4.1.2
   runtypes: ^6.5.1
   sass: ^1.49.9
@@ -53,6 +54,7 @@ dependencies:
   react-redux: 7.2.6_react-dom@16.14.0+react@16.14.0
   react-responsive: 9.0.0-beta.6_react@16.14.0
   react-router-dom: 5.3.0_react@16.14.0
+  react-transition-group: 4.4.2_react-dom@16.14.0+react@16.14.0
   redux: 4.1.2
   runtypes: 6.5.1
   styled-components: 5.3.3_react-dom@16.14.0+react@16.14.0
@@ -1192,6 +1194,13 @@ packages:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
     dev: false
 
+  /dom-helpers/5.2.1:
+    resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
+    dependencies:
+      '@babel/runtime': 7.17.2
+      csstype: 3.0.10
+    dev: false
+
   /dom-serializer/0.2.2:
     resolution: {integrity: sha512-2/xPb3ORsQ42nHYiSunXkDjPLBaEj/xTwUO4B7XCZQTRk7EBtTOPaygh10YAAh2OI1Qrp6NWfpAhzswj0ydt9g==}
     dependencies:
@@ -2221,6 +2230,20 @@ packages:
       invariant: 2.2.4
       react: 16.14.0
       tslib: 1.14.1
+    dev: false
+
+  /react-transition-group/4.4.2_react-dom@16.14.0+react@16.14.0:
+    resolution: {integrity: sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg==}
+    peerDependencies:
+      react: '>=16.6.0'
+      react-dom: '>=16.6.0'
+    dependencies:
+      '@babel/runtime': 7.17.2
+      dom-helpers: 5.2.1
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
     dev: false
 
   /react/16.14.0:
