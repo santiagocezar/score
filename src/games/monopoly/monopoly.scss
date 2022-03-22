@@ -1,0 +1,104 @@
+._MP {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    align-content: space-around;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    user-select: none;
+    * {
+        user-select: none;
+    }
+
+    > ul {
+        list-style: none;
+        align-items: center;
+        align-self: stretch;
+        align-content: center;
+        justify-content: center;
+        flex-grow: 1;
+        flex-wrap: wrap;
+        margin-bottom: 120px;
+        display: flex;
+        overflow: auto;
+
+        @media only screen and (max-width: 768px) {
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+    }
+}
+
+.history,
+.rankings {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    list-style: none;
+
+    li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-bottom: 1px solid #0004;
+
+        div {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .name {
+        font-size: 22px;
+    }
+
+    .pts {
+        font-size: 12px;
+    }
+}
+
+.history li div {
+    margin: 8px;
+}
+
+.history .empty {
+    text-align: center;
+    display: none;
+
+    &:first-child {
+        display: inline;
+    }
+}
+
+@mixin medal($place, $color) {
+    li:nth-child(#{$place}) .rank {
+        background-color: $color;
+        border-color: $color;
+        box-shadow: 0px 0px 8px opacify($color, $amount: 0.8);
+        color: black;
+    }
+}
+
+.rankings {
+    .rank {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin: 8px;
+        border-radius: 100%;
+        border: 1px solid #555;
+        font-weight: bold;
+        font-size: 24px;
+        color: #555;
+    }
+
+    @include medal(1, gold);
+    @include medal(2, silver);
+    @include medal(3, orange);
+}
