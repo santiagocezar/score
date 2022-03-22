@@ -26,10 +26,11 @@ const Player = rt.Record({
 
 type AddPlayer<F extends FieldGroup> = Omit<Player<F>, 'pid' | 'facets'>;
 
-const GameData = rt.Record({
+export const GameData = rt.Record({
     players: rt.Array(Player),
     globals: rt.Dictionary(rt.Unknown, rt.String),
 });
+export type GameData = rt.Static<typeof GameData>;
 
 interface Producer<T> {
     value: Readonly<T>;
@@ -70,38 +71,32 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         this.globals = producer(buildFacets(globalFacetBuilders));
     }
 
-    loadJSON(j: Json) {
-        try {
-            const data = GameData.check(j);
-
-            this.globals.value = checkFacets(data.globals, this.globalDeclarations);
-            for (const player of data.players) {
-                console.dir(player);
-                const { pid, name, palette, facets: untypedFacets } = player;
-                this.increasingID = Math.max(this.increasingID, pid + 1);
-                const facets = checkFacets(untypedFacets, this.facets);
-                this.players.produce(draft => {
-                    draft.set(pid, {
-                        pid,
-                        name,
-                        palette,
-                        facets: castDraft(facets),
-                    });
+    loadData(data: GameData) {
+        this.globals.value = checkFacets(data.globals, this.globalDeclarations);
+        for (const player of data.players) {
+            console.dir(player);
+            const { pid, name, palette, facets: untypedFacets } = player;
+            this.increasingID = Math.max(this.increasingID, pid + 1);
+            const facets = checkFacets(untypedFacets, this.facets);
+            this.players.produce(draft => {
+                draft.set(pid, {
+                    pid,
+                    name,
+                    palette,
+                    facets: castDraft(facets),
                 });
-                this.sortedIDs.produce(draft => {
-                    if (!draft.includes(pid))
-                        draft.push(pid);
-                });
-            }
-            this.sortedIDs.produce(draft => {
-                draft.sort();
             });
-        } catch (e) {
-            console.log(e);
+            this.sortedIDs.produce(draft => {
+                if (!draft.includes(pid))
+                    draft.push(pid);
+            });
         }
+        this.sortedIDs.produce(draft => {
+            draft.sort();
+        });
     }
 
-    dumpJSON(): rt.Static<typeof GameData> {
+    dumpData(): GameData {
         const players = this.sortedIDs.value.map(pid => {
             const { facets, ...player }: any = this.players.value.get(pid)!;
             player.facets = facetsToJson(facets, this.facets);

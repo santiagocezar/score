@@ -31,7 +31,6 @@ export const Container = styled(DialogContent, {
     zIndex: '$modal',
     fontSize: '1rem',
     fontWeight: 'normal',
-    gap: '.5rem',
 });
 
 export const Content = styled('main', {

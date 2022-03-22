@@ -1,10 +1,10 @@
-import { InlineIcon } from 'components/Commons';
+// import { InlineIcon } from 'components/Commons';
 import TextBody from 'components/TextBody';
 import React, { ReactNode } from 'react';
 
 export const Usage = () => (
     <TextBody style={{ maxWidth: '512px' }}>
-        <h1 id="como-usar">Como usar</h1>
+        {/* <h1 id="como-usar">Como usar</h1>
         <h2 id="modo-dinero">Modo Dinero</h2>
         <p>
             Presione <em>Add</em> para agregar un banco o jugadores.
@@ -36,7 +36,7 @@ export const Usage = () => (
             Desarrollo de carácter educativo.{' '}
             <strong>No se permite el uso para fines lucrativos.</strong> Sin
             ninguna garantía para un propósito en particular.
-        </p>
+        </p> */}
     </TextBody>
 );
 

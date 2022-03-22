@@ -1,6 +1,6 @@
 import { styled } from 'lib/theme';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import scoreURL from 'res/score.svg';
 
 import MdRight from '~icons/ic/round-chevron-right';
@@ -79,6 +79,13 @@ const StyledHeader = styled('header', {
                 backgroundColor: '#333',
             }
         }
+    },
+    variants: {
+        disabled: {
+            true: {
+                transform: 'translateX(-12rem)',
+            }
+        }
     }
 });
 
@@ -86,6 +93,7 @@ export function Header(p: {
     children?: ReactNode;
 }) {
     const [isFullscreen, setFullscreen] = useState(false);
+    const { pathname } = useLocation();
 
     document.addEventListener('fullscreenchange', (e) =>
         setFullscreen(Boolean(document.fullscreenElement))
@@ -102,7 +110,7 @@ export function Header(p: {
     }
 
     return (
-        <StyledHeader>
+        <StyledHeader disabled={pathname === "/"}>
             <nav>
                 <Link to="/" about="Atrás" className="material-icons">
                     <MdBack />

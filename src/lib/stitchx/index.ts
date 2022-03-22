@@ -16,7 +16,7 @@ export type SomeStitches = Pick<Stitches, 'config' | 'css'>;
 
 export function extendStitches<S extends SomeStitches>(stitches: S) {
     return {
-        useBreakpoint: createUseBreakpoint(stitches.config.media),
+        useBreakpoint: createUseBreakpoint<S['config']['media']>(stitches.config.media),
         transitions: createTransitions(stitches),
     };
 }

@@ -6,7 +6,7 @@ const LabelText = styled('p', {
     flexShrink: 0,
     fontWeight: 'bold',
     fontSize: '.9rem',
-    margin: '.3rem .2rem',
+    margin: '0 .2rem .3rem .2rem',
 });
 const InputWrapper = styled(LabelRoot, {
     fontWeight: 'normal',

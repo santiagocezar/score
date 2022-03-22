@@ -18,9 +18,9 @@ const BaseTitle = styled('p', {
     }
 });
 
-export const Title1 = styled('h1', BaseTitle, { fontSize: '4rem' });
-export const Title2 = styled('h2', BaseTitle, { fontSize: '3.5rem' });
-export const Title3 = styled('h3', BaseTitle, { fontSize: '3rem' });
-export const Title4 = styled('h4', BaseTitle, { fontSize: '2.5rem' });
-export const Title5 = styled('h5', BaseTitle, { fontSize: '2rem' });
+export const Title1 = styled('h1', BaseTitle, { fontSize: '3rem' });
+export const Title2 = styled('h2', BaseTitle, { fontSize: '2.5rem' });
+export const Title3 = styled('h3', BaseTitle, { fontSize: '2rem' });
+export const Title4 = styled('h4', BaseTitle, { fontSize: '1.7rem' });
+export const Title5 = styled('h5', BaseTitle, { fontSize: '1.6rem' });
 export const Title6 = styled('h6', BaseTitle, { fontSize: '1.5rem' });

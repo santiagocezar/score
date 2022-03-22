@@ -1,7 +1,9 @@
-import React, { FC, useState } from 'react';
-import { AddSimple, AddScore } from 'components/Dialogs';
-import { Header, Sidebar } from 'components/Header';
+import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { Panel, Paneled } from 'components/panels';
+import { useAddPlayerPanel } from 'components/panels/AddPlayer';
+import { PlayerID } from 'lib/bx';
+import { AddScore } from './AddScore';
 import { card } from '.';
 
 const cell = css`
@@ -84,21 +86,103 @@ const Totals = styled.div`
     }
 `;
 
-interface SheetState {
-    players: Map<string, Player>;
-    addingPlayer: boolean;
-    addingScore: string;
-    rankOpen: boolean;
-}
-
 const SAVE_NAME = 'sheetsave';
 
 export const CardsView: FC = () => {
     const board = card.useBoard();
     const players = card.usePlayers();
 
-    const [addingPlayer, setAddingPlayer] = useState(false);
-    const [addingScore, setAddingScore] = useState(false);
+    const [addingScore, setAddingScore] = useState<PlayerID | null>(null);
+
+    // const rankings = [];
+    // this.getRankings().forEach((players, rank) => {
+    //     rankings.push(
+    //         <li key={players.name}>
+    //             <span className="rank">{rank + 1}°</span>
+    //             <div>
+    //                 <span className="name">{players.name}</span>
+    //                 <span className="pts">{players.score}</span>
+    //             </div>
+    //         </li>
+    //     );
+    // });
+
+    function addScore(score: PlayerID | null) {
+        if (score !== null) {
+            board.set(addingScore!, "prevScore", draft => {
+                draft.push(score);
+            });
+        }
+        setAddingScore(null);
+    }
+
+    const names: JSX.Element[] = [];
+    const history: JSX.Element[] = [];
+    const totals: JSX.Element[] = [];
+    players.forEach((v, k) => {
+        names.push(<span key={k}>{v.name}</span>);
+
+        let total = 0;
+        const col = [];
+        for (const s of v.facets.prevScore) {
+            total += s;
+            col.push(<span key={col.length}>{s}</span>);
+        }
+
+        col.push(
+            <span
+                key={k}
+                className="material-icons"
+                onClick={() => setAddingScore(v.pid)}
+            >
+                add
+            </span>
+        );
+
+        history.push(<Column key={k}>{col}</Column>);
+
+        totals.push(<span key={k}>{total}</span>);
+    });
+
+    return (
+        <Paneled
+            mainView={(
+                <Sheet>
+                    <Names>
+                        {names}
+                    </Names>
+                    <History>
+                        {history}
+                    </History>
+                    <Totals>
+                        {totals}
+                    </Totals>
+                    {addingScore !== null && (
+                        <AddScore
+                            pid={addingScore}
+                            onConfirm={addScore}
+                        />
+                    )}
+                </Sheet>
+            )}
+        >
+            {/* <a
+                href="#"
+                className="material-icons"
+                onClick={() => {
+                    this.setState((state) => ({
+                        rankOpen: !state.rankOpen,
+                    }));
+                }}
+            >
+                poll
+            </a> */}
+            {/* <Sidebar open={this.state.rankOpen}>
+                <ul className="rankings">{rankings}</ul>
+            </Sidebar> */}
+            {useAddPlayerPanel()}
+        </Paneled>
+    );
 };
 
 
@@ -115,28 +199,6 @@ export const CardsView: FC = () => {
 //             addingScore: null,
 //             rankOpen: false,
 //         };
-//     }
-
-//     addPlayer(cancelled: boolean, name: string) {
-//         if (cancelled) {
-//             this.setState((state) => ({
-//                 addingPlayer: false,
-//             }));
-//             return;
-//         }
-//         console.log(`Agregar jugador ${name}`);
-//         this.setState((state) => {
-//             let newState = {
-//                 players: state.players.update(name, (_) => ({
-//                     name,
-//                     score: 0,
-//                     prevScore: [],
-//                 })),
-//                 addingPlayer: false,
-//             };
-//             this.save(newState);
-//             return newState;
-//         });
 //     }
 
 //     save = (state) =>

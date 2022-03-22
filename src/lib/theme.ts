@@ -44,7 +44,7 @@ const stitches = createStitches({
         },
         fonts: {
             'body': '"Manrope", sans-serif',
-            'title': '"Manrope", sans-serif',
+            'title': '"Poppins", sans-serif',
         },
         colors: {
             bg100: '#fff',
@@ -70,17 +70,16 @@ const stitches = createStitches({
             red800: '#3f0e28',
             red900: '#1b0210',
 
-
-            yellow050: '#fdf3e2',
-            yellow100: '#ecdfc3',
-            yellow200: '#ddc9a0',
-            yellow300: '#ceb47d',
-            yellow400: '#c09e59',
-            yellow500: '#a6853f',
-            yellow600: '#816730',
-            yellow700: '#5d4a20',
-            yellow800: '#382c10',
-            yellow900: '#160f00',
+            yellow050: '#fff4da',
+            yellow100: '#ffe4ad',
+            yellow200: '#ffd67d',
+            yellow300: '#ffcc4b',
+            yellow400: '#ffc51a',
+            yellow500: '#e69d00',
+            yellow600: '#b36d00',
+            yellow700: '#804500',
+            yellow800: '#4e2400',
+            yellow900: '#1d0900',
 
             blue050: '#e4f1ff',
             blue100: '#bed2f6',
@@ -132,17 +131,18 @@ export const iconCSS: CSS = {
 };
 
 globalCss({
-    'html, body': {
-        overflow: 'hidden',
-        maxWidth: '100vw',
-        width: '100vw',
-        height: '100vh',
-    },
     'html': {
+        maxWidth: '100vw',
+        height: '100%',
+        width: '100%',
         color: '$text',
         fontFamily: '$body',
         fontSize: '16px',
         backgroundColor: '$bg100',
+    },
+    'body': {
+        display: 'block',
+        minHeight: '100%',
     },
     'hr': {
         borderBottom: '1px solid $bg200',

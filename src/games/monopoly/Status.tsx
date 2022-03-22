@@ -129,13 +129,14 @@ interface StatusProps {
 }
 
 export const Status: FC<StatusProps> = ({ from, to }) => {
+    const board = mono.useBoard();
     const players = mono.usePlayers();
 
     const get = useCallback((pid: PlayerID | null) => {
         if (pid === BANK)
             return ["Banco", BANK_PALETTE] as const;
 
-        const player = pid === null ? undefined : players[pid];
+        const player = pid === null ? undefined : board.get(pid);
         console.log(player?.palette);
 
         return [player?.name, player?.palette !== undefined ? palettes[player.palette] : undefined] as const;

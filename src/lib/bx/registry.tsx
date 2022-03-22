@@ -1,7 +1,10 @@
 import { ComponentType, ComponentProps, FC, createContext, useRef, ReactNode, useContext, useState } from 'react';
-import { Record as RuntypeRecord, Runtype, Static } from 'runtypes';
+import * as rt from 'runtypes';
 import { BoardStorage, FieldGroup, FacetValue, Player, PlayerID, } from '.';
+import { GameData } from './board';
 import { Json } from './facet';
+import { nanoid } from 'nanoid';
+import { hasOwnProperty } from 'lib/utils';
 
 
 const BoardContext = createContext<[board: BoardStorage<any, any>, name: string] | undefined>(undefined);
@@ -12,70 +15,22 @@ export const useAnyBoard = () => {
     return ctx[0];
 };
 
-type Settings = Runtype;
+type Settings = rt.Runtype;
 
 
 interface BoardGame
     <
-    F extends FieldGroup,
-    G extends FieldGroup = {},
+    F extends FieldGroup = FieldGroup,
+    G extends FieldGroup = FieldGroup,
     P extends Settings = Settings,
     > {
-    id: {};
     name: string;
     settings: P;
-    view: ComponentType<Static<P>>;
+    view: ComponentType<rt.Static<P>>;
     globalFacets?: G;
-    facets: F;
+    facets?: F;
 }
 
-interface BXProviderProps<P extends Settings> {
-    useSavedMatch?: string;
-    settings: Static<P>;
-}
-
-function createBXProvider<P extends Settings>(bg: BoardGame<any, any, P>) {
-    const { id, name, facets, globalFacets, view: View } = bg;
-    const bgp: FC<BXProviderProps<P>> =
-        ({ useSavedMatch, settings }) => {
-            const game = useRef<BoardStorage<any, any>>();
-            if (game.current === undefined) {
-                const g = new BoardStorage(facets, globalFacets);
-
-                if (useSavedMatch !== undefined) {
-                    const match = useSavedMatch;
-                    const item = localStorage.getItem(useSavedMatch);
-                    if (item) {
-                        g.loadJSON(JSON.parse(item));
-                    }
-                    function save() {
-                        localStorage.setItem(match, JSON.stringify(g.dumpJSON()));
-                    }
-                    g.onPlayersUpdate.use(save);
-                    g.onGlobalUpdate.use(save);
-                    g.onFacetUpdate.use(save);
-                };
-
-                game.current = g;
-            }
-
-
-
-            return (
-                <BoardContext.Provider value={[game.current, name]}>
-                    {/*@ts-expect-error*/}
-                    <View {...settings} />
-                </BoardContext.Provider>
-            );
-        };
-    return bgp;
-}
-
-type Registry<B extends BoardGames> = {
-    [K in keyof B]: B[K] extends BoardGame<any, any, infer P>
-    ? FC<BXProviderProps<P>>
-    : never
-};
 
 type BoardGames = Record<string, BoardGame<any, any, any>>;
 
@@ -83,7 +38,6 @@ export function createGame<F extends FieldGroup, G extends FieldGroup, P extends
     (boardGame: Omit<BoardGame<F, G, P>, 'id'>): BoardGame<F, G, P> {
     return {
         ...boardGame,
-        id: {}
     };
 }
 
@@ -174,15 +128,129 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
     return hooks;
 };
 
-export function registerGames<B extends BoardGames>(boardGames: B): Registry<B> {
-    const incompleteRegistry: Partial<Registry<B>> = {};
 
-    for (const name in boardGames) {
-        const bg = boardGames[name];
-        const provider = createBXProvider(bg);
-        //@ts-expect-error
-        incompleteRegistry[name] = provider;
+const MatchData = rt.Record({
+    id: rt.String,
+    settings: rt.Unknown,
+    name: rt.String,
+    game: GameData,
+});
+type MatchData<S extends Settings = Settings> =
+    & Omit<rt.Static<typeof MatchData>, 'settings'>
+    & { settings: rt.Static<S>; };
+
+function createMatch<S extends Settings>({ name, globalFacets = {} }: BoardGame, settings: rt.Static<S>) {
+    const id = nanoid();
+    const globals: any = {};
+    for (const global in globalFacets) {
+        if (hasOwnProperty(globalFacets, global)) {
+            globals[global] = globalFacets[global].new();
+        }
     }
 
-    return incompleteRegistry as Registry<B>;
+    const match: MatchData<S> = {
+        id,
+        settings,
+        name,
+        game: {
+            globals,
+            players: []
+        }
+    };
+
+    localStorage.setItem(id, JSON.stringify(match));
+
+    return id;
+}
+
+function loadMatch<S extends Settings>(matchID: string, bgs: BoardGames): [MatchData<S>?, BoardGame?] {
+    const item = localStorage.getItem(matchID);
+
+    if (item) {
+        const match = MatchData.check(JSON.parse(item));
+        if (hasOwnProperty(bgs, match.name)) {
+            const bg = bgs[match.name] as BoardGame;
+            match.settings = bg.settings.check(match.settings);
+            return [match, bg];
+        }
+    }
+    return [];
+}
+
+function useGameInstance(bg: BoardGame, match: MatchData) {
+    const game = useRef<BoardStorage<any, any>>();
+
+    if (game.current === undefined) {
+        const g = new BoardStorage(bg.facets ?? {}, bg.globalFacets ?? {});
+
+        g.loadData(match.game);
+        function save() {
+            match.game = g.dumpData();
+
+            localStorage.setItem(match.id, JSON.stringify(match));
+        }
+        g.onPlayersUpdate.use(save);
+        g.onGlobalUpdate.use(save);
+        g.onFacetUpdate.use(save);
+
+        game.current = g;
+    }
+
+    return game.current;
+}
+
+interface GameProviderProps {
+    match: MatchData;
+    bg: BoardGame;
+}
+
+const GameProvider: FC<GameProviderProps> = ({ match, bg }) => {
+    const game = useGameInstance(bg, match);
+    const View = bg.view;
+    const settings = match.settings;
+    return (
+        <BoardContext.Provider value={[game, bg.name]}>
+            {/*@ts-expect-error*/}
+            <View {...settings} />
+        </BoardContext.Provider>
+    );
+};
+
+interface MatchProviderProps {
+    matchID: string;
+}
+
+function createMatchProvider(bgs: BoardGames) {
+    const MatchProvider: FC<MatchProviderProps> =
+        ({ matchID }) => {
+            const [match, bg] = loadMatch(matchID, bgs);
+
+            return match && bg
+                ? <GameProvider match={match} bg={bg} />
+                : null;
+        };
+    return MatchProvider;
+}
+
+
+interface GameRegistry<B extends BoardGames> {
+    MatchProvider: FC<MatchProviderProps>;
+    newMatch<G extends keyof B>(game: G, settings: rt.Static<B[G]['settings']>): string;
+}
+
+export function registerGames<B extends BoardGames>(boardGames: B): GameRegistry<B> {
+    for (const name in boardGames) {
+        const bg = boardGames[name];
+        if (bg.name !== name) {
+            console.warn(`game ${name} has .name: "${bg.name}"`);
+        }
+        bg.name = name;
+    }
+
+    return {
+        MatchProvider: createMatchProvider(boardGames),
+        newMatch(game, settings) {
+            return createMatch(boardGames[game], settings);
+        }
+    };
 }

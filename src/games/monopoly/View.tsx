@@ -10,13 +10,12 @@ import { useImmer } from 'use-immer';
 import MdHistory from '~icons/ic/round-history';
 import MdLeaderboard from '~icons/ic/round-leaderboard';
 import MdBusiness from '~icons/ic/round-business';
-import MdAdd from '~icons/ic/round-add';
 
 import { properties as untypedProperties } from './hasbro_argentina.json';
 import { Dialog } from 'components/Dialog';
-import { Panel, Paneled } from 'components/Paneled';
+import { Panel, Paneled } from 'components/panels';
 import { MPProperties } from './MPProperties';
-import { AddPlayer } from './AddPlayer';
+import { AddPlayer, useAddPlayerPanel } from 'components/panels/AddPlayer';
 import { SendMoney } from './SendMoney';
 import { styled } from 'lib/theme';
 import { Status } from './Status';
@@ -70,6 +69,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     }, [deletingPlayer]);
 
     const doDelete = useCallback(() => {
+        // TODO: Restore properties
         if (deletingPlayer !== null) {
             board.remove(deletingPlayer);
             if (sendingFrom === deletingPlayer)
@@ -233,6 +233,8 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         setSelectedProperty(prop);
     }
 
+    console.log({ sendingFrom, sendingTo });
+
     return (
         <>
             <Paneled
@@ -298,12 +300,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                         onPayRent={() => { }}
                     />
                 </Panel>
-                <Panel
-                    icon={<MdAdd />}
-                    name="Agregar"
-                >
-                    <AddPlayer afterAddingPlayer={onPlayerAdded} />
-                </Panel>
+                {useAddPlayerPanel(onPlayerAdded)}
             </Paneled>
         </>
         //<div className="_MP">

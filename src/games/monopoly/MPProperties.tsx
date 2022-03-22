@@ -12,7 +12,7 @@ import MdBank from '~icons/ic/round-account-balance';
 import { BANK, mono, MonopolyProperty } from '.';
 import { Name } from './PlayerCard';
 import { PlayerID } from 'lib/bx';
-import { usePanelGoTo } from 'components/Paneled';
+import { usePanelGoTo } from 'components/panels';
 import { BANK_PALETTE } from './BankCard';
 import { Card } from 'components/Card';
 import { palettes } from 'lib/color';
@@ -45,7 +45,7 @@ interface MPPropertiesProps {
 
 export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPayRent, onSendProperty }) => {
     const [viewingProperty, viewProperty] = useState<MonopolyProperty | null>(null);
-    const [ownerOfProperty, setOwnerOfProperty] = useState<PlayerID>(BANK);
+    const [ownerOfProperty, setOwnerOfProperty] = useState<PlayerID>(BANK); // TODO: update property on transfer
     const players = mono.usePlayers();
     const goTo = usePanelGoTo();
 

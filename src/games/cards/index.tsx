@@ -1,13 +1,13 @@
 import { PlayerID, createGame, createFacet, gameHooks } from 'lib/bx';
-import { Number, Record } from 'runtypes';
+import { Array, Number, Record } from 'runtypes';
 import { CardsView } from './View';
 
 export const Cards = createGame({
-    name: 'Monopoly',
+    name: 'Cards',
     view: CardsView,
     settings: Record({}),
     facets: {
-        money: createFacet(Number, () => 0),
+        prevScore: createFacet(Array(Number), () => []),
     }
 });
 

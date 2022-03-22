@@ -18,9 +18,9 @@ export const ButtonGroup = styled('div', {
 
 
 export const Button = styled('button', {
-    $$inactive: 'transparent',
+    $$inactive: '$colors$bg300',
     $$hover: '$colors$bg200',
-    $$pressed: '$colors$bg300',
+    $$pressed: '$colors$bg400',
     $$text: '$colors$text',
     $$disabledText: '$colors$secondaryText',
 
@@ -35,6 +35,7 @@ export const Button = styled('button', {
     paddingX: '1rem',
     borderRadius: '1rem',
     height: '2.5rem',
+    lineHeight: '1rem',
     transition: 'background-color .1s',
     '&:hover': {
         backgroundColor: '$$hover',
