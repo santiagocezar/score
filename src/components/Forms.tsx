@@ -7,6 +7,13 @@ const LabelText = styled('p', {
     fontWeight: 'bold',
     fontSize: '.9rem',
     margin: '0 .2rem .3rem .2rem',
+    variants: {
+        error: {
+            true: {
+                color: '$red500'
+            }
+        }
+    }
 });
 const InputWrapper = styled(LabelRoot, {
     fontWeight: 'normal',
@@ -17,6 +24,13 @@ const InputWrapper = styled(LabelRoot, {
     fontSize: '1rem',
     '&:focus-within': {
         borderColor: '$blue500',
+    },
+    variants: {
+        invalid: {
+            true: {
+                borderColor: '$red500',
+            }
+        }
     }
 });
 
@@ -38,12 +52,13 @@ const ClearInput = styled('input', {
 
 export interface InputProps extends ComponentProps<typeof ClearInput> {
     label?: ReactNode;
+    error?: string | null;
     onEnter?: () => void;
     leftDecoration?: ReactNode;
 }
 
 export const Input: FC<InputProps>
-    = ({ label, leftDecoration, id, onEnter, onKeyPress, ...rest }) => {
+    = ({ label, error, leftDecoration, id, onEnter, onKeyPress, ...rest }) => {
         const onEnterKeyPress: KeyboardEventHandler<HTMLInputElement> = useCallback((e) => {
             if (onEnter && e.key == 'Enter') {
                 onEnter();
@@ -56,12 +71,13 @@ export const Input: FC<InputProps>
         return (
             <LabelRoot htmlFor={id}>
                 <LabelText>{label}</LabelText>
-                <InputWrapper>
+                <InputWrapper invalid={!!error}>
                     {leftDecoration && (
                         <InputDecoration htmlFor={id}>{leftDecoration}</InputDecoration>
                     )}
-                    <ClearInput {...rest} onKeyPress={onEnterKeyPress} id={id} />
+                    <ClearInput {...rest} aria-invalid={!!error} onKeyPress={onEnterKeyPress} id={id} />
                 </InputWrapper>
+                {error && <LabelText error>{error}</LabelText>}
             </LabelRoot>
         );
     };

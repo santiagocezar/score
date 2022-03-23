@@ -10,9 +10,23 @@ export const ButtonGroup = styled('div', {
     display: 'flex',
     alignSelf: 'stretch',
     gap: '.5rem',
-    'button': {
-        width: 0,
-        flex: 1,
+    variants: {
+        compact: {
+            false: {
+                '> *': {
+                    width: 0,
+                    flex: 1,
+                },
+            },
+            true: {
+                '> *': {
+                    flexShrink: 0,
+                }
+            }
+        }
+    },
+    defaultVariants: {
+        compact: false,
     }
 });
 
@@ -31,6 +45,7 @@ export const Button = styled('button', {
     borderColor: '$$hover',
     gap: '4px',
     color: '$$text',
+    fontSize: '1rem',
     fontWeight: 'bold',
     paddingX: '1rem',
     borderRadius: '1rem',

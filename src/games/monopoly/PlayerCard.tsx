@@ -9,6 +9,8 @@ import MdUpload from '~icons/ic/round-file-upload';
 import MdTrash from '~icons/ic/round-delete';
 import { SwitchTransition } from 'react-transition-group';
 import { Dialog } from 'components/Dialog';
+import { PlayerCardActions } from './CardActions';
+import { ButtonGroup } from 'components/Button';
 
 
 const StyledStatusIcon = styled('div', {
@@ -34,8 +36,7 @@ const StyledStatusIcon = styled('div', {
 
 interface StatusIconProps {
     palette: Palette;
-    icon: 'from' | 'to' | 'delete' | null;
-    onClick?: () => void;
+    icon: 'from' | 'to' | null;
 }
 
 const RocketInOut = transitions({
@@ -53,14 +54,10 @@ const RocketInOut = transitions({
     }
 });
 
-export const StatusIcon = memo<StatusIconProps>(({ palette, icon, onClick }) => {
-    const click: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
-        onClick?.();
-        e.stopPropagation();
-    }, [onClick]);
+export const StatusIcon = memo<StatusIconProps>(({ palette, icon }) => {
 
     return (
-        <StyledStatusIcon onClick={click} css={palette} active={!!icon && icon !== "delete"}>
+        <StyledStatusIcon css={palette} active={!!icon}>
             <SwitchTransition>
                 <RocketInOut
                     key={icon}
@@ -70,9 +67,7 @@ export const StatusIcon = memo<StatusIconProps>(({ palette, icon, onClick }) => 
                         ? <MdUpload />
                         : icon === 'to'
                             ? <MdDownload />
-                            : icon === "delete"
-                                ? <MdTrash />
-                                : <div />
+                            : <div />
                     }
                 </RocketInOut>
             </SwitchTransition>
@@ -182,7 +177,7 @@ const StyledCard = styled('li', {
         fontSize: '1.2rem',
     },
 
-    [`${StatusIcon}`]: {
+    [`${ButtonGroup}`]: {
         justifySelf: 'end',
     },
 
@@ -219,11 +214,13 @@ export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, pr
             <Stripes>
                 {stripes}
             </Stripes>
-            <StatusIcon
-                palette={palettes[palette]}
-                icon={from ? 'from' : to ? 'to' : 'delete'}
-                onClick={statusClick}
-            />
+            <ButtonGroup compact>
+                <PlayerCardActions active={from} onDeleteClick={statusClick} />
+                <StatusIcon
+                    palette={palettes[palette]}
+                    icon={from ? 'from' : to ? 'to' : null}
+                />
+            </ButtonGroup>
         </StyledCard>
     );
 });

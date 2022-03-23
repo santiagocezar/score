@@ -2,7 +2,6 @@ import React, { ComponentProps, FC, memo, ReactNode, useEffect, useReducer, useS
 import { Header } from 'components/Header';
 import { range, useEvent } from 'lib/utils';
 import { Dialog, DialogClose } from 'components/Dialog';
-import TextBody from 'components/TextBody';
 import { useImmer } from 'use-immer';
 import MdCasino from '~icons/ic/baseline-casino';
 import MdRestorePage from '~icons/ic/baseline-restore-page';
@@ -137,7 +136,6 @@ export const BingoView: FC = () => {
     const board = bingo.useBoard();
     const played = bingo.useGlobal('played');
     const [newNum, setNewNum] = useState(-1);
-    const [showingHelp, setShowingHelp] = useState(false);
     const [showingConfirm, setShowingConfirm] = useState(false);
 
     useEvent(document, 'keypress', (e) => {
@@ -165,9 +163,6 @@ export const BingoView: FC = () => {
             setNewNum(n);
         }
     }
-
-    console.log(showingHelp);
-
     return (
         <Content>
             <BingoContent>
@@ -177,7 +172,6 @@ export const BingoView: FC = () => {
                     </p>
                 </StyledBall>}
                 <ButtonGroup>
-                    <Button onClick={() => setShowingHelp(true)}>Ayuda</Button>
                     <Button onClick={() => setShowingConfirm(true)}>Reiniciar</Button>
                     <Button onClick={random}>Sacar un número</Button>
                 </ButtonGroup>
@@ -201,32 +195,6 @@ export const BingoView: FC = () => {
                         </DialogClose>
                         <Button color="red" onClick={reset}>Reiniciar</Button>
                     </ButtonGroup>
-                </Dialog>
-                <Dialog
-                    open={showingHelp}
-                    onOpenChange={setShowingHelp}
-                    titlebar="Ayuda"
-                >
-                    <TextBody style={{ maxWidth: '512px', padding: '16px' }}>
-                        <h2 id="modo-bingo">Instrucciones</h2>
-                        <p>
-                            Para sortear un número haga clic en
-                            <MdCasino />, presione la tecla espacio
-                            o toque la grilla (solo en teléfonos).
-                        </p>
-                        <p>
-                            Para empezar de nuevo haga clic en{' '}
-                            <MdRestorePage />
-                        </p>
-                        <h2 id="condiciones-de-uso">Condiciones de Uso</h2>
-                        <p>
-                            Desarrollo de carácter educativo.{' '}
-                            <strong>
-                                No se permite el uso para fines lucrativos.
-                            </strong>{' '}
-                            Sin ninguna garantía para un propósito en particular.
-                        </p>
-                    </TextBody>
                 </Dialog>
             </BingoContent>
         </Content>

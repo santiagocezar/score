@@ -132,17 +132,10 @@ export const iconCSS: CSS = {
 
 globalCss({
     'html': {
-        maxWidth: '100vw',
-        height: '100%',
-        width: '100%',
         color: '$text',
         fontFamily: '$body',
         fontSize: '16px',
         backgroundColor: '$bg100',
-    },
-    'body': {
-        display: 'block',
-        minHeight: '100%',
     },
     'hr': {
         borderBottom: '1px solid $bg200',

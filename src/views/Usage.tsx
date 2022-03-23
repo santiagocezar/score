@@ -1,42 +1,46 @@
 // import { InlineIcon } from 'components/Commons';
-import TextBody from 'components/TextBody';
+import { TextBody } from 'components/TextBody';
+import { Title1, Title2, Title3 } from 'components/Title';
+import { gameModeToName } from 'home/GameCard';
 import React, { ReactNode } from 'react';
 
+import MdAdd from '~icons/ic/round-add';
+import MdBusiness from '~icons/ic/round-business';
+
 export const Usage = () => (
-    <TextBody style={{ maxWidth: '512px' }}>
-        {/* <h1 id="como-usar">Como usar</h1>
-        <h2 id="modo-dinero">Modo Dinero</h2>
+    <TextBody>
+        <Title2 id="como-usar">Como usar</Title2>
+        <Title3 id="modo-dinero">{gameModeToName.Monopoly}</Title3>
         <p>
-            Presione <em>Add</em> para agregar un banco o jugadores.
-            <br />
-            Para hacer una transacción haga click en un la entidad que entrega
-            el dinero y luego la que lo recibe.
-            <InlineIcon name="restore_page" />
-            para empezar un nuevo juego.
+            En la pestaña <MdAdd /> puede agregar jugadores, tiene que ingresar el
+            nombre junto a un color.
         </p>
-        <h2 id="modo-tabla">Modo Tabla</h2>
         <p>
-            Agregue a un jugador apretando el
-            <InlineIcon name="add" />
-            en la fila superior. Para sumarle un puntaje apriete
-            <InlineIcon name="add" />
-            en la columna bajo el nombre del jugador. En la ultima fila se
-            muestra el puntaje total.
+            Para enviar dinero haga click sobre un jugador y luego sobre otro. El
+            primer jugador será el que paga y el segundo el que cobra.
         </p>
-        <h2 id="modo-bingo">Modo Bingo</h2>
         <p>
-            Haga clic en
-            <InlineIcon name="casino" />
-            para elegir un número aleatorio y marcarlo en la grilla.
-            <InlineIcon name="restore_page" />
-            para limpiar la grilla.
+            En la pestaña <MdBusiness /> puede encontrar una lista con las
+            propiedades disponibles en el juego, agrupadas por dueño. Al apretar
+            una de estas puede ver información del alquiler y de las casas, así
+            como también un botón que dice Transferir, que le permite enviarle
+            la propiedad a otro jugador
         </p>
-        <h1 id="condiciones-de-uso">Condiciones de Uso</h1>
+        <Title3>{gameModeToName.Cards}</Title3>
+        <p>
+            Se encuentra en renovaciones actualmente...
+        </p>
+        <Title3>{gameModeToName.Bingo}</Title3>
+        <p>
+            Aprete el botón "Sacar un número" para hacer lo que el botón indica.
+            Como alternativa puede apretar la tecla espacio, si le es más cómodo.
+        </p>
+        <Title2>Condiciones de Uso</Title2>
         <p>
             Desarrollo de carácter educativo.{' '}
             <strong>No se permite el uso para fines lucrativos.</strong> Sin
             ninguna garantía para un propósito en particular.
-        </p> */}
+        </p>
     </TextBody>
 );
 

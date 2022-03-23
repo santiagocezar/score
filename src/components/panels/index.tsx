@@ -114,15 +114,17 @@ export const Paneled = ({ mainView, children }: PaneledProps) => {
             setTab(tab);
     }, [lg]);
 
-    return <PaneledLayout>
-        <PaneledGoToContext.Provider value={goTo}>
-            {lg && <Content>{mainView}</Content>}
-            <Sidebar value={tab} onValueChange={setTab} orientation="vertical" defaultValue={first}>
-                {content}
-                <SidebarTabs>
-                    {tabs}
-                </SidebarTabs>
-            </Sidebar>
-        </PaneledGoToContext.Provider>
-    </PaneledLayout>;
-};;
+    return (
+        <PaneledLayout>
+            <PaneledGoToContext.Provider value={goTo}>
+                {lg && <Content>{mainView}</Content>}
+                <Sidebar value={tab} onValueChange={setTab} orientation="vertical" defaultValue={first}>
+                    {content}
+                    <SidebarTabs>
+                        {tabs}
+                    </SidebarTabs>
+                </Sidebar>
+            </PaneledGoToContext.Provider>
+        </PaneledLayout>
+    );
+};

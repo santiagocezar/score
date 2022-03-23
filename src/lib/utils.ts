@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { isLight } from './color';
 import { CSS } from './theme';
+import * as rt from 'runtypes';
 
 export function saveString(name: string, text: string) {
     let el = document.createElement('a');
@@ -117,3 +118,78 @@ export function plural(word: string, suffixOrAmount: string | number, maybeAmoun
         return `${word}${suffix}`;
     }
 };
+
+export function listPlayers(list: string[], maxPlayers: number = 5): string {
+    if (list.length === 0) {
+        return "Sin jugadores";
+    } else if (list.length === 1) {
+        return `Con ${list[0]} solo`;
+    } else {
+        let res = "Con ";
+
+        // no tiene sentido escribir "y 1 más", que lo muestre y 
+        // que empiece de "y 2 más"
+        if (maxPlayers + 1 === list.length)
+            maxPlayers++;
+
+        for (let i = 0; i < Math.min(list.length, maxPlayers); i++) {
+            const prefix = i === 0
+                ? ''
+                : i === list.length - 1
+                    ? ' y '
+                    : ', ';
+            res += prefix + list[i];
+        }
+        if (list.length > maxPlayers) {
+            res += ` y ${list.length - maxPlayers} más`;
+        }
+        return res;
+    }
+}
+
+export function useLocalStorage<T extends rt.Runtype>(key: string, type: T): [rt.Static<T> | undefined, (value: rt.Static<T>) => void];
+export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, initialValue: rt.Static<T>): [rt.Static<T>, (value: rt.Static<T>) => void];
+export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, initialValue?: rt.Static<T>): [rt.Static<T> | undefined, (value: rt.Static<T>) => void] {
+    const [storedValue, setStoredValue] = useState<rt.Static<T> | undefined>(() => {
+        try {
+            // Get from local storage by key
+            const item = localStorage.getItem(key);
+            // Parse stored json or if none return initialValue
+            return item ? type.check(JSON.parse(item)) : initialValue;
+        } catch (error) {
+            // If error also return initialValue
+            console.error(error);
+            return initialValue;
+        }
+    });
+
+    useEvent(window, 'storage', () => {
+        const item = localStorage.getItem(key);
+        if (item !== null) {
+            const value = JSON.parse(item);
+            if (type.guard(value))
+                setStoredValue(value);
+        }
+    });
+
+    // Return a wrapped version of useState's setter function that ...
+    // ... persists the new value to localStorage.
+    const setValue = (value: rt.Static<T>) => {
+        try {
+            // Allow value to be a function so we have same API as useState
+            const valueToStore =
+                value instanceof Function ? value(storedValue) : value;
+            // Save state
+            setStoredValue(valueToStore);
+            // Save to local storage
+            if (typeof window !== "undefined") {
+                window.localStorage.setItem(key, JSON.stringify(valueToStore));
+            }
+        } catch (error) {
+            // A more advanced implementation would handle the error case
+            console.log(error);
+        }
+    };
+
+    return [storedValue, setValue];
+}

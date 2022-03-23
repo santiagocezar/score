@@ -66,15 +66,29 @@ const StyledAddPlayer = styled('div', {
 
 export const AddPlayer: FC<AddPlayerProps> = ({ afterAddingPlayer }) => {
     const [name, setName] = useState('');
+    const [error, setError] = useState<string | null>(null);
+
     const [palette, setPalette] = useState(() => Math.floor(Math.random() * palettes.length));
     const board = useAnyBoard();
 
     const onAdd = useCallback(() => {
+        if (!name) {
+            setError('El nombre no tiene que estar vacio');
+            return;
+        }
+
+        const nameExists = board.sortedIDs.value
+            .some(pid => board.players.value.get(pid)?.name === name);
+        if (nameExists) {
+            setError('Ya hay alguien con ese nombre');
+            return;
+        }
         const pid = board.add({
             name,
             palette,
         });
         setName('');
+        setError(null);
         afterAddingPlayer?.(pid);
     }, [name, palette, afterAddingPlayer]);
 
@@ -83,6 +97,7 @@ export const AddPlayer: FC<AddPlayerProps> = ({ afterAddingPlayer }) => {
             <Input
                 label="Nombre"
                 type="text"
+                error={error}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onEnter={onAdd}

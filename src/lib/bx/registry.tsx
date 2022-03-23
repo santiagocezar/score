@@ -129,13 +129,14 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
 };
 
 
-const MatchData = rt.Record({
+export const MatchData = rt.Record({
     id: rt.String,
     settings: rt.Unknown,
     name: rt.String,
     game: GameData,
 });
-type MatchData<S extends Settings = Settings> =
+
+export type MatchData<S extends Settings = Settings> =
     & Omit<rt.Static<typeof MatchData>, 'settings'>
     & { settings: rt.Static<S>; };
 
@@ -236,6 +237,7 @@ function createMatchProvider(bgs: BoardGames) {
 interface GameRegistry<B extends BoardGames> {
     MatchProvider: FC<MatchProviderProps>;
     newMatch<G extends keyof B>(game: G, settings: rt.Static<B[G]['settings']>): string;
+    games: B,
 }
 
 export function registerGames<B extends BoardGames>(boardGames: B): GameRegistry<B> {
@@ -251,6 +253,7 @@ export function registerGames<B extends BoardGames>(boardGames: B): GameRegistry
         MatchProvider: createMatchProvider(boardGames),
         newMatch(game, settings) {
             return createMatch(boardGames[game], settings);
-        }
+        },
+        games: boardGames,
     };
 }

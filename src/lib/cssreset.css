@@ -6,10 +6,12 @@ html {
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   touch-action: manipulation;
+  min-height: 100%;
+  max-width: 100vw,
 }
 body {
   position: relative;
-  min-height: 100%;
+  height: 100%;
   font-feature-settings: 'kern';
 }
 *,
