@@ -23,13 +23,13 @@ const StyledPlayerCardActions = styled('div', {
 
 const Collapse = transitions({
     always: {
-        transition: 'opacity .2s .2s',
+        transition: 'transform .2s cubic-bezier(0.79,0.14,0.15,0.86)',
     },
     enterStart: {
-        opacity: 0,
+        transform: 'scale(0)',
     },
     enterEnd: {
-        opacity: 1,
+        transform: 'scale(1)',
     },
 });
 
@@ -39,7 +39,7 @@ interface PlayerCardActionsProps {
 }
 export const PlayerCardActions: FC<PlayerCardActionsProps> = ({ active, onDeleteClick }) => {
     return (
-        <Collapse in={active} unmountOnExit timeout={400}>
+        <Collapse in={active} unmountOnExit timeout={200}>
             <StyledPlayerCardActions>
                 <PlayerCardAction onClick={ev => {
                     onDeleteClick();

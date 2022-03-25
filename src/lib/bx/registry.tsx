@@ -109,17 +109,17 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
         },
         useFacet(pid, facetKey) {
             const board = hooks.useBoard();
-            const [facet, setFacet] = useState(board.get(pid)?.facets?.[facetKey]);
+            const [facet, setFacet] = useState(board.get(pid)?.fields?.[facetKey]);
 
             board.onFacetUpdate.use((id, facet) => {
                 if (id == pid && facet == facetKey) {
-                    setFacet(board.get(pid)?.facets?.[facetKey]);
+                    setFacet(board.get(pid)?.fields?.[facetKey]);
                 }
             });
 
             board.onPlayersUpdate.use((id) => {
                 if (id == pid) {
-                    setFacet(board.get(pid)?.facets?.[facetKey]);
+                    setFacet(board.get(pid)?.fields?.[facetKey]);
                 }
             });
             return facet;

@@ -124,7 +124,7 @@ export const CardsView: FC = () => {
 
         let total = 0;
         const col = [];
-        for (const s of v.facets.prevScore) {
+        for (const s of v.fields.prevScore) {
             total += s;
             col.push(<span key={col.length}>{s}</span>);
         }

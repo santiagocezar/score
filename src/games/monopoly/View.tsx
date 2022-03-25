@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { saveString, loadString } from 'lib/utils';
+import { saveString, loadString, useCompareFn } from 'lib/utils';
 import { Name, PlayerCard } from 'games/monopoly/PlayerCard';
 //import OwnedProperties from 'components/OwnedProperties';
 import { loadSave, LOCALSTORAGE_KEY, useBank } from 'lib/bankContext';
@@ -47,6 +47,21 @@ const PlayerList = styled('div', {
     },
 });
 
+function usePlayerProperties() {
+    const players = mono.usePlayers();
+
+    const playerProperties = useMemo(() => (
+        players
+            .map(p => p.fields.properties)
+            .filter(set => !!set.size)
+    ), [players]);
+
+    return useCompareFn(
+        playerProperties,
+        (prev, next) => prev.every((prevItem, i) => prevItem === next[i]),
+        [players]
+    );
+}
 
 const BANK = -1;
 export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
@@ -55,8 +70,18 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
 
     const [sendingFrom, setFrom] = useState<PlayerID | null>(null);
     const [sendingTo, setTo] = useState<PlayerID | null>(null);
+    const [defaultAmount, setDefaultAmount] = useState(0);
     const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
+
     const [history, produceHistory] = useImmer<Transaction[]>([]);
+
+    const playerProperties = usePlayerProperties();
+
+    const orphanProperties = useMemo(() => (
+        properties
+            .map(({ id }) => id)
+            .filter(id => !playerProperties.some(set => set.has(id)))
+    ), [playerProperties]);
 
     const [deletingPlayer, setDeletingPlayer] = useState<PlayerID | null>(null);
     const deletingPlayerInfo = useMemo(() => {
@@ -84,22 +109,6 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         setDeletingPlayer(null);
     }
 
-    const [propertyOwners, produceProperyOwners] = useImmer(() => {
-        const po = new Map<number, PlayerID>();
-        for (const player of players) {
-            for (const prop of player.facets.properties) {
-                po.set(prop, player.pid);
-            }
-        }
-        return po;
-    });
-
-    const orphanProperties = useMemo(() => (
-        properties
-            .map(({ id }) => id)
-            .filter(id => !propertyOwners.has(id))
-    ), [propertyOwners]);
-
     function onPlayerClicked(pid: PlayerID) {
         console.log('hwar');
         if (pid === sendingFrom) {
@@ -122,31 +131,23 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     }
 
     const sendMoney = useCallback((money: number) => {
-        //TODO: properties duplicate when deselecting the [to] player
-
         const from = board.get(sendingFrom ?? -1);
         const to = board.get(sendingTo ?? -1);
 
         let names = [from?.name ?? 'Banco', to?.name ?? 'Banco'] as [string, string];
 
-        if (from) board.set(from.pid, "money", from.facets.money - money);
-        if (to) board.set(to.pid, "money", to.facets.money + money);
+        if (from) board.set(from.pid, "money", from.fields.money - money);
+        if (to) board.set(to.pid, "money", to.fields.money + money);
 
         if (selectedProperty !== null) {
             if (from) {
                 board.set(from.pid, "properties", set => {
                     set.add(selectedProperty);
                 });
-                produceProperyOwners(draft => {
-                    draft.set(selectedProperty, from.pid);
-                });
             }
             if (to) {
                 board.set(to.pid, "properties", set => {
                     set.delete(selectedProperty);
-                });
-                produceProperyOwners(draft => {
-                    draft.delete(selectedProperty);
                 });
             }
         }
@@ -172,15 +173,17 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     }
 
     useEffect(() => {
-        if (sendingFrom === null && sendingTo === null)
+        if (sendingFrom === null && sendingTo === null) {
             setSelectedProperty(null);
+            setDefaultAmount(0);
+        }
     }, [sendingFrom, sendingTo]);
 
 
     const playerElements = useMemo(() => (
         players.map(p => {
             const propertyColors: string[] = [];
-            for (const property of p.facets.properties) {
+            for (const property of p.fields.properties) {
                 const prop = properties[property];
                 if (prop) propertyColors.push(prop.block);
             }
@@ -192,7 +195,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                     palette={p.palette}
                     name={p.name}
                     properties={propertyColors}
-                    money={p.facets.money}
+                    money={p.fields.money}
                     from={sendingFrom === p.pid}
                     to={sendingTo === p.pid}
                     onClick={onPlayerClicked}
@@ -205,13 +208,13 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     let rank = 1;
     const rankingElements = useMemo(() => (
         [...players]
-            .sort((a, b) => b.facets.money - a.facets.money)
+            .sort((a, b) => b.fields.money - a.fields.money)
             .map(p => (
                 <li key={p.name}>
                     <span className="rank">{rank++}°</span>
                     <div>
                         <span className="name">{p.name}</span>
-                        <span className="pts">$ {p.facets.money}</span>
+                        <span className="pts">$ {p.fields.money}</span>
                     </div>
                 </li>
             ))
@@ -231,6 +234,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     function onSendProperty(from: PlayerID, prop: number) {
         setTo(from);
         setSelectedProperty(prop);
+        setDefaultAmount(properties[prop].price);
     }
 
     console.log({ sendingFrom, sendingTo });
@@ -249,7 +253,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                                 <SendMoney
                                     from={sendingFrom}
                                     to={sendingTo}
-                                    defaultValue={0}
+                                    defaultValue={defaultAmount}
                                     onConfirm={onTransactionConfirmed}
                                 />
                             ) : (

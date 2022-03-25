@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { DependencyList, useEffect, useMemo, useRef, useState } from 'react';
 import { isLight } from './color';
 import { CSS } from './theme';
 import * as rt from 'runtypes';
@@ -192,4 +192,14 @@ export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, init
     };
 
     return [storedValue, setValue];
+}
+
+export function useCompareFn<T>(value: T, isEqual: (prev: T, next: T) => boolean, deps?: DependencyList): T {
+    const [prev, setPrev] = useState(value);
+    useEffect(() => {
+        if (!isEqual(prev, value))
+            setPrev(value);
+    }, deps);
+
+    return prev;
 }

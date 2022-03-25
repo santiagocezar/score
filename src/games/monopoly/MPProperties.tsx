@@ -44,9 +44,18 @@ interface MPPropertiesProps {
 }
 
 export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPayRent, onSendProperty }) => {
-    const [viewingProperty, viewProperty] = useState<MonopolyProperty | null>(null);
-    const [ownerOfProperty, setOwnerOfProperty] = useState<PlayerID>(BANK); // TODO: update property on transfer
     const players = mono.usePlayers();
+
+    const [viewingProperty, viewProperty] = useState<MonopolyProperty | null>(null);
+    const ownerOfProperty = useMemo(() => {
+        if (viewingProperty) {
+            const owner = players.find(p => p.fields.properties.has(viewingProperty.id));
+            return owner?.pid ?? BANK;
+        } else {
+            return BANK;
+        }
+    }, [players, viewingProperty]);
+
     const goTo = usePanelGoTo();
 
     useEffect(() => {
@@ -54,9 +63,9 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
     });
 
     const ownedProperties = useMemo(() => (
-        players.filter(p => p.facets.properties.size > 0)
+        players.filter(p => p.fields.properties.size > 0)
             .map(p => (
-                [p, Array.from(p.facets.properties).map(id => properties[id])] as const
+                [p, Array.from(p.fields.properties).map(id => properties[id])] as const
             ))
     ), [properties, players]);
 
@@ -103,24 +112,20 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
                                 key={prop.id}
                                 onClick={() => {
                                     viewProperty(prop);
-                                    setOwnerOfProperty(p.pid);
                                 }}
                                 prop={prop}
                             />
                         ))}
                     </PropertiesList>
-                    <hr />
                 </Fragment>
             ))}
             <Name name="Banco" palette={BANK_PALETTE} />
-            <br />
             <PropertiesList>
                 {disownedProperties.map(([prop, id]) => (
                     <MPPropertyItem
                         key={id}
                         onClick={() => {
                             viewProperty(prop);
-                            setOwnerOfProperty(BANK);
                         }}
                         prop={prop}
                     />

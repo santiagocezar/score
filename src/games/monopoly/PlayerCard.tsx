@@ -19,16 +19,17 @@ const StyledStatusIcon = styled('div', {
     justifyContent: 'center',
     width: '2rem',
     height: '2rem',
+    border: '.125rem solid transparent',
     borderRadius: '2rem',
     color: 'currentColor',
     overflow: 'hidden',
-    transition: 'background-color .2s .2s, color .2s .2s',
+    transition: 'border-color .4s, color .2s .2s',
 
     variants: {
         active: {
             true: {
-                backgroundColor: '$$p90',
                 color: '$$p50',
+                borderColor: '$$p50',
             }
         }
     }
@@ -79,6 +80,11 @@ StatusIcon.toString = StyledStatusIcon.toString;
 
 export type Icon = ComponentProps<typeof StatusIcon>['icon'] | undefined;
 
+const NameAndStatus = styled('div', {
+    display: 'flex',
+    gap: '.5rem',
+});
+
 const StyledStripe = styled('div', {
     $$color: 'red',
     display: 'flex',
@@ -124,9 +130,11 @@ const StyledName = styled('span', {
     color: '$$contrast',
     maxWidth: '100%',
     paddingX: '1rem',
+    height: '2rem',
+    lineHeight: '2rem',
+    borderRadius: '2rem',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '1rem',
     justifySelf: 'start',
     display: 'inline-block',
     verticalAlign: 'middle',
@@ -162,6 +170,7 @@ const StyledCard = styled('li', {
     flexDirection: 'row',
     alignItems: 'start',
     padding: '.5rem',
+    border: '.125rem solid $$p30',
     borderRadius: '1rem',
     backgroundColor: '$$p30',
     color: '$$p90',
@@ -169,7 +178,7 @@ const StyledCard = styled('li', {
     flexShrink: '0',
     gap: '.5rem',
 
-    transition: 'transform ease 0.3s',
+    transition: 'transform ease 0.2s, border-color .2s',
 
     '.money': {
         justifySelf: 'end',
@@ -185,6 +194,14 @@ const StyledCard = styled('li', {
         //boxShadow: 0px 6px 12px #0004,
         transform: 'translateY(-2px)',
     },
+
+    variants: {
+        active: {
+            true: {
+                borderColor: '$$p50',
+            }
+        }
+    }
 });
 
 type PlayerCardProps = {
@@ -208,18 +225,20 @@ export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, pr
     const statusClick = useCallback(() => onIconClick(pid), [pid, onIconClick]);
 
     return (
-        <StyledCard css={palettes[palette]} onClick={() => onClick(pid)} >
-            <Name name={name} palette={palettes[palette]} />
+        <StyledCard css={palettes[palette]} active={from || to} onClick={() => onClick(pid)} >
+            <NameAndStatus>
+                <Name name={name} palette={palettes[palette]} />
+                <StatusIcon
+                    palette={palettes[palette]}
+                    icon={from ? 'from' : to ? 'to' : null}
+                />
+            </NameAndStatus>
             <p className="money">$ {money}</p>
             <Stripes>
                 {stripes}
             </Stripes>
             <ButtonGroup compact>
                 <PlayerCardActions active={from} onDeleteClick={statusClick} />
-                <StatusIcon
-                    palette={palettes[palette]}
-                    icon={from ? 'from' : to ? 'to' : null}
-                />
             </ButtonGroup>
         </StyledCard>
     );

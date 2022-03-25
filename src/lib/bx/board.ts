@@ -14,7 +14,7 @@ export type Player<F extends FieldGroup> = {
     name: string;
     avatar?: string;
     palette: number;
-    facets: Facets<F>;
+    fields: Facets<F>;
 };
 
 const Player = rt.Record({
@@ -83,7 +83,7 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
                     pid,
                     name,
                     palette,
-                    facets: castDraft(facets),
+                    fields: castDraft(facets),
                 });
             });
             this.sortedIDs.produce(draft => {
@@ -116,7 +116,7 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         this.players.produce(draft => {
             draft.set(pid, {
                 pid,
-                facets: castDraft(buildFacets(this.facets)),
+                fields: castDraft(buildFacets(this.facets)),
                 ...player
             });
         });
@@ -131,7 +131,7 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         if (this.players.value.has(pid)) {
             this.players.produce(draft => {
                 const player = draft.get(pid)!;
-                const facets = uncastDraft(player.facets);
+                const facets = uncastDraft(player.fields);
                 if (value instanceof Function) {
                     const f = facets[facet];
                     value(f);

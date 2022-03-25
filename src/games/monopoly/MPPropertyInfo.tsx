@@ -98,6 +98,7 @@ const Row: FC<RowProps> = ({ left, price }) => (
         </td>
     </tr>
 );
+
 const BigDynamicIcon = styled(DynamicIcon, {
     width: '6rem',
     height: '6rem',
@@ -156,7 +157,7 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
                                         left={
                                             <>
                                                 <BlackTrain />
-                                                Con {i} {plural('estacion', 'es', i)}
+                                                Con {i + 1} {plural('estacion', 'es', i)}
                                             </>
                                         }
                                     />

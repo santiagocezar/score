@@ -104,7 +104,8 @@ export const Button = styled('button', {
                 $$pressed: '$$p50',
                 $$text: '$$p90',
                 $$disabledText: '$$p70',
-                borderWidth: '1px',
+                borderWidth: '.125rem',
+                borderColor: '$$p50',
             },
         },
     }
