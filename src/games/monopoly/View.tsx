@@ -135,6 +135,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     const sendMoney = useCallback((money: number) => {
         const from = board.get(sendingFrom ?? -1);
         const to = board.get(sendingTo ?? -1);
+        const { mortgaged = false } = to?.fields.properties.get(selectedProperty ?? -1) ?? {};
 
         let names = [from?.name ?? 'Banco', to?.name ?? 'Banco'] as [string, string];
 
@@ -151,6 +152,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                     fields.properties.set(selectedProperty, {
                         id: selectedProperty,
                         houses: 0,
+                        mortgaged,
                     });
                 });
             }
@@ -196,7 +198,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                 ...rest
             })
         ).reduce((acc, curr) => (
-            acc + (curr.prop.price + curr.houses * (curr.prop.housing ?? 0))
+            acc + ((curr.mortgaged ? 0 : curr.prop.price) + curr.houses * (curr.prop.housing ?? 0))
         ), 0);
     }, [properties]);
 
@@ -255,7 +257,11 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     function onSendProperty(from: PlayerID, prop: number) {
         setTo(from);
         setSelectedProperty(prop);
-        setDefaultAmount(properties[prop].price);
+        let def = properties[prop].price;
+        if (board.get(from)?.fields.properties.get(prop)?.mortgaged) {
+            def /= 2;
+        }
+        setDefaultAmount(def);
     }
 
     function onPayRent(to: PlayerID, amount: number) {

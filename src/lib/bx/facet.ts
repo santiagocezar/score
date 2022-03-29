@@ -52,7 +52,7 @@ export function buildFacets<F extends FieldGroup>(builders: F): Facets<F> {
     //@ts-expect-error
     const facets: Facets<F> = {};
     for (const name in builders) {
-        facets[name] = builders[name].type.parse(undefined);
+        facets[name] = builders[name].def();
     }
     return facets;
 }
@@ -67,10 +67,10 @@ export function checkFacets<F extends FieldGroup>(j: object, builders: F): Facet
             } catch (err) {
                 console.log('this can actually happen');
                 console.error(err);
-                facets[name] = builders[name].type.parse(undefined);
+                facets[name] = builders[name].def();
             }
         } else {
-            facets[name] = builders[name].type.parse(undefined);
+            facets[name] = builders[name].def();
         }
     }
     return facets;
