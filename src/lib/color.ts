@@ -30,7 +30,7 @@ function memoizeIsLight() {
 
 export const isLight = memoizeIsLight();
 
-type Values = '10' | '30' | '50' | '70' | '90';
+type Values = '10' | '30' | '40' | '50' | '70' | '90';
 export type Palette = {
     [key in `$$p${Values}` | '$$contrast']: string;
 };
@@ -44,6 +44,7 @@ function createPaletteFromParsed(color: tinycolor.Instance): Palette {
     return {
         $$p10: hex(.97),
         $$p30: hex(.9),
+        $$p40: hex(.75),
         $$p50: mid.toHexString(),
         $$p70: hex(.3),
         $$p90: hex(.1),
@@ -54,7 +55,6 @@ function createPaletteFromParsed(color: tinycolor.Instance): Palette {
 export function createPalette(color: string) {
     const value = createPalette.memory.get(color);
     if (value !== undefined) {
-        console.log(`value ${color} was in memory`);
         return value;
     } else {
         const palette = createPaletteFromParsed(tinycolor(color));
@@ -78,6 +78,7 @@ export const palettes = createPalettes();
 export const bw: Palette = {
     $$p10: '#fff',
     $$p30: '#ddd',
+    $$p40: '#aaa',
     $$p50: '#888',
     $$p70: '#444',
     $$p90: '#000',

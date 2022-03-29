@@ -2,6 +2,10 @@ import { createStitches } from '@stitches/react';
 import { CSSForStitches, extendStitches } from './stitchx';
 
 
+export const paletteShadow = {
+    e2: '0 .15rem .5rem $$p30',
+    e3: '0 .4rem 1rem $$p40',
+};
 const stitches = createStitches({
     utils: {
         paddingX: (v: {}) => ({

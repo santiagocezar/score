@@ -8,7 +8,7 @@ import { FC, memo, ReactElement, useCallback, useMemo, useState } from "react";
 
 import MdDone from '~icons/ic/round-done';
 import MdAdd from '~icons/ic/round-add';
-import { Panel, PanelElement } from '.';
+import { Panel, PanelElement, usePanelGoTo } from '.';
 
 interface AddPlayerProps {
     afterAddingPlayer?: (pid: PlayerID) => void;
@@ -70,6 +70,7 @@ export const AddPlayer: FC<AddPlayerProps> = ({ afterAddingPlayer }) => {
 
     const [palette, setPalette] = useState(() => Math.floor(Math.random() * palettes.length));
     const board = useAnyBoard();
+    const goTo = usePanelGoTo();
 
     const onAdd = useCallback(() => {
         if (!name) {
@@ -90,6 +91,7 @@ export const AddPlayer: FC<AddPlayerProps> = ({ afterAddingPlayer }) => {
         setName('');
         setError(null);
         afterAddingPlayer?.(pid);
+        goTo('-1');
     }, [name, palette, afterAddingPlayer]);
 
     return (

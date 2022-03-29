@@ -57,10 +57,10 @@ interface MatchCardProps extends ComponentProps<typeof StyledMatchCard> {
 export const MatchCard: FC<MatchCardProps> = ({ match, onDeleteClick, ...rest }) => {
     const mode = match.mode as Modes;
     const item = localStorage.getItem(match.id) ?? '{}';
-    const actualMatch = JSON.parse(item);
+    const parsed = MatchData.safeParse(JSON.parse(item));
 
-    if (MatchData.guard(actualMatch)) {
-        const players = actualMatch.game.players.map(p => p.name);
+    if (parsed.success) {
+        const players = parsed.data.game.players.map(p => p.name);
         return (
             <StyledMatchCard  {...rest}>
                 <MatchChip mode={mode}>

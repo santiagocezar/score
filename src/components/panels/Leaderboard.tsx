@@ -1,7 +1,7 @@
 import produce from 'immer';
-import { PlayerID, Player } from 'lib/bx';
+import { PlayerID, Player, FieldGroup, BoardGameHooks } from 'lib/bx';
 import { tuple } from 'lib/utils';
-import { ComponentProps, FC, memo, PropsWithChildren, useEffect } from 'react';
+import { ComponentProps, FC, memo, PropsWithChildren, useEffect, useMemo } from 'react';
 import { styled } from 'lib/theme';
 import { Title6 } from 'components/Title';
 
@@ -58,54 +58,42 @@ const PodiumPlayerContainer = styled('div', {
 });
 
 interface PodiumPlayerProps {
-    value: readonly [PlayerID, PlayerInfo | undefined, string];
+    value: number;
+    name: string;
     bigger?: boolean;
     pos: number;
 }
 
-const PodiumPlayer: FC<PodiumPlayerProps>
-    = ({ value, bigger, pos }) => {
-        console.log(value);
-        const id = value?.[0] ?? null;
-        const info = value?.[1] ?? {
-            color: '#000',
-            id: null,
-            name: 'Nadie'
-        };
-        const format = value?.[2] ?? '—';
-        const color = (['gold', 'silver', 'bronze'] as const)[pos - 1];
+const formatScore = (value: number) => value.toLocaleString() + ' pts';
 
-        return (
-            <PodiumPlayerContainer>
-                <MedalContainer>
-                    {id !== null
-                        ? (
-                            <>
-                                <Medal bigger color={color}>
-                                    {pos}
-                                </Medal>
-                                <PlayerAvatar size={bigger ? 'large' : 'big'} pid={id} />
-                            </>
-                        )
-                        : <Avatar icon={null} color="$bg200" size={bigger ? 'large' : 'big'} />}
-                </MedalContainer>
+const PodiumPlayer = memo<PodiumPlayerProps>(({ value, name, bigger, pos }) => {
+    const format = formatScore(value);
+    const color = (['gold', 'silver', 'bronze'] as const)[pos - 1];
 
-                <Title6>
-                    {info.name}
-                </Title6>
+    return (
+        <PodiumPlayerContainer>
+            <MedalContainer>
+                <Medal bigger color={color}>
+                    {pos}
+                </Medal>
+            </MedalContainer>
 
-                <Title6
-                    css={{
-                        marginTop: '-.25rem',
-                        fontWeight: 'normal',
-                        color: '$secondaryText',
-                    }}
-                >
-                    {format}
-                </Title6>
-            </PodiumPlayerContainer >
-        );
-    };
+            <Title6>
+                {name}
+            </Title6>
+
+            <Title6
+                css={{
+                    marginTop: '-.25rem',
+                    fontWeight: 'normal',
+                    color: '$secondaryText',
+                }}
+            >
+                {format}
+            </Title6>
+        </PodiumPlayerContainer >
+    );
+});
 
 const Podium = styled('div', {
     display: 'flex',
@@ -126,54 +114,51 @@ const LeaderboardContainer = styled('div', {
     gap: '.5rem',
 });
 
-export interface LeaderboardProps<D extends DataTuple> extends ComponentProps<typeof LeaderboardContainer> {
-    deps: D;
-    scoreSort: (a: DataTuplePartial<D>, b: DataTuplePartial<D>) => number;
-    scoreFormat: (...args: DataTuplePartial<D>) => string;
+export interface LeaderboardProps<F extends FieldGroup, G extends FieldGroup> {
+    hooks: BoardGameHooks<F, G>;
+    calculate: (player: Player<F>) => number;
+    reverse?: boolean,
 }
 
-function LeaderboardNoMemo<D extends DataTuple>
-    ({ deps, scoreSort, scoreFormat }: LeaderboardProps<D>) {
-    const store = useGame();
+function LeaderboardNoMemo<F extends FieldGroup, G extends FieldGroup>
+    ({ hooks, calculate, reverse }: LeaderboardProps<F, G>) {
+    const players = hooks.usePlayers();
 
-    const players = store.useMap(PlayerInfo, ...deps);
+    const sorted = useMemo(() => {
+        const calculated = players.map((player) => ({
+            player,
+            value: calculate(player),
+        }));
+        calculated.sort((a, b) => (
+            (b.value - a.value) * (reverse ? -1 : 1)
+        ));
+        return calculated;
+    }, [players, calculate, reverse]);
 
     useEffect(() => {
-        console.log('update');
         console.dir(players);
     }, [players]);
 
-    const sorted = produce(players,
-        (players: [PlayerID, PlayerInfo | undefined, ...OrUndefined<DataTupleValues<D>>][]) => {
-            players.sort((a, b) => {
-                const [, , ...dataA] = a;
-                const [, , ...dataB] = b;
-                return scoreSort(dataA, dataB);
-            });
-        }
-    );
-
-    const [first, second, third, ...rest] = sorted.map(([id, info, ...data]) => tuple(id, info, scoreFormat(...data)));
+    //const [first, second, third, ...rest] = sorted;
 
 
     return (
         <LeaderboardContainer>
-            <Podium>
-                <PodiumPlayer pos={3} value={third} />
-                <PodiumPlayer pos={1} value={first} bigger />
-                <PodiumPlayer pos={2} value={second} />
-            </Podium>
-            <Divider />
-            {rest.map(([id, info, format], i) => (
-                <RankItem key={id} >
+            {/* <Podium>
+                <PodiumPlayer pos={3} value={third.value} name={third.player.name} />
+                <PodiumPlayer pos={1} value={first.value} name={first.player.name} bigger />
+                <PodiumPlayer pos={2} value={second.value} name={second.player.name} />
+            </Podium> */}
+
+            {sorted.map(({ player, value }, i) => (
+                <RankItem key={player.pid} >
 
                     <Title6>
-                        {i + 4}°
+                        {i + 1}°
                     </Title6>
-                    <PlayerAvatar pid={id} />
 
                     <Title6 css={{ flexGrow: 1 }}>
-                        {info?.name}
+                        {player.name}
                     </Title6>
                     <Title6
                         css={{
@@ -181,7 +166,7 @@ function LeaderboardNoMemo<D extends DataTuple>
                             color: 'GrayText',
                         }}
                     >
-                        {format}
+                        {formatScore(value)}
                     </Title6>
                 </RankItem>
             ))}

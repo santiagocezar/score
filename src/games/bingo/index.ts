@@ -1,16 +1,17 @@
-import { createGame, createFacet, gameHooks } from 'lib/bx';
-import { Array, Number, Record } from 'runtypes';
+import { createGame, createField, gameHooks } from 'lib/bx';
+import { z } from 'zod';
 import { BingoView } from './View';
 
 export const Bingo = createGame({
     name: 'Bingo',
     view: BingoView,
-    settings: Record({}),
+    settings: z.object({}),
     globalFacets: {
-        played: createFacet(Array(Number), () => new Set<number>(), {
-            fromJSON: (json) => new Set(json),
-            toJSON: (obj) => [...obj]
-        })
+        played: createField(
+            z.array(z.number()).transform((arr) => new Set(arr)),
+            () => new Set(),
+            (value) => [...value]
+        )
     },
     facets: {}
 });

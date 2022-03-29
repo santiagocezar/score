@@ -137,7 +137,6 @@ export const Status: FC<StatusProps> = ({ from, to }) => {
             return ["Banco", BANK_PALETTE] as const;
 
         const player = pid === null ? undefined : board.get(pid);
-        console.log(player?.palette);
 
         return [player?.name, player?.palette !== undefined ? palettes[player.palette] : undefined] as const;
     }, [players]);

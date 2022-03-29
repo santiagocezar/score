@@ -22,7 +22,7 @@ export default function BankSocket() {
             typeof e.data == 'string'
                 ? e.data
                 : new TextDecoder('utf-8').decode(e.data);
-        console.log(data);
+
         const action: Action = JSON.parse(data);
         switch (action.type) {
             case 'REGISTERED': {

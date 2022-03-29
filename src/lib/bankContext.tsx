@@ -30,7 +30,6 @@ export type Player = {
 
 function writeSave(players: PlayerMap) {
     let saveData = players.serialize();
-    console.log('saving ', saveData);
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(saveData));
 }
 

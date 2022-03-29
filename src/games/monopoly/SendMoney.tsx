@@ -15,6 +15,7 @@ const StyledSendMoney = styled('div', {
     alignItems: 'stretch',
     flexDirection: 'column',
     gap: '.5rem',
+    margin: '1rem',
 });
 
 export interface SendMoneyProps {

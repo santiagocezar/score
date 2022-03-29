@@ -5,12 +5,12 @@ import { MPPropertyItem } from './MPPropertyItem';
 import { Title5, Title6 } from 'components/Title';
 import { styled } from 'lib/theme';
 //import { Divider } from 'ui/Blocks';
-import { MPPropertyInfo } from './MPPropertyInfo';
+import { MPPropertyInfo } from './FullProperty';
 //import { useContextSelector } from 'use-context-selector';
 
 import MdBank from '~icons/ic/round-account-balance';
 import { BANK, mono, MonopolyProperty } from '.';
-import { Name } from './PlayerCard';
+import { Name, PlayerTitleCard } from './PlayerCard';
 import { PlayerID } from 'lib/bx';
 import { usePanelGoTo } from 'components/panels';
 import { BANK_PALETTE } from './BankCard';
@@ -39,7 +39,7 @@ const PropertiesList = styled('div', {
 interface MPPropertiesProps {
     properties: MonopolyProperty[];
     onSendProperty: (from: PlayerID, prop: number) => void;
-    onPayRent: (to: PlayerID, rent: number) => void;
+    onPayRent: (to: PlayerID, amount: number) => void;
     orphans: number[];
 }
 
@@ -58,15 +58,18 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
 
     const goTo = usePanelGoTo();
 
-    useEffect(() => {
-        console.log('updateado');
-    });
-
     const ownedProperties = useMemo(() => (
         players.filter(p => p.fields.properties.size > 0)
-            .map(p => (
-                [p, Array.from(p.fields.properties).map(id => properties[id])] as const
-            ))
+            .map(p => ({
+                player: p,
+                properties: Array.from(
+                    p.fields.properties.values(),
+                    ({ id, ...rest }) => ({
+                        prop: properties[id],
+                        ...rest,
+                    })
+                )
+            }))
     ), [properties, players]);
 
     const disownedProperties = useMemo(() => (
@@ -78,6 +81,10 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
         goTo('-1');
     }, [ownerOfProperty, viewingProperty]);
 
+    const payPropertyRent = useCallback((amount: number) => {
+        onPayRent(ownerOfProperty, amount);
+        goTo('-1');
+    }, [ownerOfProperty, onPayRent]);
     // function payPropertyRent(idx: number) {
     //     const prop = monopoly.properties.get(viewingProperty!)!;
     //     console.log(idx);
@@ -91,10 +98,11 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
     if (viewingProperty !== null) {
         return (
             <MPPropertyInfo
+                properties={properties}
                 prop={viewingProperty}
-                banks={true}
+                owner={ownerOfProperty}
                 onGoBack={() => viewProperty(null)}
-                onPayRent={() => 'payPropertyRent'}
+                onPayRent={payPropertyRent}
                 onTransfer={transferProperty}
             />
         );
@@ -103,23 +111,26 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPa
     return (
         <PropertiesContainer>
             <Title5>Propiedades</Title5>
-            {ownedProperties.map(([p, props]) => (
-                <Fragment key={p.pid}>
-                    <Name name={p.name} palette={palettes[p.palette]} />
+            {ownedProperties.map(({ player, properties }) => (
+                <Fragment key={player.pid}>
+                    <PlayerTitleCard children={'de ' + player.name} css={palettes[player.palette]} />
                     <PropertiesList>
-                        {props.map(prop => (
+                        {properties.map(({ prop, houses, mortgaged }) => (
                             <MPPropertyItem
                                 key={prop.id}
                                 onClick={() => {
                                     viewProperty(prop);
                                 }}
+                                houses={houses}
+                                mortgaged={mortgaged}
                                 prop={prop}
                             />
                         ))}
                     </PropertiesList>
+                    <br />
                 </Fragment>
             ))}
-            <Name name="Banco" palette={BANK_PALETTE} />
+            <PlayerTitleCard children="del Banco" css={BANK_PALETTE} />
             <PropertiesList>
                 {disownedProperties.map(([prop, id]) => (
                     <MPPropertyItem

@@ -3,7 +3,7 @@ import { saveString, loadString, useCompareFn } from 'lib/utils';
 import { Name, PlayerCard } from 'games/monopoly/PlayerCard';
 //import OwnedProperties from 'components/OwnedProperties';
 import { loadSave, LOCALSTORAGE_KEY, useBank } from 'lib/bankContext';
-import { gameHooks, PlayerID } from 'lib/bx';
+import { gameHooks, PlayerFor, PlayerID } from 'lib/bx';
 import { mono, Monopoly, MonopolyProperty, MonopolySettings, Transaction } from '.';
 import { useImmer } from 'use-immer';
 
@@ -22,6 +22,7 @@ import { Status } from './Status';
 import { BankCard } from './BankCard';
 import { palettes } from 'lib/color';
 import { Button, ButtonGroup } from 'components/Button';
+import { Leaderboard } from 'components/panels/Leaderboard';
 
 const properties = untypedProperties as MonopolyProperty[];
 
@@ -110,7 +111,6 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     }
 
     function onPlayerClicked(pid: PlayerID) {
-        console.log('hwar');
         if (pid === sendingFrom) {
             setFrom(null);
         } else if (pid === sendingTo) {
@@ -127,7 +127,9 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     }
 
     function onPlayerAdded(pid: number) {
-        board.set(pid, 'money', defaultMoney);
+        board.set(pid, fields => {
+            fields.money = defaultMoney;
+        });
     }
 
     const sendMoney = useCallback((money: number) => {
@@ -136,18 +138,25 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
 
         let names = [from?.name ?? 'Banco', to?.name ?? 'Banco'] as [string, string];
 
-        if (from) board.set(from.pid, "money", from.fields.money - money);
-        if (to) board.set(to.pid, "money", to.fields.money + money);
+        if (from) board.set(from.pid, fields => {
+            fields.money -= money;
+        });
+        if (to) board.set(to.pid, fields => {
+            fields.money += money;
+        });
 
         if (selectedProperty !== null) {
             if (from) {
-                board.set(from.pid, "properties", set => {
-                    set.add(selectedProperty);
+                board.set(from.pid, fields => {
+                    fields.properties.set(selectedProperty, {
+                        id: selectedProperty,
+                        houses: 0,
+                    });
                 });
             }
             if (to) {
-                board.set(to.pid, "properties", set => {
-                    set.delete(selectedProperty);
+                board.set(to.pid, fields => {
+                    fields.properties.delete(selectedProperty);
                 });
             }
         }
@@ -179,12 +188,24 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         }
     }, [sendingFrom, sendingTo]);
 
+    const calculatePlayerValue = useCallback((player: PlayerFor<typeof mono>) => {
+        return player.fields.money + Array.from(
+            player.fields.properties.values(),
+            ({ id, ...rest }) => ({
+                prop: properties[id],
+                ...rest
+            })
+        ).reduce((acc, curr) => (
+            acc + (curr.prop.price + curr.houses * (curr.prop.housing ?? 0))
+        ), 0);
+    }, [properties]);
+
 
     const playerElements = useMemo(() => (
         players.map(p => {
             const propertyColors: string[] = [];
-            for (const property of p.fields.properties) {
-                const prop = properties[property];
+            for (const property of p.fields.properties.values()) {
+                const prop = properties[property.id];
                 if (prop) propertyColors.push(prop.block);
             }
 
@@ -237,7 +258,11 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         setDefaultAmount(properties[prop].price);
     }
 
-    console.log({ sendingFrom, sendingTo });
+    function onPayRent(to: PlayerID, amount: number) {
+        setTo(to);
+        setDefaultAmount(amount);
+    }
+
 
     return (
         <>
@@ -291,7 +316,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                     icon={<MdLeaderboard />}
                     name="Rankings"
                 >
-                    <ul className="rankings">{rankingElements}</ul>
+                    <Leaderboard hooks={mono} calculate={calculatePlayerValue} />
                 </Panel>
                 <Panel
                     icon={<MdBusiness />}
@@ -301,7 +326,7 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                         orphans={orphanProperties}
                         properties={properties}
                         onSendProperty={onSendProperty}
-                        onPayRent={() => { }}
+                        onPayRent={onPayRent}
                     />
                 </Panel>
                 {useAddPlayerPanel(onPlayerAdded)}

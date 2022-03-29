@@ -89,7 +89,6 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>
 
 export function useContrastingColor(color: string) {
     return useMemo(() => {
-        console.log('called color');
         return isLight(color) ? 'black' : 'white';
     }, [color]);
 }

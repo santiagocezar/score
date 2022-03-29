@@ -1,6 +1,6 @@
-import { ComponentType, ComponentProps, FC, createContext, useRef, ReactNode, useContext, useState } from 'react';
-import * as rt from 'runtypes';
-import { BoardStorage, FieldGroup, FacetValue, Player, PlayerID, } from '.';
+import { ComponentType, ComponentProps, FC, createContext, useRef, ReactNode, useContext, useState, useCallback, useEffect } from 'react';
+import { z } from "zod";
+import { BoardStorage, FieldGroup, FieldInfer, Player, PlayerID, } from '.';
 import { GameData } from './board';
 import { Json } from './facet';
 import { nanoid } from 'nanoid';
@@ -15,7 +15,7 @@ export const useAnyBoard = () => {
     return ctx[0];
 };
 
-type Settings = rt.Runtype;
+type Settings = z.ZodTypeAny;
 
 
 interface BoardGame
@@ -26,7 +26,7 @@ interface BoardGame
     > {
     name: string;
     settings: P;
-    view: ComponentType<rt.Static<P>>;
+    view: ComponentType<z.infer<P>>;
     globalFacets?: G;
     facets?: F;
 }
@@ -41,12 +41,12 @@ export function createGame<F extends FieldGroup, G extends FieldGroup, P extends
     };
 }
 
-interface BoardGameHooks<F extends FieldGroup, G extends FieldGroup> {
+export interface BoardGameHooks<F extends FieldGroup, G extends FieldGroup> {
     useBoard(): BoardStorage<F, G>;
     usePlayers(): Player<F>[];
     usePlayer(pid: PlayerID): Player<F> | undefined;
-    useGlobal<K extends keyof G>(facet: K): FacetValue<G[K]>;
-    useFacet<K extends keyof F>(pid: PlayerID, facet: K): FacetValue<F[K]> | undefined;
+    useGlobal<K extends keyof G>(facet: K): FieldInfer<G[K]>;
+    useFacet<K extends keyof F>(pid: PlayerID, facet: K): FieldInfer<F[K]> | undefined;
 }
 
 
@@ -85,14 +85,19 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
             const board = hooks.useBoard();
             const [player, setPlayer] = useState(board.get(pid));
 
-            const listener = (id: PlayerID) => {
+            const listener = useCallback((id: PlayerID) => {
+                console.dir({ id, pid });
                 if (id == pid) {
                     setPlayer(board.get(pid));
                 }
-            };
+            }, [pid]);
 
-            board.onFacetUpdate.use(listener);
-            board.onPlayersUpdate.use(listener);
+            useEffect(() => {
+                setPlayer(board.get(pid));
+            }, [pid]);
+
+            board.onFacetUpdate.use(listener, [listener]);
+            board.onPlayersUpdate.use(listener, [listener]);
 
             return player;
         },
@@ -129,23 +134,23 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
 };
 
 
-export const MatchData = rt.Record({
-    id: rt.String,
-    settings: rt.Unknown,
-    name: rt.String,
+export const MatchData = z.object({
+    id: z.string(),
+    settings: z.unknown(),
+    name: z.string(),
     game: GameData,
 });
 
 export type MatchData<S extends Settings = Settings> =
-    & Omit<rt.Static<typeof MatchData>, 'settings'>
-    & { settings: rt.Static<S>; };
+    & Omit<z.infer<typeof MatchData>, 'settings'>
+    & { settings: z.infer<S>; };
 
-function createMatch<S extends Settings>({ name, globalFacets = {} }: BoardGame, settings: rt.Static<S>) {
+function createMatch<S extends Settings>({ name, globalFacets = {} }: BoardGame, settings: z.infer<S>) {
     const id = nanoid();
     const globals: any = {};
     for (const global in globalFacets) {
         if (hasOwnProperty(globalFacets, global)) {
-            globals[global] = globalFacets[global].new();
+            globals[global] = globalFacets[global].def();
         }
     }
 
@@ -168,11 +173,11 @@ function loadMatch<S extends Settings>(matchID: string, bgs: BoardGames): [Match
     const item = localStorage.getItem(matchID);
 
     if (item) {
-        const match = MatchData.check(JSON.parse(item));
+        const match = MatchData.parse(JSON.parse(item));
         if (hasOwnProperty(bgs, match.name)) {
             const bg = bgs[match.name] as BoardGame;
-            match.settings = bg.settings.check(match.settings);
-            return [match, bg];
+            match.settings = bg.settings.parse(match.settings);
+            return [match as MatchData<S>, bg];
         }
     }
     return [];
@@ -211,7 +216,6 @@ const GameProvider: FC<GameProviderProps> = ({ match, bg }) => {
     const settings = match.settings;
     return (
         <BoardContext.Provider value={[game, bg.name]}>
-            {/*@ts-expect-error*/}
             <View {...settings} />
         </BoardContext.Provider>
     );
@@ -236,7 +240,7 @@ function createMatchProvider(bgs: BoardGames) {
 
 interface GameRegistry<B extends BoardGames> {
     MatchProvider: FC<MatchProviderProps>;
-    newMatch<G extends keyof B>(game: G, settings: rt.Static<B[G]['settings']>): string;
+    newMatch<G extends keyof B>(game: G, settings: z.infer<B[G]['settings']>): string;
     games: B,
 }
 

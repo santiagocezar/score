@@ -1,5 +1,5 @@
 import { hasOwnProperty } from 'lib/utils';
-import { Number, Runtype, Static } from 'runtypes';
+import { z } from 'zod';
 
 export type JsonMap = { [k in string]?: Json; };
 export type Json =
@@ -10,68 +10,49 @@ export type Json =
     | Json[]
     | JsonMap;
 
-type JsonTransform<J extends Runtype, T> = {
-    fromJSON: (json: Static<J>) => T;
-    toJSON: (obj: T) => Static<J>;
+// type JsonTransform<J extends z.ZodTypeAny, T> = {
+//     fromJSON: (json: z.infer<J>) => T;
+//     toJSON: (obj: T) => z.infer<J>;
+// };
+
+type Encoder<T extends z.ZodTypeAny> =
+    z.output<T> extends Json
+    ? undefined
+    : (value: z.output<T>) => Json;
+
+type Default<T extends z.ZodTypeAny> =
+    () => z.output<T>;
+
+export type Field<T extends z.ZodTypeAny = any> = {
+    type: T;
+    encode: Encoder<T>;
+    def: Default<T>;
 };
 
-export class FieldDeclaration<J extends Runtype, T = Static<J>> {
-    private runtype: J;
-    private defaultFn: () => T;
-    private transform: JsonTransform<J, T> | undefined;
+export type FieldInfer<F extends Field> =
+    F extends Field<infer T>
+    ? z.infer<T>
+    : never;
 
-    constructor(runtype: J, defaultFn: () => T, transform?: JsonTransform<J, T>) {
-        this.runtype = runtype;
-        this.defaultFn = defaultFn;
-        this.transform = transform;
+export function createField<T extends z.ZodTypeAny>(type: T, def: Default<T>, ...[encode]: Encoder<T> extends undefined ? [] : [encode: Encoder<T>]): Field<T> {
+    return {
+        type, encode, def
     };
-    new(): T {
-        return this.defaultFn();
-    }
-
-    fromJSON(json: any): T {
-        if (this.runtype.guard(json)) {
-            if (this.transform) {
-                return this.transform.fromJSON(json);
-            }
-            return json as T;
-        }
-        return this.defaultFn();
-    }
-    toJSON(obj: T): Static<J> {
-        console.log(this.transform);
-        if (this.transform) {
-            const json = this.transform.toJSON(obj);
-            return this.runtype.check(json);
-        };
-        return obj as Static<J>;
-    }
-}
-
-export function createFacet<J extends Runtype>(type: J, def: () => Static<J>): FieldDeclaration<J>;
-export function createFacet<J extends Runtype, T>(type: J, def: () => T, transform: JsonTransform<J, T>): FieldDeclaration<J, T>;
-export function createFacet<J extends Runtype, T = Static<J>>(type: J, def: () => T, transform?: JsonTransform<J, T>): FieldDeclaration<J, T> {
-    return new FieldDeclaration(type, def, transform);
 };
 
 export type FieldGroup = {
-    [key: string]: FieldDeclaration<any>;
+    [key: string]: Field;
 };
-export type FacetValue<F extends FieldDeclaration<any>> =
-    F extends FieldDeclaration<any, infer T>
-    ? T
-    : never;
-
 
 export type Facets<F extends FieldGroup> = {
-    [K in keyof F]: FacetValue<F[K]>
+    [K in keyof F]: FieldInfer<F[K]>
 };
 
 export function buildFacets<F extends FieldGroup>(builders: F): Facets<F> {
     //@ts-expect-error
     const facets: Facets<F> = {};
     for (const name in builders) {
-        facets[name] = builders[name].new();
+        facets[name] = builders[name].type.parse(undefined);
     }
     return facets;
 }
@@ -81,18 +62,24 @@ export function checkFacets<F extends FieldGroup>(j: object, builders: F): Facet
     const facets: Facets<F> = {};
     for (const name in builders) {
         if (hasOwnProperty(j, name)) {
-            facets[name] = builders[name].fromJSON(j[name]);
+            try {
+                facets[name] = builders[name].type.parse(j[name]);
+            } catch (err) {
+                console.log('this can actually happen');
+                console.error(err);
+                facets[name] = builders[name].type.parse(undefined);
+            }
         } else {
-            facets[name] = builders[name].new();
+            facets[name] = builders[name].type.parse(undefined);
         }
     }
     return facets;
 }
 
 export function facetsToJson<F extends FieldGroup>(fields: Facets<F>, decls: F): any {
-    const json: any = {}
+    const json: any = {};
     for (const key in fields) {
-        json[key] = decls[key].toJSON(fields[key]);
+        json[key] = decls[key].encode?.(fields[key]) ?? fields[key];
     }
     return json;
 }

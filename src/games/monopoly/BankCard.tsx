@@ -11,6 +11,7 @@ import { Palette } from 'lib/color';
 export const BANK_PALETTE: Palette = {
     $$p10: '#efeffb',
     $$p30: '#8e92bb',
+    $$p40: '#55598f',
     $$p50: '#2f3150',
     $$p70: '#080a15',
     $$p90: '#efeffb',

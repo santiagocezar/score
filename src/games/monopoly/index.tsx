@@ -1,7 +1,6 @@
-import { PlayerID, createGame, createFacet, gameHooks } from 'lib/bx';
+import { PlayerID, createGame, createField, gameHooks } from 'lib/bx';
 import { MonopolyView } from './View';
-import { Array, Number, Record, Static } from 'runtypes';
-
+import { z } from "zod";
 
 export type MonopolyProperty = {
     id: number;
@@ -27,23 +26,36 @@ export interface Transaction {
     id: number;
 }
 
+const OwnedProperty = z.object({
+    id: z.number(),
+    houses: z.number().default(0),
+    mortgaged: z.boolean().default(false),
+})
+export type OwnedProperty = z.infer<typeof OwnedProperty>
+
+
+//export type ResolvedProperty = Omit<OwnedProperty, 'id'> & {prop: MonopolyProperty}
+
 export const BANK: PlayerID = -1;
 
-const MonopolySettings = Record({
-    defaultMoney: Number,
+const MonopolySettings = z.object({
+    defaultMoney: z.number(),
 })
-export type MonopolySettings = Static<typeof MonopolySettings>
+export type MonopolySettings = z.infer<typeof MonopolySettings>
 
 export const Monopoly = createGame({
     name: 'Monopoly',
     view: MonopolyView,
     settings: MonopolySettings,
     facets: {
-        money: createFacet(Number, () => 0),
-        properties: createFacet(Array(Number), () => new Set<number>(), {
-            fromJSON: (json) => new Set(json),
-            toJSON: (obj) => [...obj]
-        })
+        money: createField(z.number(), () => 0),
+        properties: createField(
+            z.array(OwnedProperty).transform((arr) => (
+                new Map(arr.map(o => [o.id, o]))
+            )),
+            () => new Map<number, OwnedProperty>(),
+            (value) => [...value.values()]
+        )
     }
 });
 

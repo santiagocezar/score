@@ -109,8 +109,8 @@ export const CardsView: FC = () => {
 
     function addScore(score: PlayerID | null) {
         if (score !== null) {
-            board.set(addingScore!, "prevScore", draft => {
-                draft.push(score);
+            board.set(addingScore!, fields => {
+                fields.prevScore.push(score);
             });
         }
         setAddingScore(null);

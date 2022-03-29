@@ -1,13 +1,13 @@
-import { PlayerID, createGame, createFacet, gameHooks } from 'lib/bx';
-import { Array, Number, Record } from 'runtypes';
+import { PlayerID, createGame, createField, gameHooks } from 'lib/bx';
+import { z } from 'zod';
 import { CardsView } from './View';
 
 export const Cards = createGame({
     name: 'Cards',
     view: CardsView,
-    settings: Record({}),
+    settings: z.object({}),
     facets: {
-        prevScore: createFacet(Array(Number), () => []),
+        prevScore: createField(z.array(z.number()), () => []),
     }
 });
 

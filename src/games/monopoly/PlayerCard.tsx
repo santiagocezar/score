@@ -1,6 +1,6 @@
 import { PlayerID } from 'lib/bx';
 import { Palette, palettes } from 'lib/color';
-import { CSS, keyframes, styled, transitions } from 'lib/theme';
+import { CSS, keyframes, paletteShadow, styled, transitions } from 'lib/theme';
 import { useContrastingColor, useContrastingPair } from 'lib/utils';
 import React, { Component, ComponentProps, FC, memo, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -17,19 +17,28 @@ const StyledStatusIcon = styled('div', {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '2rem',
-    height: '2rem',
-    border: '.125rem solid transparent',
+    width: '0',
+    height: '0',
+    marginRight: '-.5rem',
+    backgroundColor: '$$p30',
+    color: '$$p90',
     borderRadius: '2rem',
-    color: 'currentColor',
     overflow: 'hidden',
-    transition: 'border-color .4s, color .2s .2s',
+    opacity: 0,
+    transition: `
+        opacity .4s,
+        width .4s, height .4s,
+        margin-right .4s
+    `,
+
 
     variants: {
         active: {
             true: {
-                color: '$$p50',
-                borderColor: '$$p50',
+                height: '2rem',
+                width: '2rem',
+                marginRight: '0',
+                opacity: 1,
             }
         }
     }
@@ -40,19 +49,17 @@ interface StatusIconProps {
     icon: 'from' | 'to' | null;
 }
 
-const RocketInOut = transitions({
+const Scale = transitions({
     always: {
-        transition: 'transform .2s cubic-bezier(0.79,0.14,0.15,0.86)',
+        transition: 'transform .2s ease',
+        imageRendering: '-moz-crisp-edges'
     },
     enterStart: {
-        transform: 'translateY(120%)',
+        transform: 'scale(0)',
     },
     enterEnd: {
-        transform: 'none',
+        transform: 'scale(1)',
     },
-    exitEnd: {
-        transform: 'translateY(-120%)',
-    }
 });
 
 export const StatusIcon = memo<StatusIconProps>(({ palette, icon }) => {
@@ -60,7 +67,7 @@ export const StatusIcon = memo<StatusIconProps>(({ palette, icon }) => {
     return (
         <StyledStatusIcon css={palette} active={!!icon}>
             <SwitchTransition>
-                <RocketInOut
+                <Scale
                     key={icon}
                     timeout={200}
                 >
@@ -70,7 +77,7 @@ export const StatusIcon = memo<StatusIconProps>(({ palette, icon }) => {
                             ? <MdDownload />
                             : <div />
                     }
-                </RocketInOut>
+                </Scale>
             </SwitchTransition>
         </StyledStatusIcon>
     );
@@ -82,6 +89,7 @@ export type Icon = ComponentProps<typeof StatusIcon>['icon'] | undefined;
 
 const NameAndStatus = styled('div', {
     display: 'flex',
+    alignItems: 'center',
     gap: '.5rem',
 });
 
@@ -126,13 +134,11 @@ const Stripes = styled('div', {
 });
 
 const StyledName = styled('span', {
-    backgroundColor: '$$p50',
-    color: '$$contrast',
+    //backgroundColor: '$$p50',
     maxWidth: '100%',
-    paddingX: '1rem',
+    paddingX: '.5rem',
     height: '2rem',
     lineHeight: '2rem',
-    borderRadius: '2rem',
     alignItems: 'center',
     justifyContent: 'center',
     justifySelf: 'start',
@@ -140,7 +146,8 @@ const StyledName = styled('span', {
     verticalAlign: 'middle',
     textAlign: 'center',
     gap: '.5rem',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
+    fontFamily: '$title',
     fontWeight: 'bold',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -159,7 +166,22 @@ export const Name: FC<NameProps> = ({ name, palette }) => {
 };
 Name.toString = StyledName.toString;
 
-const StyledCard = styled('li', {
+export const PlayerTitleCard = styled('div', {
+    display: 'flex',
+    flexShrink: 0,
+    height: '3rem',
+    borderRadius: '1rem',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.5rem',
+    fontFamily: '$title',
+    fontWeight: 'bold',
+    color: '$$contrast',
+    backgroundImage: 'linear-gradient(30deg, $$p40, $$p50)',
+    boxShadow: paletteShadow.e2,
+});
+
+export const StyledPlayerCard = styled('li', {
     overflow: 'hidden',
     display: 'grid',
     gridTemplate: `
@@ -167,18 +189,22 @@ const StyledCard = styled('li', {
         "properties status" 2rem
         / 1fr min-content
     `,
-    flexDirection: 'row',
     alignItems: 'start',
     padding: '.5rem',
-    border: '.125rem solid $$p30',
     borderRadius: '1rem',
     backgroundColor: '$$p30',
+    backgroundImage: 'linear-gradient(30deg, $$p40, transparent)',
     color: '$$p90',
     userSelect: 'none',
     flexShrink: '0',
     gap: '.5rem',
+    boxShadow: paletteShadow.e2,
 
-    transition: 'transform ease 0.2s, border-color .2s',
+    transition: `
+        transform ease .4s, color .2s,
+        filter .2s, box-shadow .4s,
+        background-color .2s
+    `,
 
     '.money': {
         justifySelf: 'end',
@@ -192,13 +218,17 @@ const StyledCard = styled('li', {
 
     '&:hover': {
         //boxShadow: 0px 6px 12px #0004,
-        transform: 'translateY(-2px)',
+        filter: 'brightness(.95)',
+        //boxShadow: '0 .4rem 1rem $$p30',
     },
 
     variants: {
         active: {
             true: {
-                borderColor: '$$p50',
+                boxShadow: paletteShadow.e3,
+                color: '$$contrast',
+                backgroundColor: '$$p50',
+                transform: 'translateY(-.25rem)',
             }
         }
     }
@@ -225,13 +255,13 @@ export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, pr
     const statusClick = useCallback(() => onIconClick(pid), [pid, onIconClick]);
 
     return (
-        <StyledCard css={palettes[palette]} active={from || to} onClick={() => onClick(pid)} >
+        <StyledPlayerCard css={palettes[palette]} active={from || to} onClick={() => onClick(pid)} >
             <NameAndStatus>
-                <Name name={name} palette={palettes[palette]} />
                 <StatusIcon
                     palette={palettes[palette]}
                     icon={from ? 'from' : to ? 'to' : null}
                 />
+                <Name name={name} palette={palettes[palette]} />
             </NameAndStatus>
             <p className="money">$ {money}</p>
             <Stripes>
@@ -240,6 +270,6 @@ export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, pr
             <ButtonGroup compact>
                 <PlayerCardActions active={from} onDeleteClick={statusClick} />
             </ButtonGroup>
-        </StyledCard>
+        </StyledPlayerCard>
     );
 });

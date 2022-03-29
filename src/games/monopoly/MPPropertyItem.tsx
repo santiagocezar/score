@@ -4,7 +4,7 @@ import { MonopolyProperty } from '.';
 import { Button } from 'components/Button';
 import { styled } from 'lib/theme';
 import { Title5, Title6 } from 'components/Title';
-import { useContrastingColor, useContrastingPair } from 'lib/utils';
+import { plural, useContrastingColor, useContrastingPair } from 'lib/utils';
 
 import MdHome from '~icons/ic/round-home';
 import MdTrain from '~icons/ic/round-train';
@@ -12,16 +12,27 @@ import MdServices from '~icons/ic/round-miscellaneous-services';
 import { createPalette } from 'lib/color';
 
 const Property = styled('div', {
-    display: 'flex',
-    flexDirection: 'row',
+    display: 'grid',
+    gridTemplateColumns: 'fit-content 1fr',
+    gridTemplateRows: 'min-content min-content',
+    alignItems: 'center',
     userSelect: 'none',
     overflow: 'hidden',
     cursor: 'pointer',
     borderRadius: '1rem',
-    padding: '.75rem .5rem .5rem .5rem',
-    height: '5rem',
-    backgroundColor: '$$p30',
+    boxShadow: '$e2',
+    padding: '.5rem',
     color: '$$p90',
+    variants: {
+        mortgaged: {
+            true: {
+                border: '.5rem solid $bg100',
+                paddingY: '0',
+                backgroundColor: '$blue800',
+                color: '$textContrast',
+            }
+        }
+    },
 });
 const Icon = styled('div', {
     display: 'flex',
@@ -48,29 +59,74 @@ export const DynamicIcon = memo<{ prop: MonopolyProperty; className?: string; }>
 DynamicIcon.toString = Icon.toString;
 
 const Name = styled('p', {
+    display: 'flex',
+    gridColumn: 'span 2',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '2rem',
+    backgroundImage: 'linear-gradient(30deg, $$p40, $$p50)',
+    color: '$$contrast',
+    borderRadius: '.5rem',
+
     flexGrow: 1,
-    lineHeight: '1.2rem',
+    lineHeight: '1rem',
+
     fontWeight: 'bold',
-    fontSize: '1.2rem',
+    fontFamily: '$title',
+    fontSize: '1rem',
+    variants: {
+        mortgaged: {
+            true: {
+                background: 'none',
+                color: 'inherit',
+            }
+        }
+    },
 });
 const Price = styled('p', {
     flexShrink: 0,
-    alignSelf: 'end',
+
+    justifySelf: 'end',
     fontSize: '1.5rem',
+});
+const Houses = styled('p', {
+    color: '$$p70',
+    fontStyle: 'italic',
+    variants: {
+        mortaged: {
+            true: {
+                color: 'inherit',
+            }
+        }
+    }
 });
 
 interface MPPropetyItemProps extends ComponentProps<typeof Property> {
     prop: MonopolyProperty;
+    houses?: number;
+    mortgaged?: boolean;
 }
 
 export const MPPropertyItem: FC<MPPropetyItemProps>
-    = memo(({ prop, ...rest }) => {
+    = memo(({ prop, houses, mortgaged: mortaged, ...rest }) => {
         return (
-            <Property {...rest} css={createPalette(prop.block)}>
-                <DynamicIcon prop={prop} />
-                <Name>
+            <Property {...rest} mortgaged={mortaged} css={createPalette(prop.block)}>
+                <Name mortgaged={mortaged}>
                     {prop.name}
                 </Name>
+                <Houses mortaged={mortaged}>
+                    {mortaged
+                        ? 'Hipotecada'
+                        : houses === undefined
+                            ? 'Sin dueño'
+                            : houses === 5
+                                ? 'Con hotel'
+                                : houses
+                                    ? `Con ${houses} ${plural('casa', houses)}`
+                                    : 'Sin casas'
+                    }
+                </Houses>
                 <Price>
                     ${prop.price}
                 </Price>

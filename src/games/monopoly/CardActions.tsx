@@ -18,10 +18,11 @@ const StyledPlayerCardActions = styled('div', {
     height: '2rem',
     borderRadius: '2rem',
     overflow: 'hidden',
-    backgroundColor: '$$p50',
+    backgroundColor: '$$p90',
+    color: '$$p10'
 });
 
-const Collapse = transitions({
+const Scale = transitions({
     always: {
         transition: 'transform .2s cubic-bezier(0.79,0.14,0.15,0.86)',
     },
@@ -39,7 +40,7 @@ interface PlayerCardActionsProps {
 }
 export const PlayerCardActions: FC<PlayerCardActionsProps> = ({ active, onDeleteClick }) => {
     return (
-        <Collapse in={active} unmountOnExit timeout={200}>
+        <Scale in={active} unmountOnExit timeout={200}>
             <StyledPlayerCardActions>
                 <PlayerCardAction onClick={ev => {
                     onDeleteClick();
@@ -48,6 +49,6 @@ export const PlayerCardActions: FC<PlayerCardActionsProps> = ({ active, onDelete
                     <MdTrash />
                 </PlayerCardAction>
             </StyledPlayerCardActions>
-        </Collapse>
+        </Scale>
     );
 };

@@ -61,6 +61,7 @@ export const Button = styled('button', {
     '&:disabled': {
         color: '$$disabledText',
         backgroundColor: '$$hover',
+        cursor: 'default'
     },
 
     variants: {
@@ -75,28 +76,28 @@ export const Button = styled('button', {
                 $$hover: '$colors$red100',
                 $$pressed: '$colors$red300',
                 $$text: '$colors$text',
-                $$disabledText: '$colors$red800',
+                $$disabledText: '$colors$red400',
             },
             yellow: {
                 $$inactive: '$colors$yellow200',
                 $$hover: '$colors$yellow100',
                 $$pressed: '$colors$yellow300',
                 $$text: '$colors$text',
-                $$disabledText: '$colors$yellow800',
+                $$disabledText: '$colors$yellow400',
             },
             blue: {
                 $$inactive: '$colors$blue200',
                 $$hover: '$colors$blue100',
                 $$pressed: '$colors$blue300',
                 $$text: '$colors$text',
-                $$disabledText: '$colors$blue800',
+                $$disabledText: '$colors$blue400',
             },
             green: {
                 $$inactive: '$colors$green200',
                 $$hover: '$colors$green100',
                 $$pressed: '$colors$green300',
                 $$text: '$colors$text',
-                $$disabledText: '$colors$green800',
+                $$disabledText: '$colors$green400',
             },
             palette: {
                 $$inactive: '$$p30',

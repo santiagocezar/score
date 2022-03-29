@@ -3,10 +3,10 @@ import { Emitter } from 'lib/emitter';
 import { useState } from 'react';
 import { Facets, FieldGroup, buildFacets } from '.';
 import { checkFacets, facetsToJson, Json } from './facet';
-import * as rt from 'runtypes';
+import { z } from "zod";
 
 export type PlayerID = number;
-const PlayerID = rt.Number;
+const PlayerID = z.number();
 
 
 export type Player<F extends FieldGroup> = {
@@ -17,20 +17,20 @@ export type Player<F extends FieldGroup> = {
     fields: Facets<F>;
 };
 
-const Player = rt.Record({
+const Player = z.object({
     pid: PlayerID,
-    name: rt.String,
-    palette: rt.Number,
-    facets: rt.Dictionary(rt.Unknown, rt.String),
+    name: z.string(),
+    palette: z.number(),
+    fields: z.record(z.unknown()),
 });
 
-type AddPlayer<F extends FieldGroup> = Omit<Player<F>, 'pid' | 'facets'>;
+type AddPlayer<F extends FieldGroup> = Omit<Player<F>, 'pid' | 'fields'>;
 
-export const GameData = rt.Record({
-    players: rt.Array(Player),
-    globals: rt.Dictionary(rt.Unknown, rt.String),
+export const GameData = z.object({
+    players: z.array(Player),
+    globals: z.record(z.unknown()),
 });
-export type GameData = rt.Static<typeof GameData>;
+export type GameData = z.infer<typeof GameData>;
 
 interface Producer<T> {
     value: Readonly<T>;
@@ -61,12 +61,12 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
     sortedIDs = producer(new Array<PlayerID>());
     players = producer(new Map<PlayerID, Player<F>>());
 
-    facets: F;
+    fields: F;
     globalDeclarations: G;
     globals: Producer<Facets<G>>;
 
     constructor(facetBuilders: F, globalFacetBuilders: G) {
-        this.facets = facetBuilders;
+        this.fields = facetBuilders;
         this.globalDeclarations = globalFacetBuilders;
         this.globals = producer(buildFacets(globalFacetBuilders));
     }
@@ -75,15 +75,15 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         this.globals.value = checkFacets(data.globals, this.globalDeclarations);
         for (const player of data.players) {
             console.dir(player);
-            const { pid, name, palette, facets: untypedFacets } = player;
+            const { pid, name, palette, fields: untypedFields } = player;
             this.increasingID = Math.max(this.increasingID, pid + 1);
-            const facets = checkFacets(untypedFacets, this.facets);
+            const fields = checkFacets(untypedFields, this.fields);
             this.players.produce(draft => {
                 draft.set(pid, {
                     pid,
                     name,
                     palette,
-                    fields: castDraft(facets),
+                    fields: castDraft(fields),
                 });
             });
             this.sortedIDs.produce(draft => {
@@ -98,8 +98,8 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
 
     dumpData(): GameData {
         const players = this.sortedIDs.value.map(pid => {
-            const { facets, ...player }: any = this.players.value.get(pid)!;
-            player.facets = facetsToJson(facets, this.facets);
+            const { fields, ...player }: any = this.players.value.get(pid)!;
+            player.fields = facetsToJson(fields, this.fields);
             return player;
         });
 
@@ -116,7 +116,7 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         this.players.produce(draft => {
             draft.set(pid, {
                 pid,
-                fields: castDraft(buildFacets(this.facets)),
+                fields: castDraft(buildFacets(this.fields)),
                 ...player
             });
         });
@@ -127,20 +127,26 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
         return pid;
     }
 
-    set<K extends keyof F>(pid: PlayerID, facet: K, value: Facets<F>[K] | ((draft: Facets<F>[K]) => void)): boolean {
+    set(pid: PlayerID, updater: ((draft: Draft<Facets<F>>) => void)): boolean {
         if (this.players.value.has(pid)) {
+            const prevFields = this.players.value.get(pid)!.fields;
+            console.log('got previous');
             this.players.produce(draft => {
                 const player = draft.get(pid)!;
-                const facets = uncastDraft(player.fields);
-                if (value instanceof Function) {
-                    const f = facets[facet];
-                    value(f);
-                    facets[facet] = f;
-                } else {
-                    facets[facet] = value;
-                }
+                updater(player.fields);
             });
-            this.onFacetUpdate.emit(pid, facet);
+            console.log('player updated');
+            const currFields = this.players.value.get(pid)!.fields;
+            console.log('got current');
+            if (prevFields !== currFields) {
+                console.log('prev and current are different');
+                for (const key in prevFields) {
+                    if (prevFields[key] !== currFields[key]) {
+                        console.log(`key "${key}" was updated`);
+                        this.onFacetUpdate.emit(pid, key);
+                    }
+                }
+            }
             return true;
         } else {
             console.warn(`called set for non-existing pid: ${pid}`);
