@@ -1,7 +1,7 @@
 import { DependencyList, useEffect, useMemo, useRef, useState } from 'react';
 import { isLight } from './color';
 import { CSS } from './theme';
-import * as rt from 'runtypes';
+import { z } from "zod";
 
 export function saveString(name: string, text: string) {
     let el = document.createElement('a');
@@ -146,15 +146,15 @@ export function listPlayers(list: string[], maxPlayers: number = 5): string {
     }
 }
 
-export function useLocalStorage<T extends rt.Runtype>(key: string, type: T): [rt.Static<T> | undefined, (value: rt.Static<T>) => void];
-export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, initialValue: rt.Static<T>): [rt.Static<T>, (value: rt.Static<T>) => void];
-export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, initialValue?: rt.Static<T>): [rt.Static<T> | undefined, (value: rt.Static<T>) => void] {
-    const [storedValue, setStoredValue] = useState<rt.Static<T> | undefined>(() => {
+export function useLocalStorage<T extends z.ZodTypeAny>(key: string, type: T): [z.infer<T> | undefined, (value: z.infer<T>) => void];
+export function useLocalStorage<T extends z.ZodTypeAny>(key: string, type: T, initialValue: z.infer<T>): [z.infer<T>, (value: z.infer<T>) => void];
+export function useLocalStorage<T extends z.ZodTypeAny>(key: string, type: T, initialValue?: z.infer<T>): [z.infer<T> | undefined, (value: z.infer<T>) => void] {
+    const [storedValue, setStoredValue] = useState<z.infer<T> | undefined>(() => {
         try {
             // Get from local storage by key
             const item = localStorage.getItem(key);
             // Parse stored json or if none return initialValue
-            return item ? type.check(JSON.parse(item)) : initialValue;
+            return item ? type.parse(JSON.parse(item)) : initialValue;
         } catch (error) {
             // If error also return initialValue
             console.error(error);
@@ -166,23 +166,21 @@ export function useLocalStorage<T extends rt.Runtype>(key: string, type: T, init
         const item = localStorage.getItem(key);
         if (item !== null) {
             const value = JSON.parse(item);
-            if (type.guard(value))
+            if (type.parse(value))
                 setStoredValue(value);
         }
     });
 
     // Return a wrapped version of useState's setter function that ...
     // ... persists the new value to localStorage.
-    const setValue = (value: rt.Static<T>) => {
+    const setValue = (value: z.infer<T>) => {
         try {
-            // Allow value to be a function so we have same API as useState
-            const valueToStore =
-                value instanceof Function ? value(storedValue) : value;
+            // Allow value to be a function so we have same API as useStateparse
             // Save state
-            setStoredValue(valueToStore);
+            setStoredValue(value);
             // Save to local storage
             if (typeof window !== "undefined") {
-                window.localStorage.setItem(key, JSON.stringify(valueToStore));
+                window.localStorage.setItem(key, JSON.stringify(value));
             }
         } catch (error) {
             // A more advanced implementation would handle the error case

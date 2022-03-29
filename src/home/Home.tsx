@@ -3,7 +3,6 @@ import { Route, BrowserRouter as Router, Switch, useLocation, useHistory } from 
 import { GameCard } from './GameCard';
 import Usage from 'views/Usage';
 import { MatchProvider, newMatch } from 'games';
-import * as rt from 'runtypes';
 
 import scoreURL from 'res/score.svg';
 import { Header } from 'components/Header';
@@ -16,6 +15,7 @@ import { listPlayers, useLocalStorage } from 'lib/utils';
 import { MatchCard } from './MatchCard';
 import { CloseButton, Dialog } from 'components/Dialog';
 import { Button, ButtonGroup } from 'components/Button';
+import { z } from 'zod';
 
 const SC = () => (
     <a
@@ -48,14 +48,14 @@ const Logo = styled('img', {
     height: '4rem',
 });
 
-const MatchItemType = rt.Record({
-    id: rt.String,
-    mode: rt.String,
-    name: rt.String,
+const MatchItemType = z.object({
+    id: z.string(),
+    mode: z.string(),
+    name: z.string(),
 });
-export type MatchItemType = rt.Static<typeof MatchItemType>;
+export type MatchItemType = z.infer<typeof MatchItemType>;
 
-const MatchListType = rt.Array(MatchItemType);
+const MatchListType = z.array(MatchItemType);
 
 export const Home = () => {
     const [matches, setMatches] = useLocalStorage("matches", MatchListType, []);
