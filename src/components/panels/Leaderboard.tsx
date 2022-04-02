@@ -4,75 +4,24 @@ import { tuple } from 'lib/utils';
 import { ComponentProps, FC, memo, PropsWithChildren, useEffect, useMemo } from 'react';
 import { styled } from 'lib/theme';
 import { Title6 } from 'components/Title';
+import { PlayerNameCard } from 'games/monopoly/PlayerCard';
+import { Palette, palettes } from 'lib/color';
 
-
-const MedalContainer = styled('div', {
-    position: 'relative',
-});
-const Medal = styled('div', {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '1rem',
-    height: '1rem',
-    borderRadius: '1rem',
-    fontSize: '.75rem',
-    fontWeight: 'bold',
-    backgroundColor: '$foreA100',
-    border: '.1rem solid $bg100',
-    color: '$darkForeA100',
-    variants: {
-        bigger: {
-            true: {
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '2rem',
-                fontSize: '1.2rem',
-            }
-        },
-        color: {
-            gold: {
-                background: 'linear-gradient(135deg, #ebb729 0%, #f3e9b7 50%, #f5d745 100%)',
-                color: 'black',
-            },
-            silver: {
-                background: 'linear-gradient(135deg, #a8aeb3 0%, #ffffff 50%, #a8aeb3 100%)',
-                color: 'black',
-            },
-            bronze: {
-                background: 'linear-gradient(135deg, #eb3d1e 0%, #ff815b 50%, #eb691e 100%)',
-                color: 'black',
-            },
-        },
-    }
-});
-
-const PodiumPlayerContainer = styled('div', {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    userSelect: 'none',
-});
-
-interface PodiumPlayerProps {
+interface StandingPlayerProps {
     value: number;
-    name: string;
-    bigger?: boolean;
-    pos: number;
+    name?: string;
+    palette: number;
+    pos: 1 | 2 | 3;
 }
 
 const formatScore = (value: number) => value.toLocaleString() + ' pts';
 
-const PodiumPlayer = memo<PodiumPlayerProps>(({ value, name, bigger, pos }) => {
+const StandingPlayer = memo<StandingPlayerProps>(({ value = 0, name, palette, pos }) => {
     const format = formatScore(value);
-    const color = (['gold', 'silver', 'bronze'] as const)[pos - 1];
 
     return (
-        <PodiumPlayerContainer>
-            <MedalContainer>
+        <Standing>
+            {/* <MedalContainer>
                 <Medal bigger color={color}>
                     {pos}
                 </Medal>
@@ -90,15 +39,83 @@ const PodiumPlayer = memo<PodiumPlayerProps>(({ value, name, bigger, pos }) => {
                 }}
             >
                 {format}
-            </Title6>
-        </PodiumPlayerContainer >
+            </Title6> */}
+            {name && <div>
+                <PlayerNameCard css={palettes[palette]}>{name}</PlayerNameCard>
+                <p><small>{format}</small></p>
+            </div>}
+            <Stand position={pos}>{pos}</Stand>
+        </Standing >
     );
 });
 
 const Podium = styled('div', {
     display: 'flex',
+    alignItems: 'end',
+});
+
+const Standing = styled('div', {
+    display: 'flex',
+    overflow: 'hidden',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    paddingTop: '2rem',
+    gap: '.5rem',
+    textAlign: 'center',
+    width: 0,
+    flex: 1,
+    '*': {
+        width: '100%',
+    }
+});
+
+const Stand = styled('div', {
+    display: 'block',
+    paddingTop: '1rem',
+    color: '$yellow900',
+    textAlign: 'center',
+    backgroundColor: '$yellow500',
+    borderTopLeftRadius: '1rem',
+    borderTopRightRadius: '1rem',
+    alignSelf: 'stretch',
+    fontSize: '2rem',
+    fontFamily: '$title',
+    fontWeight: 'bold',
+    variants: {
+        position: {
+            1: {
+                height: '8rem',
+                backgroundColor: '$yellow300',
+            },
+            2: {
+                height: '6.5rem',
+            },
+            3: {
+                height: '5rem',
+            },
+        }
+    }
+});
+
+const FullLeaderboard = styled('ol', {
+    '> li': {
+        display: 'flex',
+        maxWidth: '100%',
+        backgroundColor: '$yellow300',
+        color: '$yellow900',
+        justifyContent: 'space-between',
+        padding: '.5rem 1rem',
+        '> strong': {
+            width: 0,
+            flexGrow: 1,
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+        }
+    },
+    '> li:nth-child(2n)': {
+        backgroundColor: '$yellow500',
+    }
 });
 
 const RankItem = styled('div', {
@@ -111,7 +128,8 @@ const LeaderboardContainer = styled('div', {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-    gap: '.5rem',
+    overflow: 'hidden',
+    padding: '1rem',
 });
 
 export interface LeaderboardProps<F extends FieldGroup, G extends FieldGroup> {
@@ -139,37 +157,23 @@ function LeaderboardNoMemo<F extends FieldGroup, G extends FieldGroup>
         console.dir(players);
     }, [players]);
 
-    //const [first, second, third, ...rest] = sorted;
-
+    const [first, second, third] = sorted;
 
     return (
         <LeaderboardContainer>
-            {/* <Podium>
-                <PodiumPlayer pos={3} value={third.value} name={third.player.name} />
-                <PodiumPlayer pos={1} value={first.value} name={first.player.name} bigger />
-                <PodiumPlayer pos={2} value={second.value} name={second.player.name} />
-            </Podium> */}
-
-            {sorted.map(({ player, value }, i) => (
-                <RankItem key={player.pid} >
-
-                    <Title6>
-                        {i + 1}°
-                    </Title6>
-
-                    <Title6 css={{ flexGrow: 1 }}>
-                        {player.name}
-                    </Title6>
-                    <Title6
-                        css={{
-                            fontWeight: 'normal',
-                            color: 'GrayText',
-                        }}
-                    >
-                        {formatScore(value)}
-                    </Title6>
-                </RankItem>
-            ))}
+            <Podium>
+                <StandingPlayer pos={3} palette={third?.player.palette} value={third?.value} name={third?.player.name} />
+                <StandingPlayer pos={1} palette={first?.player.palette} value={first?.value} name={first?.player.name} />
+                <StandingPlayer pos={2} palette={second?.player.palette} value={second?.value} name={second?.player.name} />
+            </Podium>
+            <FullLeaderboard>
+                {sorted.map(({ player, value }, i) => (
+                    <li key={player.pid}>
+                        <strong>{i + 1}° {player.name}</strong>
+                        <span>{formatScore(value)}</span>
+                    </li>
+                ))}
+            </FullLeaderboard>
         </LeaderboardContainer>
 
     );

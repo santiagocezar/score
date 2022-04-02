@@ -16,6 +16,7 @@ import { usePanelGoTo } from 'components/panels';
 import { BANK_PALETTE } from './BankCard';
 import { Card } from 'components/Card';
 import { palettes } from 'lib/color';
+import { useCompareFn } from 'lib/utils';
 
 const PropertiesContainer = styled('div', {
     display: 'flex',
@@ -40,11 +41,34 @@ interface MPPropertiesProps {
     properties: MonopolyProperty[];
     onSendProperty: (from: PlayerID, prop: number) => void;
     onPayRent: (to: PlayerID, amount: number) => void;
-    orphans: number[];
+}
+function usePlayerProperties() {
+    const players = mono.usePlayers();
+
+    const playerProperties = useMemo(() => (
+        players
+            .map(p => p.fields.properties)
+            .filter(set => !!set.size)
+    ), [players]);
+
+    return useCompareFn(
+        playerProperties,
+        (prev, next) => prev.length === next.length && prev.every((prevItem, i) => prevItem === next[i]),
+        [players]
+    );
 }
 
-export const MPProperties = memo<MPPropertiesProps>(({ properties, orphans, onPayRent, onSendProperty }) => {
+
+export const MPProperties = memo<MPPropertiesProps>(({ properties, onPayRent, onSendProperty }) => {
     const players = mono.usePlayers();
+
+    const playerProperties = usePlayerProperties();
+
+    const orphans = useMemo(() => (
+        properties
+            .map(({ id }) => id)
+            .filter(id => !playerProperties.some(set => set.has(id)))
+    ), [playerProperties]);
 
     const [viewingProperty, viewProperty] = useState<MonopolyProperty | null>(null);
     const ownerOfProperty = useMemo(() => {

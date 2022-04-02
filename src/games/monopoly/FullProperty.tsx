@@ -30,15 +30,17 @@ const Note = styled('p', {
 
 interface ManagePropertyProps extends PropertyActions {
     prop: MonopolyProperty;
-    fullBlock: boolean;
+    ownedOfBlock: number;
+    propertiesForBlock: number;
     housesInBlock: boolean;
     owner?: PlayerFor<typeof mono>;
 }
 
 const ManageProperty: FC<ManagePropertyProps>
-    = ({ prop, fullBlock, housesInBlock, owner, onTransfer, onPayRent }) => {
+    = ({ prop, ownedOfBlock, propertiesForBlock, housesInBlock, owner, onTransfer, onPayRent }) => {
         const board = mono.useBoard();
 
+        const fullBlock = ownedOfBlock === propertiesForBlock;
 
         const ownedProperty = owner?.fields.properties.get(prop.id);
 
@@ -67,30 +69,123 @@ const ManageProperty: FC<ManagePropertyProps>
         }, [ownedProperty, owner, mortgaged]);
 
         const rentValue = useMemo(() => (
-            houses > 0
-                ? prop.rent?.[houses] ?? 0
-                : (prop.rent?.[0] ?? 0) * (fullBlock ? 2 : 1)
+            !!prop.special
+                ? prop.rent?.[ownedOfBlock - 1] ?? 0
+                : houses > 0
+                    ? prop.rent?.[houses] ?? 0
+                    : (prop.rent?.[0] ?? 0) * (fullBlock ? 2 : 1)
         ), [onPayRent, houses]);
 
         const onPayRentClick = useCallback(() => {
             onPayRent(rentValue);
         }, [rentValue]);
 
-
-
         return (<>
-            <Button color="green" disabled={housesInBlock || houses > 0} onClick={onTransfer}>Transferir</Button>
+            <Button
+                color="green"
+                // can't transfer a built property
+                disabled={housesInBlock || houses > 0}
+                onClick={onTransfer}
+            >
+                Transferir
+            </Button>
             {owner && (<>
-                <Button disabled={housesInBlock || houses > 0} onClick={onMortgage}>{mortgaged ? 'Levantar hipoteca' : 'Hipotecar'}</Button>
-                {houses > 0 && <Note>Para transferir o hipotecar, venda todos los edificios en esta propiedad.</Note>}
-                {housesInBlock && houses <= 0 && <Note>Para transferir o hipotecar, venda los edificios en las otras propiedades del mismo color.</Note>}
-                <Button onClick={onPayRentClick} color="blue">Pagar alquiler (${rentValue})</Button>
-                <ButtonGroup>
-                    <Button onClick={() => changeHouses(-1)} disabled={houses <= 0}> Vender {houses === 5 ? <MdHotel /> : <MdHome />}</Button>
-                    <Button onClick={() => changeHouses(+1)} disabled={houses >= 5 || !fullBlock} color={houses >= 4 ? "blue" : "red"}>Comprar {houses >= 4 ? <MdHotel /> : <MdHome />}</Button>
-                </ButtonGroup>
-                {fullBlock || <Note>Para edificar, necesita el grupo completo de propiedades.</Note>}
+                <Button
+                    // can't mortgage a built property either
+                    disabled={housesInBlock || houses > 0}
+                    onClick={onMortgage}
+                >
+                    {mortgaged ? 'Levantar hipoteca' : 'Hipotecar'}
+                </Button>
+                {houses > 0 // warnings
+                    ? (
+                        <Note>Para transferir o hipotecar, venda todos
+                            los edificios en esta propiedad.</Note>
+                    )
+                    : housesInBlock && (
+                        <Note>Para transferir o hipotecar, venda los
+                            edificios en las otras propiedades del
+                            mismo color.</Note>
+                    )
+                }
+                {prop.special !== 'service' && // paying rent doesn't really work for services
+                    <Button onClick={onPayRentClick} color="blue">
+                        Pagar alquiler (${rentValue})
+                    </Button>
+                }
+                {!!prop.special || // and you can't build houses on stations or services
+                    (<>
+                        <ButtonGroup>
+                            <Button
+                                onClick={() => changeHouses(-1)}
+                                disabled={houses <= 0}>
+                                Vender {houses === 5 ? <MdHotel /> : <MdHome />}
+                            </Button>
+                            <Button
+                                onClick={() => changeHouses(+1)}
+                                disabled={houses >= 5 || !fullBlock}
+                                color={houses >= 4 ? "blue" : "red"}
+                            >
+                                Comprar {houses >= 4 ? <MdHotel /> : <MdHome />}
+                            </Button>
+                        </ButtonGroup>
+                        {fullBlock ||
+                            <Note>Para edificar, necesita el grupo
+                                completo de propiedades.</Note>
+                        }
+                    </>)
+                }
             </>)}
+
+            <Rent>
+                {prop.special === 'station'
+                    ? (<>
+                        {prop.rent?.map((price, i) => (
+                            <Row
+                                key={i}
+                                price={price}
+                                active={ownedOfBlock === (i + 1)}
+                                left={
+                                    <>
+                                        <MdTrain />
+                                        Con {i + 1} {plural('estacion', 'es', i)}
+                                    </>
+                                }
+                            />
+                        ))}
+                    </>)
+                    : prop.special === 'service'
+                        ? (<Note>
+
+                            El alquiler es 4 veces lo que digan los dados, 10 veces si
+                            tiene la otra propiedades de servicios
+                        </Note>)
+                        : (<>
+                            <Row active={owner && !fullBlock && !houses} left="Alquiler" price={prop.rent?.[0] ?? 0} />
+                            <Row active={fullBlock && !houses} left="Con el grupo completo" price={(prop.rent?.[0] ?? 0) * 2} />
+                            {prop.rent?.map((price, i) => i != 0 && (
+                                <Row
+                                    key={i}
+                                    price={price}
+                                    active={houses === i}
+                                    type={i == 5 ? "hotel" : "house"}
+                                    left={
+                                        <>
+                                            {i == 5 ? <MdHotel /> : <MdHome />}
+                                            {i != 5 ? `Con ${i} ${plural('casa', i)}` : 'Con hotel'}
+                                        </>
+                                    }
+                                />
+                            ))}
+                        </>)
+                }
+            </Rent>
+            <Disclaimer>
+                <p>Costo de compra de la propiedad: ${prop.price}</p>
+                {prop.housing !== undefined &&
+                    <p>Costo de cada casa u hotel: ${prop.housing}</p>
+                }
+            </Disclaimer>
         </>);
     };
 const Rent = styled('div', {
@@ -147,60 +242,6 @@ const Row: FC<RowProps> = ({ left, price, ...rest }) => (
     </StyledRow>
 );
 
-interface PropertyInformationProps {
-    prop: MonopolyProperty;
-    owned?: boolean;
-    houses?: number;
-    fullBlock?: boolean;
-}
-
-const PropertyInformation: FC<PropertyInformationProps>
-    = ({ prop, owned, houses, fullBlock }) => (<>
-        <Rent>
-            {prop.special === 'station'
-                ? (<>
-                    {prop.rent?.map((price, i) => (
-                        <Row
-                            key={i}
-                            price={price}
-                            left={
-                                <>
-                                    <MdTrain />
-                                    Con {i + 1} {plural('estacion', 'es', i)}
-                                </>
-                            }
-                        />
-                    ))}
-                </>)
-                : (<>
-                    <Row active={owned && !fullBlock && !houses} left="Alquiler" price={prop.rent?.[0] ?? 0} />
-                    <Row active={fullBlock && !houses} left="Con el grupo completo" price={(prop.rent?.[0] ?? 0) * 2} />
-                    {prop.rent?.map((price, i) => i != 0 && (
-                        <Row
-                            key={i}
-                            price={price}
-                            active={houses === i}
-                            type={i == 5 ? "hotel" : "house"}
-                            left={
-                                <>
-                                    {i == 5 ? <MdHotel /> : <MdHome />}
-                                    {i != 5 ? `Con ${i} ${plural('casa', i)}` : 'Con hotel'}
-                                </>
-                            }
-                        />
-                    ))}
-                </>)
-            }
-        </Rent>
-        <Disclaimer>
-            <p>Costo de compra de la propiedad: ${prop.price}</p>
-            {prop.housing !== undefined &&
-                <p>Costo de cada casa u hotel: ${prop.housing}</p>
-            }
-        </Disclaimer>
-    </>);
-
-
 const BigDynamicIcon = styled(DynamicIcon, {
     width: '6rem',
     height: '6rem',
@@ -224,16 +265,11 @@ const PropertyHeader = styled('header', {
     alignItems: 'center',
     alignSelf: 'stretch',
     flexDirection: 'column',
-    padding: '.5rem',
+    padding: '.5rem .5rem 1rem .5rem',
     gap: '.5rem',
     backgroundColor: '$$p30',
     color: '$$p90',
     borderRadius: '1rem',
-});
-const Actions = styled('div', {
-    display: 'flex',
-    gap: '.5rem',
-    alignSelf: 'end',
 });
 
 interface MPPropetyInfoProps extends PropertyActions {
@@ -249,7 +285,7 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
         console.log(owner);
         const player = mono.usePlayer(owner);
 
-        const [fullBlock = false, housesInBlock = false] = useMemo(() => {
+        const [ownedOfBlock = 0, propertiesForBlock = 3, housesInBlock = false] = useMemo(() => {
             if (!player) return [];
             let housesInBlock = false;
 
@@ -268,7 +304,7 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
                 }
             }
 
-            return [ownedOfBlock === propertiesForBlock, housesInBlock];
+            return [ownedOfBlock, propertiesForBlock, housesInBlock];
         }, [player, prop, properties]);
 
         const houses = useMemo(() => {
@@ -297,10 +333,10 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
                     prop={prop}
                     owner={player}
                     housesInBlock={housesInBlock}
-                    fullBlock={fullBlock}
+                    ownedOfBlock={ownedOfBlock}
+                    propertiesForBlock={propertiesForBlock}
                     {...actions}
                 />
-                <PropertyInformation prop={prop} owned={owner !== BANK} fullBlock={fullBlock} houses={houses} />
             </PropertyContainer>
         );
     });

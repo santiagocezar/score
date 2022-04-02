@@ -166,20 +166,33 @@ export const Name: FC<NameProps> = ({ name, palette }) => {
 };
 Name.toString = StyledName.toString;
 
-export const PlayerTitleCard = styled('div', {
-    display: 'flex',
+export const PlayerNameCard = styled('p', {
+    display: 'inline-block',
+    verticalAlign: 'middle',
+    height: '2rem',
+    lineHeight: '2rem',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     flexShrink: 0,
-    height: '3rem',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.5rem',
+    textAlign: 'center',
+    fontSize: '1rem',
     fontFamily: '$title',
     fontWeight: 'bold',
     color: '$$contrast',
-    marginTop: '1rem',
-    marginX: '-1rem',
+    borderRadius: '1rem',
+    paddingX: '1rem',
     backgroundImage: 'linear-gradient(30deg, $$p40, $$p50)',
     boxShadow: paletteShadow.e2,
+});
+
+export const PlayerTitleCard = styled(PlayerNameCard, {
+    height: '3rem',
+    lineHeight: '3rem',
+    fontSize: '1.5rem',
+    marginTop: '1rem',
+    marginX: '-1rem',
+    borderRadius: '0',
 });
 
 export const StyledPlayerCard = styled('li', {

@@ -48,22 +48,6 @@ const PlayerList = styled('div', {
     },
 });
 
-function usePlayerProperties() {
-    const players = mono.usePlayers();
-
-    const playerProperties = useMemo(() => (
-        players
-            .map(p => p.fields.properties)
-            .filter(set => !!set.size)
-    ), [players]);
-
-    return useCompareFn(
-        playerProperties,
-        (prev, next) => prev.every((prevItem, i) => prevItem === next[i]),
-        [players]
-    );
-}
-
 const BANK = -1;
 export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     const board = mono.useBoard();
@@ -74,15 +58,8 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     const [defaultAmount, setDefaultAmount] = useState(0);
     const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
 
+
     const [history, produceHistory] = useImmer<Transaction[]>([]);
-
-    const playerProperties = usePlayerProperties();
-
-    const orphanProperties = useMemo(() => (
-        properties
-            .map(({ id }) => id)
-            .filter(id => !playerProperties.some(set => set.has(id)))
-    ), [playerProperties]);
 
     const [deletingPlayer, setDeletingPlayer] = useState<PlayerID | null>(null);
     const deletingPlayerInfo = useMemo(() => {
@@ -141,6 +118,9 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
 
         if (from) board.set(from.pid, fields => {
             fields.money -= money;
+            if (mortgaged) {
+                fields.money -= Math.floor(properties[selectedProperty ?? -1]?.price * .1);
+            }
         });
         if (to) board.set(to.pid, fields => {
             fields.money += money;
@@ -329,7 +309,6 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                     name="Propiedades"
                 >
                     <MPProperties
-                        orphans={orphanProperties}
                         properties={properties}
                         onSendProperty={onSendProperty}
                         onPayRent={onPayRent}
