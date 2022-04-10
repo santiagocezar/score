@@ -44,6 +44,7 @@ const NameBar = styled('div', {
     borderRadius: '1rem',
     display: 'flex',
     alignItems: 'stretch',
+    flexShrink: 0,
     justifyContent: 'center',
     height: '0',
     overflow: 'hidden',
@@ -110,19 +111,6 @@ const Name: FC<NameProps> = ({ mode, name, palette, show }) => {
     );
 };
 
-const TopCard = styled('div', {
-    position: 'sticky',
-    backgroundColor: '$bg200',
-    top: `-${HEADER_HEIGHT}`,
-    marginTop: `-${HEADER_HEIGHT}`,
-    padding: '1rem',
-    paddingTop: `calc(${HEADER_HEIGHT} + 1rem)`,
-    zIndex: '$header',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-});
-
 interface StatusProps {
     from: number | null;
     to: number | null;
@@ -151,15 +139,13 @@ export const Status: FC<StatusProps> = ({ from, to }) => {
 
 
     return (
-        <TopCard>
-            <NameBar show>
-                <Name mode="from" name={nameF} palette={paletteF} show={showF || noneShowing} />
-                <Arrow
-                    show={showF && showT}
-                    css={{ $$l: paletteF?.$$p30, $$r: paletteT?.$$p30 }}
-                ><MdPay /></Arrow>
-                <Name mode="to" name={nameT} palette={paletteT} show={showT} />
-            </NameBar>
-        </TopCard>
+        <NameBar show>
+            <Name mode="from" name={nameF} palette={paletteF} show={showF || noneShowing} />
+            <Arrow
+                show={showF && showT}
+                css={{ $$l: paletteF?.$$p30, $$r: paletteT?.$$p30 }}
+            ><MdPay /></Arrow>
+            <Name mode="to" name={nameT} palette={paletteT} show={showT} />
+        </NameBar>
     );
 };

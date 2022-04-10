@@ -15,6 +15,7 @@ import { ButtonGroup } from 'components/Button';
 
 const StyledStatusIcon = styled('div', {
     display: 'flex',
+    flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
     width: '0',
@@ -91,6 +92,8 @@ const NameAndStatus = styled('div', {
     display: 'flex',
     alignItems: 'center',
     gap: '.5rem',
+    maxWidth: '100%',
+    overflow: 'hidden',
 });
 
 const StyledStripe = styled('div', {
@@ -133,19 +136,15 @@ const Stripes = styled('div', {
     }
 });
 
-const StyledName = styled('span', {
+const StyledName = styled('p', {
     //backgroundColor: '$$p50',
+    display: 'block',
+    width: '100%',
     maxWidth: '100%',
     paddingX: '.5rem',
     height: '2rem',
     lineHeight: '2rem',
-    alignItems: 'center',
-    justifyContent: 'center',
-    justifySelf: 'start',
-    display: 'inline-block',
     verticalAlign: 'middle',
-    textAlign: 'center',
-    gap: '.5rem',
     fontSize: '1.5rem',
     fontFamily: '$title',
     fontWeight: 'bold',

@@ -15,18 +15,12 @@ import { HEADER_HEIGHT } from 'components/Header';
 import { createPalette } from 'lib/color';
 import { DynamicIcon } from './MPPropertyItem';
 import { PlayerFor, PlayerID } from 'lib/bx';
+import { Note } from 'components/Forms';
 
 interface PropertyActions {
     onPayRent: (amount: number) => void;
     onTransfer: () => void;
 }
-
-const Note = styled('p', {
-    fontSize: '.8rem',
-    textAlign: 'center',
-    lineHeight: '1em',
-    paddingX: '1rem',
-});
 
 interface ManagePropertyProps extends PropertyActions {
     prop: MonopolyProperty;
@@ -78,7 +72,7 @@ const ManageProperty: FC<ManagePropertyProps>
 
         const onPayRentClick = useCallback(() => {
             onPayRent(rentValue);
-        }, [rentValue]);
+        }, [onPayRent, rentValue]);
 
         return (<>
             <Button
@@ -282,7 +276,6 @@ interface MPPropetyInfoProps extends PropertyActions {
 
 export const MPPropertyInfo: FC<MPPropetyInfoProps>
     = memo(({ properties, prop, owner, onGoBack, ...actions }) => {
-        console.log(owner);
         const player = mono.usePlayer(owner);
 
         const [ownedOfBlock = 0, propertiesForBlock = 3, housesInBlock = false] = useMemo(() => {

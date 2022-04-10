@@ -7,65 +7,24 @@ import { Title6 } from 'components/Title';
 import { PlayerNameCard } from 'games/monopoly/PlayerCard';
 import { Palette, palettes } from 'lib/color';
 
-interface StandingPlayerProps {
-    value: number;
-    name?: string;
-    palette: number;
-    pos: 1 | 2 | 3;
-}
-
 const formatScore = (value: number) => value.toLocaleString() + ' pts';
-
-const StandingPlayer = memo<StandingPlayerProps>(({ value = 0, name, palette, pos }) => {
-    const format = formatScore(value);
-
-    return (
-        <Standing>
-            {/* <MedalContainer>
-                <Medal bigger color={color}>
-                    {pos}
-                </Medal>
-            </MedalContainer>
-
-            <Title6>
-                {name}
-            </Title6>
-
-            <Title6
-                css={{
-                    marginTop: '-.25rem',
-                    fontWeight: 'normal',
-                    color: '$secondaryText',
-                }}
-            >
-                {format}
-            </Title6> */}
-            {name && <div>
-                <PlayerNameCard css={palettes[palette]}>{name}</PlayerNameCard>
-                <p><small>{format}</small></p>
-            </div>}
-            <Stand position={pos}>{pos}</Stand>
-        </Standing >
-    );
-});
 
 const Podium = styled('div', {
     display: 'flex',
     alignItems: 'end',
 });
 
-const Standing = styled('div', {
-    display: 'flex',
-    overflow: 'hidden',
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingTop: '2rem',
-    gap: '.5rem',
-    textAlign: 'center',
-    width: 0,
-    flex: 1,
-    '*': {
-        width: '100%',
+const Names = styled('div', {
+    display: 'grid',
+    gap: '.5rem 2rem',
+    paddingBottom: '.5rem',
+    gridTemplateColumns: '1fr 1fr',
+    justifyItems: 'center',
+    '> *': {
+        maxWidth: '100%',
+    },
+    '> *:first-child': {
+        gridColumn: 'span 2',
     }
 });
 
@@ -77,27 +36,27 @@ const Stand = styled('div', {
     backgroundColor: '$yellow500',
     borderTopLeftRadius: '1rem',
     borderTopRightRadius: '1rem',
-    alignSelf: 'stretch',
     fontSize: '2rem',
     fontFamily: '$title',
     fontWeight: 'bold',
+    height: '5rem',
+    width: 0,
+    flex: 1,
     variants: {
-        position: {
-            1: {
-                height: '8rem',
+        first: {
+            true: {
+                height: '7rem',
                 backgroundColor: '$yellow300',
-            },
-            2: {
-                height: '6.5rem',
-            },
-            3: {
-                height: '5rem',
             },
         }
     }
 });
 
 const FullLeaderboard = styled('ol', {
+    overflow: 'hidden',
+    borderBottomLeftRadius: '1rem',
+    borderBottomRightRadius: '1rem',
+
     '> li': {
         display: 'flex',
         maxWidth: '100%',
@@ -161,10 +120,15 @@ function LeaderboardNoMemo<F extends FieldGroup, G extends FieldGroup>
 
     return (
         <LeaderboardContainer>
+            <Names>
+                {first && <PlayerNameCard css={palettes[first.player.palette]}>{first.player.name}</PlayerNameCard>}
+                {second && <PlayerNameCard css={palettes[second.player.palette]}>{second.player.name}</PlayerNameCard>}
+                {third && <PlayerNameCard css={palettes[third.player.palette]}>{third.player.name}</PlayerNameCard>}
+            </Names>
             <Podium>
-                <StandingPlayer pos={3} palette={third?.player.palette} value={third?.value} name={third?.player.name} />
-                <StandingPlayer pos={1} palette={first?.player.palette} value={first?.value} name={first?.player.name} />
-                <StandingPlayer pos={2} palette={second?.player.palette} value={second?.value} name={second?.player.name} />
+                <Stand>2</Stand>
+                <Stand first>1</Stand>
+                <Stand>3</Stand>
             </Podium>
             <FullLeaderboard>
                 {sorted.map(({ player, value }, i) => (

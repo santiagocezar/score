@@ -1,9 +1,11 @@
 import { styled } from 'lib/theme';
-import { FC, memo, useMemo, useState } from 'react';
+import { FC, memo, ReactNode, useMemo, useState } from 'react';
 import checkURL from 'res/check.svg';
 
 const ToggleLabelWrapper = styled('label', {
-    display: 'block',
+    display: 'flex',
+    gap: '.5rem',
+    userSelect: 'none',
     'input': {
         display: 'none',
     }
@@ -15,6 +17,8 @@ const CheckboxToggle = styled('p', {
     height: '1.5rem',
     borderRadius: '.5rem',
     backgroundColor: '$bg200',
+    backgroundPosition: 'center',
+    border: '.125rem solid $secondaryText',
     'input:checked + &': {
         backgroundColor: '$blue400',
         backgroundImage: `url('${checkURL}')`
@@ -24,10 +28,11 @@ const CheckboxToggle = styled('p', {
 interface ToggleProps {
     toggled?: boolean;
     disabled?: boolean;
+    label?: ReactNode;
     onToggle?: (toggled: boolean) => void;
 }
 
-export const Toggle = memo<ToggleProps>(({ toggled, disabled, onToggle }) => (
+export const Toggle = memo<ToggleProps>(({ toggled, disabled, label, onToggle }) => (
     <ToggleLabelWrapper>
         <input
             type="checkbox"
@@ -36,6 +41,7 @@ export const Toggle = memo<ToggleProps>(({ toggled, disabled, onToggle }) => (
             disabled={disabled}
         />
         <CheckboxToggle />
+        <span>{label}</span>
     </ToggleLabelWrapper>
 ));
 

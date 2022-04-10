@@ -20,11 +20,12 @@ export interface Transfer {
     defaultValue?: number;
 }
 
-export interface Transaction {
-    action: string;
-    money: number;
-    id: number;
-}
+const Transaction = z.object({
+    id: z.number(),
+    action: z.string(),
+    money: z.number(),
+})
+export type Transaction = z.infer<typeof Transaction>
 
 const OwnedProperty = z.object({
     id: z.number(),
@@ -47,7 +48,7 @@ export const Monopoly = createGame({
     name: 'Monopoly',
     view: MonopolyView,
     settings: MonopolySettings,
-    facets: {
+    fields: {
         money: createField(z.number(), () => 0),
         properties: createField(
             z.array(OwnedProperty).transform((arr) => (
@@ -56,6 +57,9 @@ export const Monopoly = createGame({
             () => new Map<number, OwnedProperty>(),
             (value) => [...value.values()]
         )
+    },
+    globals: {
+        history: createField(z.array(Transaction), () => [])
     }
 });
 

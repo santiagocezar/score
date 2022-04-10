@@ -17,6 +17,7 @@ import { BANK_PALETTE } from './BankCard';
 import { Card } from 'components/Card';
 import { palettes } from 'lib/color';
 import { useCompareFn } from 'lib/utils';
+import { useSelection } from './Selection';
 
 const PropertiesContainer = styled('div', {
     display: 'flex',
@@ -37,11 +38,6 @@ const PropertiesList = styled('div', {
 });
 
 
-interface MPPropertiesProps {
-    properties: MonopolyProperty[];
-    onSendProperty: (from: PlayerID, prop: number) => void;
-    onPayRent: (to: PlayerID, amount: number) => void;
-}
 function usePlayerProperties() {
     const players = mono.usePlayers();
 
@@ -58,11 +54,31 @@ function usePlayerProperties() {
     );
 }
 
+interface MPPropertiesProps {
+    properties: MonopolyProperty[];
+}
 
-export const MPProperties = memo<MPPropertiesProps>(({ properties, onPayRent, onSendProperty }) => {
+export const MPProperties = memo<MPPropertiesProps>(({ properties }) => {
+    const board = mono.useBoard();
     const players = mono.usePlayers();
 
+    const { setTo, setFrom, setDefaultValue, setWithProperty } = useSelection();
     const playerProperties = usePlayerProperties();
+
+    function onPayRent(to: PlayerID, amount: number) {
+        setTo(to);
+        setDefaultValue(amount);
+    }
+
+    function onSendProperty(from: PlayerID, prop: number) {
+        setTo(from);
+        setWithProperty(prop);
+        let def = properties[prop].price;
+        if (board.get(from)?.fields.properties.get(prop)?.mortgaged) {
+            def /= 2;
+        }
+        setDefaultValue(def);
+    }
 
     const orphans = useMemo(() => (
         properties
@@ -74,6 +90,7 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties, onPayRent, on
     const ownerOfProperty = useMemo(() => {
         if (viewingProperty) {
             const owner = players.find(p => p.fields.properties.has(viewingProperty.id));
+
             return owner?.pid ?? BANK;
         } else {
             return BANK;

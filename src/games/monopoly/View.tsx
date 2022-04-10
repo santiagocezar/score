@@ -23,152 +23,36 @@ import { BankCard } from './BankCard';
 import { palettes } from 'lib/color';
 import { Button, ButtonGroup } from 'components/Button';
 import { Leaderboard } from 'components/panels/Leaderboard';
+import { PlayerList } from './PlayerList';
+import { SelectionProvider } from './Selection';
+import { HEADER_HEIGHT } from 'components/Header';
 
 const properties = untypedProperties as MonopolyProperty[];
 
 const MainView = styled('div', {
     display: 'flex',
+    position: 'relative',
+    height: `calc(100% + ${HEADER_HEIGHT})`,
     flexDirection: 'column',
     gap: '.5rem',
+    overflow: 'auto',
     alignItems: 'stretch',
+    marginTop: `-${HEADER_HEIGHT}`,
 });
 
-const PlayerList = styled('div', {
-    display: 'grid',
-    padding: '1rem',
-    gridAutoFlow: 'row',
-    gridTemplateColumns: '1fr',
-    gap: '.5rem',
-    '@md': {
-        gridTemplateColumns: '1fr 1fr',
-        gap: '1rem',
-    },
-    '@lg': {
-        gridTemplateColumns: '1fr 1fr 1fr',
-    },
-});
 
 const BANK = -1;
 export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     const board = mono.useBoard();
     const players = mono.usePlayers();
 
-    const [sendingFrom, setFrom] = useState<PlayerID | null>(null);
-    const [sendingTo, setTo] = useState<PlayerID | null>(null);
-    const [defaultAmount, setDefaultAmount] = useState(0);
-    const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
-
-
-    const [history, produceHistory] = useImmer<Transaction[]>([]);
-
-    const [deletingPlayer, setDeletingPlayer] = useState<PlayerID | null>(null);
-    const deletingPlayerInfo = useMemo(() => {
-        if (deletingPlayer != null) {
-            const { name = '', palette = 0 } = board.get(deletingPlayer) ?? {};
-            return { name, palette: palettes[palette] };
-        } else {
-            return { name: '', palette: palettes[0] };
-        }
-    }, [deletingPlayer]);
-
-    const doDelete = useCallback(() => {
-        // TODO: Restore properties
-        if (deletingPlayer !== null) {
-            board.remove(deletingPlayer);
-            if (sendingFrom === deletingPlayer)
-                setFrom(null);
-            if (sendingTo === deletingPlayer)
-                setTo(null);
-            setDeletingPlayer(null);
-        }
-    }, [deletingPlayer]);
-
-    function deletingDialogOpenChange() {
-        setDeletingPlayer(null);
-    }
-
-    function onPlayerClicked(pid: PlayerID) {
-        if (pid === sendingFrom) {
-            setFrom(null);
-        } else if (pid === sendingTo) {
-            setTo(null);
-        } else if (sendingFrom !== null) {
-            setTo(pid);
-        } else {
-            setFrom(pid);
-        }
-    }
-
-    function onPlayerIconClicked(pid: PlayerID) {
-        setDeletingPlayer(pid);
-    }
+    const history = mono.useGlobal('history');
 
     function onPlayerAdded(pid: number) {
         board.set(pid, fields => {
             fields.money = defaultMoney;
         });
     }
-
-    const sendMoney = useCallback((money: number) => {
-        const from = board.get(sendingFrom ?? -1);
-        const to = board.get(sendingTo ?? -1);
-        const { mortgaged = false } = to?.fields.properties.get(selectedProperty ?? -1) ?? {};
-
-        let names = [from?.name ?? 'Banco', to?.name ?? 'Banco'] as [string, string];
-
-        if (from) board.set(from.pid, fields => {
-            fields.money -= money;
-            if (mortgaged) {
-                fields.money -= Math.floor(properties[selectedProperty ?? -1]?.price * .1);
-            }
-        });
-        if (to) board.set(to.pid, fields => {
-            fields.money += money;
-        });
-
-        if (selectedProperty !== null) {
-            if (from) {
-                board.set(from.pid, fields => {
-                    fields.properties.set(selectedProperty, {
-                        id: selectedProperty,
-                        houses: 0,
-                        mortgaged,
-                    });
-                });
-            }
-            if (to) {
-                board.set(to.pid, fields => {
-                    fields.properties.delete(selectedProperty);
-                });
-            }
-        }
-
-        produceHistory(draft => {
-            draft.push({
-                id: draft.length,
-                action: `${names[0]} le envio a ${names[1]}`,
-                money,
-            });
-        });
-        setFrom(null);
-        setTo(null);
-    }, [sendingFrom, sendingTo, selectedProperty]);
-
-    function onTransactionConfirmed(money: number | null) {
-        if (money === null) {
-            setFrom(null);
-            setTo(null);
-        } else {
-            sendMoney(money);
-        }
-    }
-
-    useEffect(() => {
-        if (sendingFrom === null && sendingTo === null) {
-            setSelectedProperty(null);
-            setDefaultAmount(0);
-        }
-    }, [sendingFrom, sendingTo]);
 
     const calculatePlayerValue = useCallback((player: PlayerFor<typeof mono>) => {
         return player.fields.money + Array.from(
@@ -182,31 +66,6 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         ), 0);
     }, [properties]);
 
-
-    const playerElements = useMemo(() => (
-        players.map(p => {
-            const propertyColors: string[] = [];
-            for (const property of p.fields.properties.values()) {
-                const prop = properties[property.id];
-                if (prop) propertyColors.push(prop.block);
-            }
-
-            return (
-                <PlayerCard
-                    key={p.pid}
-                    pid={p.pid}
-                    palette={p.palette}
-                    name={p.name}
-                    properties={propertyColors}
-                    money={p.fields.money}
-                    from={sendingFrom === p.pid}
-                    to={sendingTo === p.pid}
-                    onClick={onPlayerClicked}
-                    onIconClick={onPlayerIconClicked}
-                />
-            );
-        })
-    ), [players, sendingFrom, sendingTo]);
 
     let rank = 1;
     const rankingElements = useMemo(() => (
@@ -234,58 +93,13 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
         ))
     ), [history]);
 
-    function onSendProperty(from: PlayerID, prop: number) {
-        setTo(from);
-        setSelectedProperty(prop);
-        let def = properties[prop].price;
-        if (board.get(from)?.fields.properties.get(prop)?.mortgaged) {
-            def /= 2;
-        }
-        setDefaultAmount(def);
-    }
-
-    function onPayRent(to: PlayerID, amount: number) {
-        setTo(to);
-        setDefaultAmount(amount);
-    }
-
-
     return (
-        <>
+        <SelectionProvider>
             <Paneled
                 mainView={(
                     <MainView>
-                        <Status
-                            from={sendingFrom}
-                            to={sendingTo}
-                        />
-                        {sendingFrom !== null && sendingTo !== null
-                            ? (
-                                <SendMoney
-                                    from={sendingFrom}
-                                    to={sendingTo}
-                                    defaultValue={defaultAmount}
-                                    onConfirm={onTransactionConfirmed}
-                                />
-                            ) : (
-                                <PlayerList>
-                                    <BankCard onClick={onPlayerClicked} from={sendingFrom === BANK} to={sendingTo === BANK} />
-                                    {playerElements}
-                                </PlayerList>
-                            )
-                        }
-                        <Dialog
-                            open={deletingPlayer !== null}
-                            palette={deletingPlayerInfo.palette}
-                            onOpenChange={deletingDialogOpenChange}
-                            titlebar={`Seguro que quiere borrar a ${deletingPlayerInfo.name}`}
-                        >
-
-                            <ButtonGroup>
-                                <Button color="red" onClick={deletingDialogOpenChange}>No</Button>
-                                <Button color="green" onClick={doDelete}>Borrar</Button>
-                            </ButtonGroup>
-                        </Dialog>
+                        <SendMoney {...{ properties }} />
+                        <PlayerList {...{ properties }} />
                     </MainView>
                 )}
             >
@@ -310,13 +124,11 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                 >
                     <MPProperties
                         properties={properties}
-                        onSendProperty={onSendProperty}
-                        onPayRent={onPayRent}
                     />
                 </Panel>
                 {useAddPlayerPanel(onPlayerAdded)}
             </Paneled>
-        </>
+        </SelectionProvider>
         //<div className="_MP">
 
         //     <Sidebar open={openedSidebar == Sidebars.History}>

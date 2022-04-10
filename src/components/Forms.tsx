@@ -81,3 +81,9 @@ export const Input: FC<InputProps>
             </LabelRoot>
         );
     };
+
+export const Note = styled('p', {
+    color: '$secondaryText',
+    fontSize: '.8rem',
+    lineHeight: '1em',
+});

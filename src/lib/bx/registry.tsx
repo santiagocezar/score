@@ -27,8 +27,8 @@ interface BoardGame
     name: string;
     settings: P;
     view: ComponentType<z.infer<P>>;
-    globalFacets?: G;
-    facets?: F;
+    globals?: G;
+    fields?: F;
 }
 
 
@@ -145,7 +145,7 @@ export type MatchData<S extends Settings = Settings> =
     & Omit<z.infer<typeof MatchData>, 'settings'>
     & { settings: z.infer<S>; };
 
-function createMatch<S extends Settings>({ name, globalFacets = {} }: BoardGame, settings: z.infer<S>) {
+function createMatch<S extends Settings>({ name, globals: globalFacets = {} }: BoardGame, settings: z.infer<S>) {
     const id = nanoid();
     const globals: any = {};
     for (const global in globalFacets) {
@@ -187,7 +187,7 @@ function useGameInstance(bg: BoardGame, match: MatchData) {
     const game = useRef<BoardStorage<any, any>>();
 
     if (game.current === undefined) {
-        const g = new BoardStorage(bg.facets ?? {}, bg.globalFacets ?? {});
+        const g = new BoardStorage(bg.fields ?? {}, bg.globals ?? {});
 
         g.loadData(match.game);
         function save() {

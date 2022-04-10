@@ -130,16 +130,12 @@ export class BoardStorage<F extends FieldGroup, G extends FieldGroup> {
     set(pid: PlayerID, updater: ((draft: Draft<Facets<F>>) => void)): boolean {
         if (this.players.value.has(pid)) {
             const prevFields = this.players.value.get(pid)!.fields;
-            console.log('got previous');
             this.players.produce(draft => {
                 const player = draft.get(pid)!;
                 updater(player.fields);
             });
-            console.log('player updated');
             const currFields = this.players.value.get(pid)!.fields;
-            console.log('got current');
             if (prevFields !== currFields) {
-                console.log('prev and current are different');
                 for (const key in prevFields) {
                     if (prevFields[key] !== currFields[key]) {
                         console.log(`key "${key}" was updated`);

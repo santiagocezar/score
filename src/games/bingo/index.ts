@@ -6,14 +6,14 @@ export const Bingo = createGame({
     name: 'Bingo',
     view: BingoView,
     settings: z.object({}),
-    globalFacets: {
+    globals: {
         played: createField(
             z.array(z.number()).transform((arr) => new Set(arr)),
             () => new Set(),
             (value) => [...value]
         )
     },
-    facets: {}
+    fields: {}
 });
 
 export const bingo = gameHooks(Bingo);

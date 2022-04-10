@@ -6,7 +6,7 @@ export const Cards = createGame({
     name: 'Cards',
     view: CardsView,
     settings: z.object({}),
-    facets: {
+    fields: {
         prevScore: createField(z.array(z.number()), () => []),
     }
 });

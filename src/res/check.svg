@@ -11,7 +11,6 @@
    sodipodi:docname="check.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -27,8 +26,8 @@
      units="px"
      inkscape:snap-smooth-nodes="true"
      inkscape:zoom="17.0131"
-     inkscape:cx="12.578542"
-     inkscape:cy="9.9922999"
+     inkscape:cx="14.3125"
+     inkscape:cy="11.579312"
      inkscape:window-width="1366"
      inkscape:window-height="699"
      inkscape:window-x="0"
@@ -41,89 +40,15 @@
        empspacing="4" />
   </sodipodi:namedview>
   <defs
-     id="defs2">
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1170">
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop1166" />
-      <stop
-         style="stop-color:#cccccc;stop-opacity:1"
-         offset="1"
-         id="stop1168" />
-    </linearGradient>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1170"
-       id="radialGradient1172"
-       cx="6"
-       cy="13"
-       fx="6"
-       fy="13"
-       r="2"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1170"
-       id="radialGradient1338"
-       cx="10"
-       cy="17"
-       fx="10"
-       fy="17"
-       r="2"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1170"
-       id="radialGradient1582"
-       gradientUnits="userSpaceOnUse"
-       cx="10"
-       cy="17"
-       fx="10"
-       fy="17"
-       r="2"
-       gradientTransform="translate(4,-4)" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1170"
-       id="radialGradient1586"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(8,-8)"
-       cx="10"
-       cy="17"
-       fx="10"
-       fy="17"
-       r="2" />
-  </defs>
+     id="defs2" />
   <g
      inkscape:label="Capa 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <circle
-       style="fill:url(#radialGradient1172);stroke-width:3.77953;paint-order:stroke fill markers;fill-opacity:1"
-       id="path1056"
-       cx="6"
-       cy="13"
-       r="2" />
-    <circle
-       style="fill:url(#radialGradient1338);stroke-width:3.77953;paint-order:stroke fill markers;fill-opacity:1.0"
-       id="circle1160"
-       cx="10"
-       cy="17"
-       r="2" />
-    <circle
-       style="fill:url(#radialGradient1582);fill-opacity:1;stroke-width:3.77953;paint-order:stroke fill markers"
-       id="circle1580"
-       cx="14"
-       cy="13"
-       r="2" />
-    <circle
-       style="fill:url(#radialGradient1586);fill-opacity:1;stroke-width:3.77953;paint-order:stroke fill markers"
-       id="circle1584"
-       cx="18"
-       cy="9"
-       r="2" />
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 18,7 2,2 -10,10 -6,-6 2,-2 4,4 z"
+       id="path1268"
+       sodipodi:nodetypes="ccccccc" />
   </g>
 </svg>
