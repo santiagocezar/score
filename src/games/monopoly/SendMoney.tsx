@@ -1,12 +1,7 @@
-import React, { ChangeEvent, ComponentProps, FC, memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from 'lib/theme';
 
-import MdClose from '~icons/ic/baseline-close';
-import MdRight from '~icons/ic/baseline-chevron-right';
-import { CloseButton, Container, ContentPadded, DialogRoot, Overlay, TitleBar, TITLE_BAR_HEIGHT } from 'components/Dialog';
-import { useContrastingPair } from 'lib/utils';
 import { mono, MonopolyProperty } from '.';
-import { Title4 } from 'components/Title';
 import { Button, ButtonGroup } from 'components/Button';
 import { Input, Note } from 'components/Forms';
 import { useSelection } from './Selection';
@@ -78,6 +73,7 @@ export const SendMoney: FC<SendMoneyProps> =
         }, [withProperty, to]);
 
         const view = useRef<HTMLDivElement>(null);
+
         /**
          * the browser scrolls into the (auto) focused (input) element 
          * even with overflow hidden, so this stops that
@@ -85,7 +81,7 @@ export const SendMoney: FC<SendMoneyProps> =
         function dontScrollPlease() {
             if (view.current)
                 view.current.scrollTop = 0;
-        };
+        }
 
         console.log({ mortgaged, liftMortgage, mortgagedTransferTax, liftPrice });
 
@@ -106,7 +102,7 @@ export const SendMoney: FC<SendMoneyProps> =
             const playerFrom = board.get(from ?? -1);
             const playerTo = board.get(to ?? -1);
 
-            let names = [playerFrom?.name ?? 'Banco', playerTo?.name ?? 'Banco'] as [string, string];
+            const names = [playerFrom?.name ?? 'Banco', playerTo?.name ?? 'Banco'] as [string, string];
 
             if (playerFrom) board.set(playerFrom.pid, fields => {
                 let total = money;
@@ -202,3 +198,5 @@ export const SendMoney: FC<SendMoneyProps> =
             </StyledSendMoney>
         );
     });
+
+SendMoney.displayName = "SendMoney";

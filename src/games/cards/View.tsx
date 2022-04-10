@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Panel, Paneled } from 'components/panels';
+import { Paneled } from 'components/panels';
 import { useAddPlayerPanel } from 'components/panels/AddPlayer';
 import { PlayerID } from 'lib/bx';
 import { AddScore } from './AddScore';
@@ -27,16 +27,16 @@ const cell = css`
     }
 `;
 
-const Wrapper = styled.div`
-    flex-grow: 1;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    align-content: space-around;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-`;
+// const Wrapper = styled.div`
+//     flex-grow: 1;
+//     width: 100%;
+//     display: flex;
+//     align-items: center;
+//     align-content: space-around;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     overflow: hidden;
+// `;
 
 const Sheet = styled.div`
     margin: 16px 0;
@@ -86,7 +86,6 @@ const Totals = styled.div`
     }
 `;
 
-const SAVE_NAME = 'sheetsave';
 
 export const CardsView: FC = () => {
     const board = card.useBoard();

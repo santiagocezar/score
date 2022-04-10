@@ -1,6 +1,6 @@
 import { DependencyList, useEffect, useRef, useState } from 'react';
 
-export class Emitter<A extends (readonly any[]) = []> {
+export class Emitter<A extends (readonly unknown[]) = []> {
     subscribers = new Set<(...args: A) => void>();
 
     emit(...args: A) {
@@ -26,7 +26,7 @@ export class Emitter<A extends (readonly any[]) = []> {
     }
 }
 
-export function useEmitter<A extends (readonly any[]) = []>() {
+export function useEmitter<A extends (readonly unknown[]) = []>() {
     const emitter = useRef(new Emitter<A>());
     return emitter.current;
 }

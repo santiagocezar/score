@@ -1,5 +1,5 @@
 import { styled } from 'lib/theme';
-import { FC, memo, ReactNode, useMemo, useState } from 'react';
+import { memo, ReactNode, useMemo, useState } from 'react';
 import checkURL from 'res/check.svg';
 
 const ToggleLabelWrapper = styled('label', {
@@ -45,13 +45,15 @@ export const Toggle = memo<ToggleProps>(({ toggled, disabled, label, onToggle })
     </ToggleLabelWrapper>
 ));
 
+Toggle.displayName = "Toggle";
+
 interface UseToggle {
     toggled: boolean;
     setToggled: (toggled: boolean) => void;
     props: ToggleProps;
 }
 
-export function useToggle(defaultState: boolean = false): UseToggle {
+export function useToggle(defaultState = false): UseToggle {
     const [toggled, setToggled] = useState(defaultState);
 
     const props: ToggleProps = useMemo(() => ({

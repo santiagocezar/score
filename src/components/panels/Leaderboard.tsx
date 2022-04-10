@@ -1,11 +1,9 @@
-import produce from 'immer';
-import { PlayerID, Player, FieldGroup, BoardGameHooks } from 'lib/bx';
-import { tuple } from 'lib/utils';
-import { ComponentProps, FC, memo, PropsWithChildren, useEffect, useMemo } from 'react';
+import { Player, FieldGroup, BoardGameHooks } from 'lib/bx';
+import { } from 'lib/utils';
+import { memo, useEffect, useMemo } from 'react';
 import { styled } from 'lib/theme';
-import { Title6 } from 'components/Title';
 import { PlayerNameCard } from 'games/monopoly/PlayerCard';
-import { Palette, palettes } from 'lib/color';
+import { palettes } from 'lib/color';
 
 const formatScore = (value: number) => value.toLocaleString() + ' pts';
 
@@ -77,12 +75,6 @@ const FullLeaderboard = styled('ol', {
     }
 });
 
-const RankItem = styled('div', {
-    display: 'flex',
-    gap: '.25rem',
-    userSelect: 'none',
-});
-
 const LeaderboardContainer = styled('div', {
     display: 'flex',
     flexDirection: 'column',
@@ -141,6 +133,6 @@ function LeaderboardNoMemo<F extends FieldGroup, G extends FieldGroup>
         </LeaderboardContainer>
 
     );
-};
+}
 
 export const Leaderboard = memo(LeaderboardNoMemo) as typeof LeaderboardNoMemo;

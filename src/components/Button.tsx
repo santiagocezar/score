@@ -1,4 +1,4 @@
-import { ComponentProps, FC, HTMLProps } from 'react';
+import { HTMLProps } from 'react';
 import { styled } from 'lib/theme';
 
 export interface ButtonProps extends HTMLProps<HTMLButtonElement> {

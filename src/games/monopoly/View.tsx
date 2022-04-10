@@ -1,27 +1,17 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { saveString, loadString, useCompareFn } from 'lib/utils';
-import { Name, PlayerCard } from 'games/monopoly/PlayerCard';
-//import OwnedProperties from 'components/OwnedProperties';
-import { loadSave, LOCALSTORAGE_KEY, useBank } from 'lib/bankContext';
-import { gameHooks, PlayerFor, PlayerID } from 'lib/bx';
-import { mono, Monopoly, MonopolyProperty, MonopolySettings, Transaction } from '.';
-import { useImmer } from 'use-immer';
+import { FC, useCallback, useMemo } from 'react';
+import { PlayerFor } from 'lib/bx';
+import { mono, MonopolyProperty, MonopolySettings } from '.';
 
 import MdHistory from '~icons/ic/round-history';
 import MdLeaderboard from '~icons/ic/round-leaderboard';
 import MdBusiness from '~icons/ic/round-business';
 
 import { properties as untypedProperties } from './hasbro_argentina.json';
-import { Dialog } from 'components/Dialog';
 import { Panel, Paneled } from 'components/panels';
 import { MPProperties } from './MPProperties';
-import { AddPlayer, useAddPlayerPanel } from 'components/panels/AddPlayer';
+import { useAddPlayerPanel } from 'components/panels/AddPlayer';
 import { SendMoney } from './SendMoney';
 import { styled } from 'lib/theme';
-import { Status } from './Status';
-import { BankCard } from './BankCard';
-import { palettes } from 'lib/color';
-import { Button, ButtonGroup } from 'components/Button';
 import { Leaderboard } from 'components/panels/Leaderboard';
 import { PlayerList } from './PlayerList';
 import { SelectionProvider } from './Selection';
@@ -41,10 +31,8 @@ const MainView = styled('div', {
 });
 
 
-const BANK = -1;
 export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
     const board = mono.useBoard();
-    const players = mono.usePlayers();
 
     const history = mono.useGlobal('history');
 
@@ -65,22 +53,6 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
             acc + ((curr.mortgaged ? 0 : curr.prop.price) + curr.houses * (curr.prop.housing ?? 0))
         ), 0);
     }, [properties]);
-
-
-    let rank = 1;
-    const rankingElements = useMemo(() => (
-        [...players]
-            .sort((a, b) => b.fields.money - a.fields.money)
-            .map(p => (
-                <li key={p.name}>
-                    <span className="rank">{rank++}°</span>
-                    <div>
-                        <span className="name">{p.name}</span>
-                        <span className="pts">$ {p.fields.money}</span>
-                    </div>
-                </li>
-            ))
-    ), [players]);
 
     const transactionItems = useMemo(() => (
         history.map(h => (
@@ -129,27 +101,5 @@ export const MonopolyView: FC<MonopolySettings> = ({ defaultMoney }) => {
                 {useAddPlayerPanel(onPlayerAdded)}
             </Paneled>
         </SelectionProvider>
-        //<div className="_MP">
-
-        //     <Sidebar open={openedSidebar == Sidebars.History}>
-        //         <ul className="history">
-        //             {transactionItems.reverse()}
-        //             <p className="empty">Historial vacío.</p>
-        //         </ul>
-        //     </Sidebar>
-
-        //     <Sidebar open={openedSidebar == Sidebars.Ranks}>
-        //         <ul className="rankings">{rankingElements}</ul>
-        //     </Sidebar>
-
-        //     {defaultMoney}
-        //     <OwnedProperties
-        //         properties={shownProperties}
-        //         selected={selectedProperty}
-        //         // empty={properties == null || properties.length == 0}
-        //         // onImport={importProperties}
-        //         onPropertyClicked={(id) => setSelectedProperty(id)}
-        //     />
-        // </div>
     );
 };

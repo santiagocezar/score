@@ -1,20 +1,18 @@
-import { FC, Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, memo, useCallback, useMemo, useState } from 'react';
 //import { PlayerID, PlayerInfo, useGame } from 'lib/game';
 import { MPPropertyItem } from './MPPropertyItem';
 //import { Avatar, PlayerAvatar } from 'components/PlayerAvatar';
-import { Title5, Title6 } from 'components/Title';
+import { Title5 } from 'components/Title';
 import { styled } from 'lib/theme';
 //import { Divider } from 'ui/Blocks';
 import { MPPropertyInfo } from './FullProperty';
 //import { useContextSelector } from 'use-context-selector';
 
-import MdBank from '~icons/ic/round-account-balance';
 import { BANK, mono, MonopolyProperty } from '.';
 import { Name, PlayerTitleCard } from './PlayerCard';
 import { PlayerID } from 'lib/bx';
 import { usePanelGoTo } from 'components/panels';
 import { BANK_PALETTE } from './BankCard';
-import { Card } from 'components/Card';
 import { palettes } from 'lib/color';
 import { useCompareFn } from 'lib/utils';
 import { useSelection } from './Selection';
@@ -62,7 +60,7 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties }) => {
     const board = mono.useBoard();
     const players = mono.usePlayers();
 
-    const { setTo, setFrom, setDefaultValue, setWithProperty } = useSelection();
+    const { setTo, setDefaultValue, setWithProperty } = useSelection();
     const playerProperties = usePlayerProperties();
 
     function onPayRent(to: PlayerID, amount: number) {
@@ -154,7 +152,9 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties }) => {
             <Title5>Propiedades</Title5>
             {ownedProperties.map(({ player, properties }) => (
                 <Fragment key={player.pid}>
-                    <PlayerTitleCard children={'de ' + player.name} css={palettes[player.palette]} />
+                    <PlayerTitleCard css={palettes[player.palette]}>
+                        de {player.name}
+                    </PlayerTitleCard>
                     <PropertiesList>
                         {properties.map(({ prop, houses, mortgaged }) => (
                             <MPPropertyItem
@@ -171,7 +171,9 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties }) => {
                     <br />
                 </Fragment>
             ))}
-            <PlayerTitleCard children="del Banco" css={BANK_PALETTE} />
+            <PlayerTitleCard css={BANK_PALETTE}>
+                del Banco
+            </PlayerTitleCard>
             <PropertiesList>
                 {disownedProperties.map(([prop, id]) => (
                     <MPPropertyItem
@@ -187,3 +189,4 @@ export const MPProperties = memo<MPPropertiesProps>(({ properties }) => {
     );
 });
 
+MPProperties.displayName = "MPProperties";

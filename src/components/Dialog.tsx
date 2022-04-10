@@ -101,3 +101,5 @@ export const Dialog: FC<DialogProps> =
             </Container>
         </DialogRoot>
     ));
+
+Dialog.displayName = "Dialog";

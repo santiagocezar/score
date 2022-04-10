@@ -1,4 +1,4 @@
-import { PlayerID, createGame, createField, gameHooks } from 'lib/bx';
+import { createGame, createField, gameHooks } from 'lib/bx';
 import { z } from 'zod';
 import { CardsView } from './View';
 

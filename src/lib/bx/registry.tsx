@@ -1,8 +1,7 @@
-import { ComponentType, ComponentProps, FC, createContext, useRef, ReactNode, useContext, useState, useCallback, useEffect } from 'react';
+import { ComponentType, FC, createContext, useRef, useContext, useState, useCallback, useEffect } from 'react';
 import { z } from "zod";
 import { BoardStorage, FieldGroup, FieldInfer, Player, PlayerID, } from '.';
 import { GameData } from './board';
-import { Json } from './facet';
 import { nanoid } from 'nanoid';
 import { hasOwnProperty } from 'lib/utils';
 
@@ -131,7 +130,7 @@ export function gameHooks<F extends FieldGroup, G extends FieldGroup>(bg: BoardG
         }
     };
     return hooks;
-};
+}
 
 
 export const MatchData = z.object({
@@ -185,16 +184,16 @@ function loadMatch<S extends Settings>(matchID: string, bgs: BoardGames): [Match
 
 function useGameInstance(bg: BoardGame, match: MatchData) {
     const game = useRef<BoardStorage<any, any>>();
+    const g = new BoardStorage(bg.fields ?? {}, bg.globals ?? {});
+    function save() {
+        match.game = g.dumpData();
+
+        localStorage.setItem(match.id, JSON.stringify(match));
+    }
 
     if (game.current === undefined) {
-        const g = new BoardStorage(bg.fields ?? {}, bg.globals ?? {});
 
         g.loadData(match.game);
-        function save() {
-            match.game = g.dumpData();
-
-            localStorage.setItem(match.id, JSON.stringify(match));
-        }
         g.onPlayersUpdate.use(save);
         g.onGlobalUpdate.use(save);
         g.onFacetUpdate.use(save);

@@ -1,15 +1,10 @@
-import { Card } from 'components/Card';
 import { PlayerID } from 'lib/bx';
 import { styled } from 'lib/theme';
-import { useContrastingPair } from 'lib/utils';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { BANK, mono } from '.';
 import { BANK_PALETTE } from './BankCard';
-import { SendMoney, SendMoneyProps } from './SendMoney';
 
-import MdRight from '~icons/ic/baseline-chevron-right';
 import MdPay from '~icons/ic/attach-money';
-import { HEADER_HEIGHT } from 'components/Header';
 import { Palette, palettes } from 'lib/color';
 
 

@@ -1,10 +1,11 @@
 import { styled, useBreakpoint } from "lib/theme";
-import { Children, createContext, FC, ReactElement, ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { Children, createContext, FC, ReactElement, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 import MdPeople from '~icons/ic/baseline-people';
 
 import * as Tabs from '@radix-ui/react-tabs';
 import { HEADER_HEIGHT } from '../Header';
+import { NOOP } from 'lib/utils';
 
 const Sidebar = styled(Tabs.Root, {
     display: 'flex',
@@ -76,7 +77,7 @@ interface PaneledProps {
 }
 
 type GoTo = (tab: string) => void;
-const PaneledGoToContext = createContext<GoTo>(() => { });
+const PaneledGoToContext = createContext<GoTo>(NOOP);
 
 export const usePanelGoTo = () => useContext(PaneledGoToContext);
 
@@ -96,13 +97,11 @@ export const Paneled = ({ mainView, children }: PaneledProps) => {
                 views.push({ ...child.props, id: i.toString() });
         });
 
-        const idFor = (v: PanelProps, i: number) => `${v.name} - ${i}`;
-
         const first = views[0]?.id ?? "";
 
         return [
-            views.map(v => <SidebarTab value={v.id} aria-label={v.name}>{v.icon}</SidebarTab>),
-            views.map(v => <PanelContent value={v.id}>{v.children}</PanelContent>),
+            views.map(v => <SidebarTab key={v.id} value={v.id} aria-label={v.name}>{v.icon}</SidebarTab>),
+            views.map(v => <PanelContent key={v.id} value={v.id}>{v.children}</PanelContent>),
             first,
         ];
     }, [lg, mainView, children]);

@@ -38,7 +38,7 @@ export function createField<T extends z.ZodTypeAny>(type: T, def: Default<T>, ..
     return {
         type, encode, def
     };
-};
+}
 
 export type FieldGroup = {
     [key: string]: Field;
@@ -49,7 +49,7 @@ export type Facets<F extends FieldGroup> = {
 };
 
 export function buildFacets<F extends FieldGroup>(builders: F): Facets<F> {
-    //@ts-expect-error
+    //@ts-expect-error mapped keys
     const facets: Facets<F> = {};
     for (const name in builders) {
         facets[name] = builders[name].def();
@@ -58,7 +58,7 @@ export function buildFacets<F extends FieldGroup>(builders: F): Facets<F> {
 }
 
 export function checkFacets<F extends FieldGroup>(j: object, builders: F): Facets<F> {
-    //@ts-expect-error
+    //@ts-expect-error mapped keys
     const facets: Facets<F> = {};
     for (const name in builders) {
         if (hasOwnProperty(j, name)) {

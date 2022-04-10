@@ -1,10 +1,7 @@
 import { styled } from 'lib/theme';
-import { ComponentProps, FC, useState } from 'react';
-import monopolyURL from './icons/monopoly.svg';
-import cardsURL from './icons/cards.svg';
-import bingoURL from './icons/bingo.svg';
+import { ComponentProps, FC } from 'react';
 import { Title3 } from 'components/Title';
-import { Button, ButtonGroup } from 'components/Button';
+import { Button } from 'components/Button';
 import { MatchItemType } from './Home';
 import { GameIcon, gameModeToCSS, gameModeToIcon, gameModeToName } from './GameCard';
 import { MatchData } from 'lib/bx';

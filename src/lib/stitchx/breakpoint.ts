@@ -6,9 +6,9 @@ export type UseBreakpoint<M extends Stitches['config']['media']> = (bp: keyof M)
 export function createUseBreakpoint<M extends Stitches['config']['media']>(media: M) {
     const hook: UseBreakpoint<M> = (bp) => {
         return useMediaQuery({
-            //@ts-expect-error
-            query: media?.[bp]
+            //@ts-expect-error no idea why it errors, it should be assignable
+            query: media?.[bp] ?? ''
         });
     };
     return hook;
-};
+}

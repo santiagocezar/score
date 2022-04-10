@@ -1,5 +1,5 @@
 import { styled } from 'lib/theme';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import scoreURL from 'res/score.svg';
 
@@ -89,13 +89,11 @@ const StyledHeader = styled('header', {
     }
 });
 
-export function Header(p: {
-    children?: ReactNode;
-}) {
+export function Header() {
     const [isFullscreen, setFullscreen] = useState(false);
     const { pathname } = useLocation();
 
-    document.addEventListener('fullscreenchange', (e) =>
+    document.addEventListener('fullscreenchange', () =>
         setFullscreen(Boolean(document.fullscreenElement))
     );
 

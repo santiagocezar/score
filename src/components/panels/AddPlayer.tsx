@@ -3,8 +3,7 @@ import { Input } from 'components/Forms';
 import { PlayerID, useAnyBoard } from "lib/bx";
 import { palettes } from "lib/color";
 import { styled } from "lib/theme";
-import { useContrastingColor } from "lib/utils";
-import { FC, memo, ReactElement, useCallback, useMemo, useState } from "react";
+import { FC, memo, useCallback, useState } from "react";
 
 import MdDone from '~icons/ic/round-done';
 import MdAdd from '~icons/ic/round-add';
@@ -52,6 +51,9 @@ const Swatch = memo<SwatchProps>(({ palette, active, onClick }) => {
         </StyledSwatch>
     );
 });
+
+Swatch.displayName = "Swatch";
+
 const Swatches = styled('div', {
     display: 'grid',
     gridTemplateColumns: 'repeat(6, 1fr)',
@@ -106,7 +108,7 @@ export const AddPlayer: FC<AddPlayerProps> = ({ afterAddingPlayer }) => {
             />
             <Swatches>
                 {palettes.map((_, i) => (
-                    <Swatch palette={i} active={i === palette} onClick={setPalette} />
+                    <Swatch key={i} palette={i} active={i === palette} onClick={setPalette} />
                 ))}
             </Swatches>
             <Button color="blue" onClick={onAdd}>Agregar jugador</Button>

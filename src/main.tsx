@@ -4,7 +4,7 @@ import { Home } from 'home/Home';
 import { enableMapSet } from 'immer';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, useParams } from 'react-router-dom';
 enableMapSet();
 
 const GameMatchRoute = () => {

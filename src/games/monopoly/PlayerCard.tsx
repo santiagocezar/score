@@ -1,14 +1,11 @@
 import { PlayerID } from 'lib/bx';
 import { Palette, palettes } from 'lib/color';
-import { CSS, keyframes, paletteShadow, styled, transitions } from 'lib/theme';
-import { useContrastingColor, useContrastingPair } from 'lib/utils';
-import React, { Component, ComponentProps, FC, memo, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
+import { paletteShadow, styled, transitions } from 'lib/theme';
+import { ComponentProps, FC, memo, useCallback, useMemo } from 'react';
 
 import MdDownload from '~icons/ic/round-file-download';
 import MdUpload from '~icons/ic/round-file-upload';
-import MdTrash from '~icons/ic/round-delete';
 import { SwitchTransition } from 'react-transition-group';
-import { Dialog } from 'components/Dialog';
 import { PlayerCardActions } from './CardActions';
 import { ButtonGroup } from 'components/Button';
 
@@ -84,6 +81,7 @@ export const StatusIcon = memo<StatusIconProps>(({ palette, icon }) => {
     );
 });
 
+StatusIcon.displayName = "StatusIcon";
 StatusIcon.toString = StyledStatusIcon.toString;
 
 export type Icon = ComponentProps<typeof StatusIcon>['icon'] | undefined;
@@ -123,6 +121,7 @@ const StyledStripe = styled('div', {
 });
 
 const Stripe = memo<{ c: string; }>(({ c }) => <StyledStripe css={{ $$color: c }} />);
+Stripe.displayName = "Stripe";
 
 const Stripes = styled('div', {
     display: 'flex',
@@ -261,7 +260,7 @@ type PlayerCardProps = {
 
 export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, properties, onClick, onIconClick, from, to }) => {
     const stripes = useMemo(() => {
-        const s = properties.map((c) => <Stripe c={c} />);
+        const s = properties.map((c) => <Stripe key={c} c={c} />);
         return s.length ? s : <p>Sin propiedades</p>;
     }, [properties]);
 
@@ -286,3 +285,5 @@ export const PlayerCard = memo<PlayerCardProps>(({ pid, palette, name, money, pr
         </StyledPlayerCard>
     );
 });
+
+PlayerCard.displayName = "PlayerCard";

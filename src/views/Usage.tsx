@@ -1,8 +1,7 @@
 // import { InlineIcon } from 'components/Commons';
 import { TextBody } from 'components/TextBody';
-import { Title1, Title2, Title3 } from 'components/Title';
+import { Title2, Title3 } from 'components/Title';
 import { gameModeToName } from 'home/GameCard';
-import React, { ReactNode } from 'react';
 
 import MdAdd from '~icons/ic/round-add';
 import MdBusiness from '~icons/ic/round-business';
@@ -32,7 +31,7 @@ export const Usage = () => (
         </p>
         <Title3>{gameModeToName.Bingo}</Title3>
         <p>
-            Aprete el botón "Sacar un número" para hacer lo que el botón indica.
+            Aprete el botón &quot;Sacar un número&quot; para hacer lo que el botón indica.
             Como alternativa puede apretar la tecla espacio, si le es más cómodo.
         </p>
         <Title2>Condiciones de Uso</Title2>

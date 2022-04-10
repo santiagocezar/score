@@ -1,32 +1,29 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Route, BrowserRouter as Router, Switch, useLocation, useHistory } from 'react-router-dom';
+import { useCallback, useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { GameCard } from './GameCard';
 import Usage from 'views/Usage';
-import { MatchProvider, newMatch } from 'games';
+import { newMatch } from 'games';
 
 import scoreURL from 'res/score.svg';
-import { Header } from 'components/Header';
 import { Title2 } from 'components/Title';
 import { styled } from 'lib/theme';
-import { Content } from 'components/panels';
 import produce from 'immer';
-import { MatchData } from 'lib/bx';
-import { listPlayers, useLocalStorage } from 'lib/utils';
+import { useLocalStorage } from 'lib/utils';
 import { MatchCard } from './MatchCard';
 import { CloseButton, Dialog } from 'components/Dialog';
 import { Button, ButtonGroup } from 'components/Button';
 import { z } from 'zod';
 
-const SC = () => (
-    <a
-        href="https://scez.ar"
-        style={{ textDecoration: 'none', color: 'unset' }}
-    >
-        <span style={{ color: '#ff4294' }}>scez</span>
-        <span style={{ color: '#898bcb' }}>.</span>
-        <span style={{ color: '#18d1ff' }}>ar</span>
-    </a>
-);
+// const SC = () => (
+//     <a
+//         href="https://scez.ar"
+//         style={{ textDecoration: 'none', color: 'unset' }}
+//     >
+//         <span style={{ color: '#ff4294' }}>scez</span>
+//         <span style={{ color: '#898bcb' }}>.</span>
+//         <span style={{ color: '#18d1ff' }}>ar</span>
+//     </a>
+// );
 
 const HomeContent = styled('div', {
     padding: '.5rem',
@@ -98,6 +95,7 @@ export const Home = () => {
     const matchElements = useMemo(() => (
         matches.map(match => (
             <MatchCard
+                key={match.id}
                 match={match}
                 onDeleteClick={deleteMatch}
                 onClick={() => goToMatch(match.id)}

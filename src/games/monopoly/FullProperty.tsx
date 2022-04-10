@@ -1,17 +1,14 @@
-import { Card } from 'components/Card';
-import { FC, Fragment, useState, memo, ComponentProps, ReactNode, useMemo, useCallback } from 'react';
-import { BANK, mono, MonopolyProperty } from '.';
+import { FC, memo, ComponentProps, ReactNode, useMemo, useCallback } from 'react';
+import { mono, MonopolyProperty } from '.';
 import { Button, ButtonGroup } from 'components/Button';
-import { iconCSS, styled } from 'lib/theme';
-import { Title5, Title6 } from 'components/Title';
-import { plural, useContrastingColor } from 'lib/utils';
+import { styled } from 'lib/theme';
+import { Title5 } from 'components/Title';
+import { plural } from 'lib/utils';
 
 import MdBack from '~icons/ic/round-arrow-back';
 import MdHome from '~icons/ic/round-home';
 import MdHotel from '~icons/ic/round-maps-home-work';
-import MdPay from '~icons/ic/attach-money';
 import MdTrain from '~icons/ic/round-train';
-import { HEADER_HEIGHT } from 'components/Header';
 import { createPalette } from 'lib/color';
 import { DynamicIcon } from './MPPropertyItem';
 import { PlayerFor, PlayerID } from 'lib/bx';
@@ -63,7 +60,7 @@ const ManageProperty: FC<ManagePropertyProps>
         }, [ownedProperty, owner, mortgaged]);
 
         const rentValue = useMemo(() => (
-            !!prop.special
+            prop.special
                 ? prop.rent?.[ownedOfBlock - 1] ?? 0
                 : houses > 0
                     ? prop.rent?.[houses] ?? 0
@@ -300,10 +297,6 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
             return [ownedOfBlock, propertiesForBlock, housesInBlock];
         }, [player, prop, properties]);
 
-        const houses = useMemo(() => {
-            return player?.fields.properties.get(prop.id)?.houses;
-        }, [player]);
-
         const palette = createPalette(prop.block);
 
         return (
@@ -333,3 +326,5 @@ export const MPPropertyInfo: FC<MPPropetyInfoProps>
             </PropertyContainer>
         );
     });
+
+MPPropertyInfo.displayName = "MPPropertyInfo";

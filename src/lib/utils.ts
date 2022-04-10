@@ -1,10 +1,13 @@
-import { DependencyList, useEffect, useMemo, useRef, useState } from 'react';
+import { DependencyList, useEffect, useMemo, useState } from 'react';
 import { isLight } from './color';
 import { CSS } from './theme';
 import { z } from "zod";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const NOOP = () => { };
+
 export function saveString(name: string, text: string) {
-    let el = document.createElement('a');
+    const el = document.createElement('a');
     el.setAttribute(
         'href',
         `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
@@ -21,20 +24,20 @@ export function saveString(name: string, text: string) {
  * @param callback A function called with the text inside the file
  */
 export function loadString(callback: (text: string | null) => void) {
-    let inp = document.createElement('input');
+    const inp = document.createElement('input');
     inp.setAttribute('type', 'file');
     inp.style.display = 'none';
     inp.addEventListener(
         'change',
         (e) => {
-            let file = (<HTMLInputElement>e.target).files?.[0];
+            const file = (<HTMLInputElement>e.target).files?.[0];
             if (!file) {
                 callback(null);
                 return;
             }
-            let r = new FileReader();
+            const r = new FileReader();
             r.onload = (e) => {
-                let c = e.target?.result?.toString();
+                const c = e.target?.result?.toString();
                 callback(c ?? null);
             };
             r.readAsText(file);
@@ -67,24 +70,24 @@ export function useEvent<
 >(
     target: T,
     type: K,
-    listener: (this: T, evt: EventMap<T>[K] & Event) => any,
+    listener: (this: T, evt: EventMap<T>[K] & Event) => unknown,
     options?: boolean | AddEventListenerOptions
 ): void {
     useEffect(() => {
-        //@ts-expect-error
+        //@ts-expect-error trust me bro
         target.addEventListener(type, listener, options);
         return () => {
-            //@ts-expect-error
+            //@ts-expect-error here too
             target.removeEventListener(type, listener, options);
         };
     }, [listener]);
 }
 
-export const tuple = <T extends [...any[]]>(...args: T): T => args;
+export const tuple = <T extends [...unknown[]]>(...args: T): T => args;
 
-export function hasOwnProperty<X extends {}, Y extends PropertyKey>
+export function hasOwnProperty<X, Y extends PropertyKey>
     (obj: X, prop: Y): obj is X & Record<Y, unknown> {
-    return obj.hasOwnProperty(prop);
+    return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
 export function useContrastingColor(color: string) {
@@ -93,7 +96,7 @@ export function useContrastingColor(color: string) {
     }, [color]);
 }
 
-export function useContrastingPair(color: string, invert: boolean = false) {
+export function useContrastingPair(color: string, invert = false) {
     const text = useContrastingColor(color);
     const css: CSS = useMemo(() => ({
         $$color: invert ? text : color,
@@ -116,9 +119,9 @@ export function plural(word: string, suffixOrAmount: string | number, maybeAmoun
     } else {
         return `${word}${suffix}`;
     }
-};
+}
 
-export function listPlayers(list: string[], maxPlayers: number = 5): string {
+export function listPlayers(list: string[], maxPlayers = 5): string {
     if (list.length === 0) {
         return "Sin jugadores";
     } else if (list.length === 1) {

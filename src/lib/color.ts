@@ -62,8 +62,9 @@ export function createPalette(color: string) {
         return palette;
     }
 }
-export module createPalette {
-    export var memory = new Map<string, Palette>();
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace createPalette {
+    export const memory = new Map<string, Palette>();
 }
 
 export function createPalettes() {

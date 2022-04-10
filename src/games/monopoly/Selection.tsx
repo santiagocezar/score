@@ -1,5 +1,6 @@
 import { createContext, Dispatch, FC, SetStateAction, useContext, useMemo, useState } from 'react';
 import { PlayerID } from 'lib/bx';
+import { NOOP } from 'lib/utils';
 
 type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -16,13 +17,13 @@ interface SelectionContext {
 
 const SelectionContext = createContext<SelectionContext>({
     from: null,
-    setFrom() { },
+    setFrom: NOOP,
     to: null,
-    setTo() { },
+    setTo: NOOP,
     withProperty: null,
-    setWithProperty() { },
+    setWithProperty: NOOP,
     defaultValue: 0,
-    setDefaultValue() { },
+    setDefaultValue: NOOP,
 });
 
 export const SelectionProvider: FC = ({ children }) => {

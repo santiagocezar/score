@@ -1,5 +1,5 @@
 import { Label as LabelRoot } from '@radix-ui/react-label';
-import { ComponentProps, FC, KeyboardEventHandler, ReactNode, useCallback, useMemo } from 'react';
+import { ComponentProps, FC, KeyboardEventHandler, ReactNode, useCallback } from 'react';
 import { styled } from 'lib/theme';
 
 const LabelText = styled('p', {

@@ -1,8 +1,7 @@
 import produce, { castDraft, Draft } from 'immer';
 import { Emitter } from 'lib/emitter';
-import { useState } from 'react';
 import { Facets, FieldGroup, buildFacets } from '.';
-import { checkFacets, facetsToJson, Json } from './facet';
+import { checkFacets, facetsToJson } from './facet';
 import { z } from "zod";
 
 export type PlayerID = number;
@@ -45,7 +44,7 @@ function producer<T>(value: T): Producer<T> {
         }
     };
     return self;
-};
+}
 
 function uncastDraft<T>(draft: Draft<T>): T {
     return draft as T;

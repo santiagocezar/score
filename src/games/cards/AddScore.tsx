@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, memo, ReactNode, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FC, memo, useEffect, useMemo, useState } from 'react';
 import { styled } from 'lib/theme';
 
 import { card } from '.';
@@ -71,3 +71,5 @@ export const AddScore: FC<AddScoreProps> =
             </Dialog>
         );
     });
+
+AddScore.displayName = "AddScore";

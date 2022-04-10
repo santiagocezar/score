@@ -1,7 +1,6 @@
 import { PlayerID } from 'lib/bx';
-import { CSS, styled } from 'lib/theme';
-import { useContrastingColor, useContrastingPair } from 'lib/utils';
-import React, { Component, ComponentProps, FC, memo, useEffect, useMemo, useState } from 'react';
+import { styled } from 'lib/theme';
+import { memo } from 'react';
 import { BANK } from '.';
 import { StatusIcon } from './PlayerCard';
 
@@ -65,6 +64,8 @@ export const BankCard = memo<BankCardProps>(({ onClick, from, to }) => {
         </StyledCard>
     );
 });
+
+BankCard.displayName = "BankCard";
 
 // export default class PlayerCard extends Component<PlayerCardProps> {
 //     state = {

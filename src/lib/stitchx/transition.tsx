@@ -15,10 +15,8 @@ export type TransitionsStyle<C extends SomeStitches['config']> = {
 
 export type TransitionsProps<Ref extends undefined | HTMLElement> = TransitionProps<Ref>;
 
-export type Transitions<S extends SomeStitches> = <Ref extends undefined | HTMLElement>(style: TransitionsStyle<S['config']>) => ComponentType<TransitionsProps<Ref>>;
-
 export function createTransitions<S extends SomeStitches>({ css }: S) {
-    const fn: Transitions<S> = (style) => {
+    const fn = <Ref extends undefined | HTMLElement>(style: TransitionsStyle<S['config']>) => {
         const { enterStart, enterEnd, exitStart = enterEnd, exitEnd = enterStart, always = {} } = style;
         const className = css({
             '&-enter-active, &-exit-active': always,
@@ -28,12 +26,15 @@ export function createTransitions<S extends SomeStitches>({ css }: S) {
             '&-exit-active': exitEnd,
         })();
 
-        return (props) => (
+        const component: ComponentType<TransitionsProps<Ref>> = (props) => (
             <CSSTransition
                 {...props}
                 classNames={className.className}
             />
         );
+        component.displayName = "Transition";
+
+        return component;
     };
     return fn;
-};
+}

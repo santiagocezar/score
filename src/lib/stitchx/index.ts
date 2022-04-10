@@ -1,7 +1,7 @@
 import type { CSS } from '@stitches/react';
 import Stitches from '@stitches/react/types/stitches';
-import { createUseBreakpoint, UseBreakpoint } from './breakpoint';
-import { createTransitions, Transitions } from './transition';
+import { createUseBreakpoint } from './breakpoint';
+import { createTransitions } from './transition';
 export type { default as Stitches } from '@stitches/react/types/stitches';
 
 export type CSSForStitches<C extends Stitches['config']> = CSS<C>;

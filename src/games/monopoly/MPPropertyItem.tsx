@@ -1,10 +1,7 @@
-import { Card } from 'components/Card';
-import { FC, Fragment, useState, memo, ComponentProps } from 'react';
+import { FC, memo, ComponentProps } from 'react';
 import { MonopolyProperty } from '.';
-import { Button } from 'components/Button';
 import { styled } from 'lib/theme';
-import { Title5, Title6 } from 'components/Title';
-import { plural, useContrastingColor, useContrastingPair } from 'lib/utils';
+import { plural } from 'lib/utils';
 
 import MdHome from '~icons/ic/round-home';
 import MdTrain from '~icons/ic/round-train';
@@ -56,6 +53,8 @@ export const DynamicIcon = memo<{ prop: MonopolyProperty; className?: string; }>
         }
     </Icon>
 ));
+
+DynamicIcon.displayName = "DynamicIcon";
 DynamicIcon.toString = Icon.toString;
 
 const Name = styled('p', {
@@ -133,3 +132,5 @@ export const MPPropertyItem: FC<MPPropetyItemProps>
             </Property>
         );
     });
+
+MPPropertyItem.displayName = "MPPropertyItem";

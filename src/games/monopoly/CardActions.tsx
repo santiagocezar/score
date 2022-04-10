@@ -1,6 +1,5 @@
 import { styled, transitions } from 'lib/theme';
 import { FC } from 'react';
-import { CSSTransition } from 'react-transition-group';
 
 import MdTrash from '~icons/ic/round-delete';
 

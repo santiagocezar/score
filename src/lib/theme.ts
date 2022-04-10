@@ -8,20 +8,20 @@ export const paletteShadow = {
 };
 const stitches = createStitches({
     utils: {
-        paddingX: (v: {}) => ({
+        paddingX: (v: unknown) => ({
             paddingLeft: v,
             paddingRight: v,
         }),
-        paddingY: (v: {}) => ({
+        paddingY: (v: unknown) => ({
             paddingTop: v,
             paddingBottom: v,
         }),
 
-        marginX: (v: {}) => ({
+        marginX: (v: unknown) => ({
             marginLeft: v,
             marginRight: v,
         }),
-        marginY: (v: {}) => ({
+        marginY: (v: unknown) => ({
             marginTop: v,
             marginBottom: v,
         }),

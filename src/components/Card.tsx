@@ -1,4 +1,3 @@
-import React, { ComponentProps } from 'react';
 import { styled } from 'lib/theme';
 
 export const Card = styled('div', {

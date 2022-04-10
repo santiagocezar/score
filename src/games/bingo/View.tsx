@@ -1,10 +1,6 @@
-import React, { ComponentProps, FC, memo, ReactNode, useEffect, useReducer, useState } from 'react';
-import { Header } from 'components/Header';
+import { ComponentProps, FC, memo, useState } from 'react';
 import { range, useEvent } from 'lib/utils';
 import { Dialog, DialogClose } from 'components/Dialog';
-import { useImmer } from 'use-immer';
-import MdCasino from '~icons/ic/baseline-casino';
-import MdRestorePage from '~icons/ic/baseline-restore-page';
 import { styled, keyframes } from 'lib/theme';
 import { Button, ButtonGroup } from 'components/Button';
 import { Content } from 'components/panels';
@@ -100,10 +96,6 @@ const StyledSquare = styled('span', {
     }
 });
 
-enum SquareState {
-    New, Played, None
-}
-
 interface SquareProps {
     number: number,
     state: ComponentProps<typeof StyledSquare>['state'],
@@ -114,10 +106,7 @@ const Square = memo<SquareProps>(({ number, state }) => (
     </StyledSquare>
 ));
 
-const Warranty = styled('div', {
-    padding: '16px',
-    maxWidth: '512px',
-});
+Square.displayName = "Square";
 
 const BingoContent = styled('div', {
     height: '100%',
@@ -154,8 +143,8 @@ export const BingoView: FC = () => {
     }
     function random() {
         if (NUMBERS.length !== played.size) {
-            let available = NUMBERS.filter((n) => !played.has(n));
-            let n = available[Math.floor(Math.random() * available.length)];
+            const available = NUMBERS.filter((n) => !played.has(n));
+            const n = available[Math.floor(Math.random() * available.length)];
             board.globalSet('played', draft => {
                 draft.add(n);
             });
