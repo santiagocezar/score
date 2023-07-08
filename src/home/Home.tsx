@@ -123,6 +123,10 @@ export const Home = () => {
                 onClick={() => nm('Cards', { defaultMoney: 1500 })}
             />
             <GameCard
+                mode="Truco"
+                onClick={() => nm('Truco', { defaultMoney: 1500 })}
+            />
+            <GameCard
                 mode="Bingo"
                 onClick={() => nm('Bingo', { defaultMoney: 1500 })}
             />

@@ -13,8 +13,7 @@ interface AddPlayerProps {
     afterAddingPlayer?: (pid: PlayerID) => void;
 }
 
-const StyledSwatch = styled('div', {
-    height: '2rem',
+export const StyledSwatch = styled('div', {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -40,7 +39,7 @@ interface SwatchProps {
     active: boolean;
 }
 
-const Swatch = memo<SwatchProps>(({ palette, active, onClick }) => {
+export const Swatch = memo<SwatchProps>(({ palette, active, onClick }) => {
     return (
         <StyledSwatch
             onClick={() => onClick?.(palette)}
@@ -57,6 +56,7 @@ Swatch.displayName = "Swatch";
 const Swatches = styled('div', {
     display: 'grid',
     gridTemplateColumns: 'repeat(6, 1fr)',
+    gridAutoRows: '3rem'
 });
 
 const StyledAddPlayer = styled('div', {

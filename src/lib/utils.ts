@@ -53,7 +53,7 @@ export function loadString(callback: (text: string | null) => void) {
 }
 
 export function range(size: number, startAt = 0) {
-    return [...Array(size).keys()].map((i) => i + startAt);
+    return [...Array(Math.floor(size)).keys()].map((i) => i + startAt);
 }
 
 export type EventMap<T extends EventTarget> = T extends Window

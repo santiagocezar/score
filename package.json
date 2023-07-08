@@ -4,7 +4,7 @@
   "description": "Scoring for your board games.",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "serve": "vite preview"
   },
@@ -22,10 +22,12 @@
   "devDependencies": {
     "@iconify-json/ic": "^1.1.1",
     "@svgr/core": "^6.2.1",
+    "@types/color-rgba": "^2.1.0",
     "@types/node": "^14.18.12",
     "@types/react": "^16.14.23",
     "@types/react-dom": "^16.9.14",
     "@types/react-router-dom": "^5.3.3",
+    "@types/react-transition-group": "^4.4.6",
     "@types/tinycolor2": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
     "@typescript-eslint/parser": "^5.18.0",

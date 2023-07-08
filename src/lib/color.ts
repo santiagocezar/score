@@ -36,8 +36,9 @@ export type Palette = {
 };
 
 function createPaletteFromParsed(color: tinycolor.Instance): Palette {
-    const { h, s } = color.toHsl();
-    const lum = (l: number) => tinycolor({ h, s: s * (Math.sin(l * Math.PI)), l });
+    const { h, s, l } = color.toHsl();
+    const lm = color.getLuminance();
+    const lum = (l: number) => tinycolor({ h, s/*: s * (Math.sin(l * Math.PI))*/, l });
     const hex = (l: number) => lum(l).toHexString();
     const mid = lum(.6);
 

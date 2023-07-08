@@ -16,6 +16,7 @@ const StyledGameIcon = styled('img', {
 export const gameModeToIcon: Record<Modes, string> = {
     Monopoly: monopolyURL,
     Cards: cardsURL,
+    Truco: cardsURL,
     Bingo: bingoURL,
 };
 
@@ -29,6 +30,9 @@ export const gameModeToCSS: Record<Modes, CSS> = {
     },
     Cards: {
         backgroundColor: '#b3e4f2',
+    },
+    Truco: {
+        backgroundColor: '#b3f2db',
     },
     Bingo: {
         backgroundColor: '#d993bc',
@@ -81,6 +85,7 @@ const StyledGameCard = styled('div', {
 export const gameModeToName: Record<Modes, string> = {
     Monopoly: "Monopolio",
     Cards: "Cartas",
+    Truco: "Truco",
     Bingo: "Lotería",
 };
 
@@ -91,6 +96,8 @@ es un banco virtual con manejo de propiedades incluido.`,
     Cards:
         `(trabajo en proceso) La tabla de puntaje tradicional. 
 Agregue a los jugadores y sume puntos`,
+    Truco:
+        `El juego tradicional argentino para los mentirosos`,
     Bingo:
         `Un bolillero virtual para usar en algún evento. ¡Puede
 usar la tecla espacio para sacar un numero!`,
