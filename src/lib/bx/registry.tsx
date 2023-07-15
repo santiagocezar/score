@@ -19,9 +19,9 @@ type Settings = z.ZodTypeAny;
 
 interface BoardGame
     <
-    F extends FieldGroup = FieldGroup,
-    G extends FieldGroup = FieldGroup,
-    P extends Settings = Settings,
+        F extends FieldGroup = FieldGroup,
+        G extends FieldGroup = FieldGroup,
+        P extends Settings = Settings,
     > {
     name: string;
     settings: P;
@@ -184,6 +184,7 @@ function loadMatch<S extends Settings>(matchID: string, bgs: BoardGames): [Match
 
 function useGameInstance(bg: BoardGame, match: MatchData) {
     const game = useRef<BoardStorage<any, any>>();
+    const autoSaveTaskID = useRef<number>(-1);
     const g = new BoardStorage(bg.fields ?? {}, bg.globals ?? {});
     function save() {
         match.game = g.dumpData();
@@ -191,12 +192,20 @@ function useGameInstance(bg: BoardGame, match: MatchData) {
         localStorage.setItem(match.id, JSON.stringify(match));
     }
 
+    function fireAutoSave() {
+        clearTimeout(autoSaveTaskID.current)
+        autoSaveTaskID.current = setTimeout(() => {
+            console.log("saved!")
+            save()
+        }, 2000)
+    }
+
     if (game.current === undefined) {
 
         g.loadData(match.game);
-        g.onPlayersUpdate.use(save);
-        g.onGlobalUpdate.use(save);
-        g.onFacetUpdate.use(save);
+        g.onPlayersUpdate.use(fireAutoSave);
+        g.onGlobalUpdate.use(fireAutoSave);
+        g.onFacetUpdate.use(fireAutoSave);
 
         game.current = g;
     }
