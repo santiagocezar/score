@@ -169,6 +169,7 @@ export const BingoView: FC = () => {
                         <Square number={n} state={n == newNum ? 'new' : played.has(n) ? 'played' : undefined} key={n} />
                     ))}
                 </NumberGrid>
+                <p><small>Desarrollo de carácter educativo. No se permite el uso para fines lucrativos. Sin ninguna garantía para un propósito en particular.</small></p>
                 <Dialog
                     open={showingConfirm}
                     onOpenChange={setShowingConfirm}
