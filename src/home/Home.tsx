@@ -119,12 +119,8 @@ export const Home = () => {
                 onClick={() => nm('Monopoly', { defaultMoney: 1500 })}
             />
             <GameCard
-                mode="Cards"
-                onClick={() => nm('Cards', { defaultMoney: 1500 })}
-            />
-            <GameCard
                 mode="Truco"
-                onClick={() => nm('Truco', { defaultMoney: 1500 })}
+                onClick={() => location.href = "https://truco.cez.ar/"}
             />
             <GameCard
                 mode="Bingo"

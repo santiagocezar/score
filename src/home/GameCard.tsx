@@ -85,22 +85,22 @@ const StyledGameCard = styled('div', {
 export const gameModeToName: Record<Modes, string> = {
     Monopoly: "Monopolio",
     Cards: "Cartas",
-    Truco: "Truco",
+    Truco: "Trucomatic",
     Bingo: "Lotería",
 };
 
 const gameModeToDescription: Record<Modes, string> = {
     Monopoly:
-        `¿Cansado de andar con billetes de papel?. Este modo 
-es un banco virtual con manejo de propiedades incluido.`,
+        `Un banco virtual que permite administrar el dinero y propiedades que
+        pertenecen a cada jugador, transferirlas entre ellos, manteniendo un historial.`,
     Cards:
         `(trabajo en proceso) La tabla de puntaje tradicional. 
 Agregue a los jugadores y sume puntos`,
     Truco:
-        `El juego tradicional argentino para los mentirosos`,
+        `Un elegante contador de puntos para el Truco, el tradicional juego de cartas argentino.`,
     Bingo:
-        `Un bolillero virtual para usar en algún evento. ¡Puede
-usar la tecla espacio para sacar un numero!`,
+        `Un bolillero virtual para usar en algún evento. Puede
+usar la tecla espacio para sacar un numero`,
 };
 
 interface GameCardProps extends ComponentProps<typeof StyledGameCard> {

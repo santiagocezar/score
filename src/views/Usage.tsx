@@ -25,10 +25,6 @@ export const Usage = () => (
             como también un botón que dice Transferir, que le permite enviarle
             la propiedad a otro jugador
         </p>
-        <Title3>{gameModeToName.Cards}</Title3>
-        <p>
-            Se encuentra en renovaciones actualmente...
-        </p>
         <Title3>{gameModeToName.Bingo}</Title3>
         <p>
             Aprete el botón &quot;Sacar un número&quot; para hacer lo que el botón indica.
